@@ -6,7 +6,17 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 07 Mar 2023 12:30:35 -0500</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 07 Mar 2023 13:18:41 -0500</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Puzzle: Counting to 100</title>
+      <link>/post/2023/03/07/puzzle-counting-to-100/</link>
+      <pubDate>Tue, 07 Mar 2023 13:18:41 -0500</pubDate>
+      
+      <guid>/post/2023/03/07/puzzle-counting-to-100/</guid>
+      <description>Here&amp;rsquo;s a puzzle I found in &amp;ldquo;The Moscow Puzzles&amp;rdquo;, by Boris Kordemsky and Martin Gardner:
+Person 1 can call any number from 1 to 10. Person 2 can then increment the last called number by any whole number from 1 to 10, then it&amp;rsquo;s Person 1&amp;rsquo;s turn again, and so on. The first person to call 100 wins. Give a strategy that allows Person 1 to win this game every time</description>
+    </item>
+    
     <item>
       <title>Hello, world!</title>
       <link>/post/2023/03/07/hello-world/</link>
