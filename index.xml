@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Home on Sam&#39;s Engineering Stuff</title>
+    <link>/</link>
+    <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Tue, 07 Mar 2023 12:30:35 -0500</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Hello, world!</title>
+      <link>/post/2023/03/07/hello-world/</link>
+      <pubDate>Tue, 07 Mar 2023 12:30:35 -0500</pubDate>
+      
+      <guid>/post/2023/03/07/hello-world/</guid>
+      <description>Hello, world!
+I made this site based on a very minimal hugo theme. Despite the fact that this theme is only 150 lines of code, I still don&amp;rsquo;t understand it! There are two reasons for this:
+I&amp;rsquo;m not familiar with Hugo (the static site generator I&amp;rsquo;m using) or really web development There seem to be a lot of magic constants in hugo that I don&amp;rsquo;t like. I think this was part of an effort to make Hugo &amp;ldquo;creator-friendly&amp;rdquo; by hiding complexity from users of the tool.</description>
+    </item>
+    
+  </channel>
+</rss>
