@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kalman Filtering: Intro | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Kalman Filtering: Intro</span></h1>
+
+<h2 class="date">2023/03/10</h2>
+</div>
+
+<main>
+<p>This is the first in a series of posts on the Kalman Filter! Over the series, we&rsquo;ll first derive a filter with the same properties as the KF, then the KF itself, and finally more advanced variants such as EKF and UKF.</p>
+<p>I&rsquo;ll assume for this series that you have some knowledge of linear algebra and probability theory. However, a quick refresher never hurt anyone, so the remainder of this post will cover that. It will take the form of sparse notes, since it&rsquo;s intended to be an information-dense set of reminders/reference sheet rather than a beginner&rsquo;s introduction to linear algebra.</p>
+<h1 id="linear-algebra">Linear Algebra</h1>
+<h2 id="linear-systems">Linear Systems</h2>
+<p>The quadratic form (also: the weighted two-norm) looks like:
+$$ \alpha = x^T A x $$</p>
+<p>Where $x$ is a vector and $A$ is a positive definite matrix, meaning that $\alpha$ will be a scalar.</p>
+<p>Inverses commute like:
+$$ (AB)^{-1} = B^{-1}A^{-1} $$</p>
+<h3 id="gradients-and-derivatives">Gradients and Derivatives</h3>
+<p>Derivative of a vector: if $x_n(t)$ is a vector-valued function of scalar $t$, its vector derivative is $\dot{x}_n(t)$</p>
+<p>Gradient: if $\alpha(x)$ is a <em>scalar</em>-valued function of vector $x$, its gradient is a vector $$\frac{\partial \alpha}{\partial x_n} $$</p>
+<p>If $y$ is a vector-valued function of vector $x$, then $\frac{dy}{dx}$ is a &ldquo;partials matrix&rdquo; whose $n$th row is the gradient of $y_n$ with respect to $x$</p>
+<p>If $z$ is a 1xm <strong>row</strong> vector and $y$ is an mx1 <strong>column</strong> vector, $$\frac{\partial zy}{\partial x} = z \frac{\partial y}{\partial x} + y^T \frac{\partial z^T}{\partial x}$$</p>
+<h3 id="linalg">Linalg</h3>
+<p><strong>Rank</strong> is the minimum of the number of linearly independent rows and columns in a matrix. Given some vector $x$, $$rank(x x^T) = 1$$</p>
+<p>The <strong>hermitian transpose</strong> of a matrix is the complex conjugate of its transpose. A matrix is <strong>hermitian</strong> if $A = A^H$</p>
+<p><strong>Determinants</strong> have two important properties: first, $|AB| = |A||B|$, and second:</p>
+<p>$$|A| = \prod_{i=1}^n \lambda_i$$</p>
+<p>A few of the ways to state that a matrix is noninvertible</p>
+<ul>
+<li>A is nonsingular</li>
+<li>$A^{-1}$ exists</li>
+<li>rank(A) = n</li>
+<li>A&rsquo;s rows/columns are linearly independent</li>
+<li>A has nonzero determinant</li>
+<li>Ax = b has a unique solution for all b</li>
+<li>0 is not an eigenvalue of A</li>
+</ul>
+<p>The <strong>trace</strong> of a matrix (only defined for a square matrix) is the sum of its diagonal elements.</p>
+<p>A symmetic, nxn matrix can be characterized as positive definite, positive semidefinite, negative definite, negative semidefinite, or indefinite. This depends on the sign of $x^T A x$ for all $x$ (positive definite if sign 1, pos semi if 1 or 0, etc). However, this also tells us about the eigenvalues of a matrix (pos def has only pos, real eigenvalues, pos semidef has only nonnegative real eigenvals, etc). Indefinite signifies that some eigenvalues are positive and some are negative.</p>
+<p>The singular values of a matrix are defined as $\sigma^2(A) = \lambda(AA^T) = \lambda(A^T A)$. An nxm matrix will always have min(n,m) singular values.</p>
+<h2 id="matrix-exponential">Matrix Exponential</h2>
+<p>Finding the matrix exponential can be done in a variety of ways, including by finding the Jordan form of $A$.</p>
+<p>The definition of $e^{At}$ is: $$e^{At} = \sum_{j = 0}^{\inf} \dfrac{(At)^j}{j!}$$.</p>
+<p>Another way to calculate $e^{At}$ is with the inverse Laplace transform:</p>
+<p>$$e^{At} = \mathcal{L}^{-1}[(sI - A)^{-1}]$$</p>
+<h3 id="diagonalization">Diagonalization</h3>
+<p>If $A$, an $n \times n$ matrix, has $n$ linearly independent eigenvectors, then it can be fully diagonalized as $X D X^{-1} = A$, where $D$ is a diagonal matrix of the eigenvalues and $X$ is a full-rank matrix of the eigenvectors. Remember that you can find eigenvectors by solving for $(A - \lambda I)x = 0$</p>
+<p>Using the Taylor series definition of matrix exponentiation, we can see that $e^{At} = X e^{Dt} X^{-1}$. Since $D$ is diagonal, its matrix exponential is equal to its elementwise exponentiation.</p>
+<h2 id="linear-system-dynamics">Linear System Dynamics</h2>
+<p>Continuous-time linears systems are described as:</p>
+<p>$$ \dot{x} = Ax + Bu, y = Cx$$</p>
+<p>If A, B, and C are constant matrices, then the solution to the system is:</p>
+<p>$$x(t) = e^{A(t - t_0)}x(t_0) + \int_{t_0}^t e^{A(t - \tau)}Bu(\tau) d\tau$$
+$$y(t) = Cx(t)$$</p>
+<p>If $u = 0$, then $x(t) = e^{A(t - t_0)}x(t_0)$. Therefore, $e^(At)$ is called the state-transition matrix of the system. This is true even if $x$ is a vector.</p>
+<h2 id="linearizing-a-system">Linearizing a System</h2>
+<p>The idea of linearizing a system is to choose some point $\bar{x}$ around which to linearize, then define a $\tilde{x} = x - \bar{x}$.  We can then do:</p>
+<p>$$\dot{x} = f(x, u, t) \approx f(\bar{x}, \bar{u}, \bar{w}) + \dfrac{\partial f}{\partial x}\rvert_{\bar{x}} \tilde{x} + \dfrac{\partial f}{\partial u}\rvert_{\bar{u}} \tilde{u} + \dfrac{\partial f}{\partial w}\rvert_{\bar{w}} \tilde{w}$$</p>
+<p>Where $w$ is a noise parameter.</p>
+<p>So that we can then get our familiar:</p>
+<p>$$ \dot{x} = Ax + Bu + Lw $$</p>
+<p>In practice, we can evaluate the first term out to a constant, then find the analytical solutions for the gradients of the next terms before plugging in $\bar{x}$ (or other relevant variable) to get constant matrices that we can use.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
