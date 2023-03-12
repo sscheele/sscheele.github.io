@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kalman Filtering 1: Motivation and LUMVE | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Kalman Filtering 1: Motivation and LUMVE</span></h1>
+
+<h2 class="date">2023/03/12</h2>
+</div>
+
+<main>
+<p>Welcome back to my Kalman filtering notes! In this post we&rsquo;ll first back up and talk about when and why we would want to use a Kalman filter, and we&rsquo;ll go all the way to deriving a filter with the same properties as KF.</p>
+<h1 id="kalman-filter-setup-and-motivation">Kalman Filter Setup and Motivation</h1>
+<p>Suppose you&rsquo;re designing a satellite that needs to estimate its location in space very precisely. The two most obvious ways to do this are to use GPS and to infer your location by measuring it relative to background stars. Suppose for a moment that your satellite is totally immobile and can take a number of independent measures of its altitude, which we&rsquo;ll call $y_i, i \in 1..m$. Each of these measurements can also have some uncertainty associated with it, which we&rsquo;ll describe using measurement variances $\sigma^2_i$. If we want the estimate with the minimum variance, it&rsquo;s hopefully intuitive that we can find it by taking an average weighted by inverse variance:</p>
+<p>$$\hat{x} = \dfrac{\sum_{i=1}^{m} \left( \sigma^2_i \right)^{-1} y_i}{\sum_{i=1}^{m} \left( \sigma^2_i \right)^{-1}}$$</p>
+<p>This is a good start, but we&rsquo;ve made a number of assumptions that won&rsquo;t necessarily hold in general. We&rsquo;ve assumed that the noise in our estimates is independent, and we also assumed a perfectly stationary satellite. In reality, we&rsquo;ll have a series of measurements with different variances of different states taken at different times, and we&rsquo;ll need to combine those measurements to estimate the current state.</p>
+<p>When is the Kalman filter a good idea? If you&rsquo;re measuring a dynamical system that you have unimodal dynamics and measurement models for, and the dynamics aren&rsquo;t insanely nonlinear (which will usually result in multimodal dynamics models anyway), KF is probably a good fit. I mean unimodal in the statistical sense here: if you need a filter that can simultaneously maintain multiple hypotheses, you should probably consider a particle filter.</p>
+<h2 id="kalman-filter-properties">Kalman Filter Properties</h2>
+<p>The Kalman Filter is a LUMVE: Linear, Unbiased, Minimum-Variance Estimator. It&rsquo;s linear in that it only uses matrix operations to perform estimations. Unbiased means that the estimates it produces aren&rsquo;t consistently higher or lower than the actual value if it has correct system and measurement models (mathematically: $E[\hat{x} - x] = 0$). Minimum-variance means pretty much what you think it does.</p>
+<p>Let&rsquo;s derive a LUMVE estimator!</p>
+<h1 id="lumve">LUMVE</h1>
+<h3 id="problem-setup">Problem Setup</h3>
+<p>We have a set of observations $y_i, i=1..m$. If we wish to fit a line to $y$, we would fit: $y(t) = a + bt = G(a,b; t)$. In general, we&rsquo;ll use $G$ as our model function, so we&rsquo;ll have $y = G(x, t)$ where x is our model parameters.</p>
+<p>Some models are nonlinear but can be linearized. For instance, if we have $y = a e^{bt}$, we can linearize by taking the natural log of both sides: $ln(y) = ln(a) + bt$, then substituting $y&rsquo; = ln(y)$ and $a&rsquo; = ln(a)$, so we get $y&rsquo; = a&rsquo; + bt$. Here, $y$ is nonlinear in $a$ and $b$, but $y&rsquo;$ is linear in $a&rsquo;$ and $b$.</p>
+<p>Our problem is now to find a set of parameters such that they minimize the sum of square error between $G(x, t)$ and $y$.</p>
+<p>From multivariate calculus, we know that the conditions for a minimum are:</p>
+<ul>
+<li>$$\dfrac{\partial J}{\partial x_i} = 0, i \in 1..N$$</li>
+<li>$H(J, x)$ is positive definite, where $H$ is the Hessian function ($H$ gives a matrix of second-order partial derivatives of $J$ with respect to pairs of variables in $x$ and can be found as $H = d d^T$ where d is the nx1 vector $\dfrac{d J}{d x}$).</li>
+</ul>
+<p>Useful property of positive definite matrix is that for all nontrivial $x$, $x^T A x &gt; 0$.</p>
+<h3 id="modeling-error">Modeling Error</h3>
+<p>In real life, we may have measurement error. Keeping our $G$ function, we&rsquo;ll model this error as $y_i = G(x, t) + \epsilon_i$. We can also model this as a linear function $y = Hx + \epsilon$. We are able to do this by having row $i$ of matrix $H$ be: $H^{(i)} = [\dfrac{\partial G_t}{\partial x_1} \dfrac{\partial G_t}{\partial x_2} \dots]$ (that is, the paritial derivative of $G$ with respect to $x$ at time $t$). Here, $H$ is $m \times n$, where $m$ is the number of observations and $n$ is the number of parameters.</p>
+<p>With this linear modeling, we have our cost function as $J(x) = [y - Hx]^T [y - Hx]$. Setting the derivative equal to zero, we arrive at the formula to minimize error without weighting:</p>
+<p>$$\hat{x} = (H^T H)^{-1}H^Ty$$</p>
+<p>Note that $H^T H$ must be invertible - this implies that $H$ must contain $n$ linearly independent observations/rows.</p>
+<p>But what if our error varies across different observations? We can address this by weighting each observation separately by adding an $m \times m$ weight matrix $w$. Then, we can show that:</p>
+<p>$$\hat{x} = (H^T W H)^{-1}H^T W y$$</p>
+<p>Note that now $H^T W H$ must be invertible.</p>
+<h3 id="lumve-1">LUMVE</h3>
+<p>By treating our weighting matrix from before in a probabalistically rigorous way, we can arrive at a Linear, Unbiased, Minimum-Variance Estimate (LUMVE). To do this, we simply replace $W$ with the inverse of the covariance matrix of our measurement noise, $\epsilon \epsilon^T$. Note that if the covariance matrix is diagonal, this is equivalent to weighting by inverse variances of each measurement, which makes sense.</p>
+<p>An unbiased estimate is one where $E[\hat{x}] = x$. We can show that for this problem, if $\hat{x} = M y$ then $M H = I$. However, this problem leaves many possible solutions for $M$, so we add an optimality criterion: we want the unbiased estimate that minimizes the trace of the covariance matrix $P$ between $x$ and $\hat{x}$. We can show that $P = MRM^T$.</p>
+<p>The above problem is a constrained optimization problem (minimize sum of variances subject to unbiased estimate). We constrain optimization problems using Lagrange multipliers:</p>
+<p>$$J(x) = Tr[MRM^T + \Lambda^T[I - MH]^T + [I - MH]\Lambda]$$</p>
+<p>Where $\Lambda$ is an $n \times n$ matrix of Lagrange multipliers. To solve this, we assume that $R$ is symmetric and positive-definite. After some derivation, we get:</p>
+<p>$$M = (H^T R^{-1} H)^{-1}H^T R^{-1}$$</p>
+<p>By using this in $\hat{x} = My$, we have a LUMVE estimator. The covariance matrix of this estimator can be shown to be:</p>
+<p>$$\hat{P} = (H^T R^{-1}H)^{-1}$$</p>
+<p>As an interesting substitution:</p>
+<p>$$M = P H^T R^{-1}$$</p>
+<p>This, as usual, assumes that $H$ is full-rank (that is, it has rank $n$).</p>
+<h3 id="dealing-with-biased-noise">Dealing with Biased Noise</h3>
+<p>If $\epsilon$ has some bias $b$, how can we deal with it? If $b$ is known, we can just solve the problem for $y - b$, but what if it&rsquo;s not? It&rsquo;s actually very simple - we can simply add $b$ as a parameter in $x$, so that it will be estimated as part of the filter. <strong>Dealing with biased noise isn&rsquo;t any different from dealing with regular biases in the data.</strong></p>
+<h2 id="incorporating-priors">Incorporating Priors</h2>
+<p>A priori information can be incorporated by making it an observation with appropriate weight. Since a priori information usually takes the form of an initial guess about $x$ with some associated covariance, we can write it as:</p>
+<p>$$\bar{x} = x + \eta, \bar{P} = E[\eta \eta^T]$$</p>
+<p>Now we can write a new measurement system:</p>
+<p>$$\tilde{y} = \tilde{H}x + \tilde{\epsilon}$$</p>
+<p>Where $\tilde{y} = [y,\ \bar{x}]^T, \tilde{H} = [H,\ I]^T, \tilde{\epsilon} = [\epsilon,\ \eta]$</p>
+<p>We can now use the original LUMVE formulation:</p>
+<p>$$\hat{x} = (\tilde{H}^T \tilde{R}^{-1} \tilde{H})^{-1} \tilde{H}^T \tilde{R}^{-1} \tilde{y}$$
+$$\hat{P} = (\tilde{H}^T \tilde{R}^{-1} \tilde{H})^{-1}$$</p>
+<p>Noting that:</p>
+<p>$$\tilde{R}^{-1} = \begin{bmatrix}R^{-1} &amp; 0\\0 &amp; \bar{P}^{-1}\end{bmatrix}$$</p>
+<p>If $R$ and $\eta$ are uncorrelated (that is, $E[\epsilon \eta^T] = E[\eta \epsilon^T] = 0$), performing the matrix multiplication shows:</p>
+<p>$$\tilde{H}^T \tilde{R}^{-1} \tilde{H} = H^T R^{-1} H + \bar{P}^{-1}$$
+$$\tilde{H} \tilde{R}^{-1} \tilde{y} = H^T R^{-1} y  + \bar{P}^{-1} \bar{x}$$</p>
+<p>So our final estimation is then:</p>
+<p>$$\hat{x} = (H^T R^{-1} H + \bar{P}^{-1})^{-1} (H^T R^{-1} y  + \bar{P}^{-1} \bar{x})$$</p>
+<p>A few notes:</p>
+<ul>
+<li>$\bar{P}$ and $(H^T R^{-1} H + \bar{P}^{-1})$ must be invertible. Interestingly, though, $H^T R^{-1} H$ need not be invertible - meaning that we no longer need a full-rank $H$ matrix. In other words, $\bar{P}$ can be used to resolve singularities in your system.</li>
+<li>Remember that the formulation here relies on $\epsilon$ and $\eta$ being uncorrelated. However, the derivation would be similar (with a different result) if they were correlated.</li>
+</ul>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

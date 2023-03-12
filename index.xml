@@ -6,7 +6,17 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 10 Mar 2023 22:38:16 -0500</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 12 Mar 2023 13:44:51 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kalman Filtering 1: Motivation and LUMVE</title>
+      <link>/post/2023/03/12/kalman-filtering-1-motivation-and-lumve/</link>
+      <pubDate>Sun, 12 Mar 2023 13:44:51 -0400</pubDate>
+      
+      <guid>/post/2023/03/12/kalman-filtering-1-motivation-and-lumve/</guid>
+      <description>Welcome back to my Kalman filtering notes! In this post we&amp;rsquo;ll first back up and talk about when and why we would want to use a Kalman filter, and we&amp;rsquo;ll go all the way to deriving a filter with the same properties as KF.
+Kalman Filter Setup and Motivation Suppose you&amp;rsquo;re designing a satellite that needs to estimate its location in space very precisely. The two most obvious ways to do this are to use GPS and to infer your location by measuring it relative to background stars.</description>
+    </item>
+    
     <item>
       <title>Kalman Filtering: Intro</title>
       <link>/post/2023/03/10/kalman-filtering-intro/</link>
