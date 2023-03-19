@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Problem 14 Part 1 | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Problem 14 Part 1</span></h1>
+
+<h2 class="date">2023/03/19</h2>
+</div>
+
+<main>
+<p>I recently saw a post on <a href="https://gwern.net/problem-14">Gwern&rsquo;s blog</a> on an interesting problem in probability and expected value:</p>
+<p><strong>A shuffled deck of cards has an equal number of red and black cards. When you draw a red card from the deck, you get \$1, and when you draw a black card you lose \$1. You can stop whenever you want. If the deck has $N$ cards, what is the expected value of playing this game? When should you stop?</strong></p>
+<p>The first part of this post has been written without reading past the question, though I did slip and see that Gwern used DP to solve this. Fortunately, it&rsquo;s pretty obvious that DP is a good option for this (the $N=2$ case is a trivially easy starting point). I&rsquo;ll start by giving a few thoughts on the problem, maybe try to do some probability math to solve it outright, and then give whatever solutions I think of. After that, I&rsquo;ll analyze Gwern&rsquo;s ideas and see what I think!</p>
+<h1 id="part-1-thoughts">Part 1: Thoughts</h1>
+<ul>
+<li>First, this game has positive expected value. You&rsquo;ll never stop drawing cards if you&rsquo;re net negative, so the worst you can do is draw every card break even. Since you can and probably should stop making draws at some point in most shuffles, expected value is positive.</li>
+<li>OK, but when should we stop? Let&rsquo;s suppose we&rsquo;re already ahead in this game. How do we determine when to cash out? Let&rsquo;s model the deck as a random sequence $c_{1}, c_{2}, c_{3}, \dots$. We want to keep playing if we think the probability that some prefix of this sequence $c_{1..n}$ has more red cards than black.</li>
+<li>One obvious point is that if the deck as a whole has more red cards than black, we can skip any complicated calculation and just note that the expected value for $n=1$ is positive.</li>
+<li>Because we can see every card we draw and know how many cards of each type started in the deck, we know at every point in time how many cards of each type remain in the deck. Let&rsquo;s denote those numbers $r$ and $b$. Trivially, no prefix of length $n &gt;\geq 2r$ can have positive value, so let&rsquo;s focus on the case where $n &lt; 2r$.</li>
+<li>The number of ways to arrange $r$ red cards and $b$ black cards is ${r+b \choose r}$</li>
+<li>The number of ways to have positive value in a prefix of length $n &lt; 2r$ can be calculated naively by:
+$$\texttt{NPosFixed}(n, r) = \sum\limits_{r_{p} = \lceil{n/2}\rceil}^{\min(n, r)} {n \choose r_p}$$</li>
+<li>The number of ways to have positive value for <em>any</em> prefix length, given $r$ red and $b$ black cards, is:
+$$\texttt{NPos} (r, b) = \dfrac{\sum\limits_{n = 1}^{\min(2r, r+b)} \texttt{NPosFixed}(n, r)}{r + b \choose r}$$</li>
+<li>That was more math than we probably need to do! This nested sum could get computationally sort of nasty, too.</li>
+<li>NPos can be calculated constructively by noting that for all prefixes of length $n+1$ are simply a prefix of length $n$ followed by either a red card or a black card:</li>
+</ul>
+<pre><code class="language-python">def n_pos_hlpr(r, b, value):
+	# if we've already added too many black cards, return
+	if value &lt;= -r:
+		return 0
+	# base cases: if we've run out of one type, all we can do
+	# is add all cards of the remaining type
+	if r == 0:
+		# can't necessarily add all black cards
+		return min(value-1, b)
+	if b == 0:
+		# can always add more red cards
+		return r
+	# recursive case: we can either add a red or black card to the prefix
+	n = 1 + n_pos_hlpr(r-1, b, value+1) + n_pos_hlpr(r, b-1, value-1)
+	return n
+
+def n_pos(r, b):
+	return n_pos_hlpr(r, b, 0) - 1
+</code></pre>
+<p><em>note: we subtract 1 in n_pos because n_pos_hlpr counts the initial/zero-length prefix</em></p>
+<h1 id="part-2-debugging-math">Part 2: Debugging, Math</h1>
+<p>Woah, I didn&rsquo;t mean to give a solution in this part! It sort of fell out of thinking about the combinatorics. Oh well. Let&rsquo;s run this naive/non-memoized version of the code and see what happens:</p>
+<pre><code class="language-python">&gt;&gt;&gt; n_pos(2,2)
+5
+</code></pre>
+<p>Time to make sure that&rsquo;s right. The valid prefixes I can think of are: {R, RR, BRR, RBR, RRB}. Seems legit! How high can we go with this?</p>
+<p>Not very far! I tried to do <code>n_pos(100, 100)</code> and it got stuck for more than a minute, so I killed it. Let&rsquo;s do some memoization with a little hash table (yes, fine, this is cursed, but it avoids the problem of having a sparse matrix in memory, we&rsquo;ll fix it later):</p>
+<pre><code class="language-python">def n_pos_hlpr(r, b, value, tbl):
+	# if we've already added too many black cards, return
+	if value &lt;= -r:
+		return 0
+	# base cases: if we've run out of one type, all we can do
+	# is add all cards of the remaining type
+	if r == 0:
+		# can't necessarily add all black cards
+		return min(value-1, b)
+	if b == 0:
+		# can always add more red cards
+		return r
+	if (r, b) in tbl:
+		return tbl[(r, b)]
+	# recursive case: we can either add a red or black card to the prefix
+	n = 1 + n_pos_hlpr(r-1, b, value+1, tbl) + n_pos_hlpr(r, b-1, value-1, tbl)
+	tbl[(r, b)] = n
+	return n
+
+def n_pos(r, b):
+	tbl = {}
+	result = n_pos_hlpr(r, b, 0, tbl)
+	return result
+</code></pre>
+<p>Woah, <code>n_pos(100, 100)</code> now returns almost instantly. But, um, yikes:</p>
+<pre><code>&gt;&gt;&gt; n_pos(100, 100)
+134926252037064790251419095546152145179336046991581259352659
+</code></pre>
+<p>I didn&rsquo;t expect to be overflowing 64-bit ints here, but this is like a 200-bit unsigned integer or something (cursed tip for estimating the number of bits in an integer: take the number of digits and multiply by 3.3). In fact, hang on:</p>
+<pre><code>&gt;&gt;&gt; import math
+&gt;&gt;&gt; math.comb(200, 100)
+90548514656103281165404177077484163874504589675413336841320
+</code></pre>
+<p>Apparently, we have more prefixes than possible arrangements of cards.</p>
+<p>At this point, I wanted to find a manageable number where my method failed, so I went to $r=3, b=3$:</p>
+<p><strong>3 red, 3 black</strong>:
+1 red: 1 (0 black)
+2 red: 1 (0 black) + 3 (1 black) = 4 (RR, RRB, RBR, BRR)
+3 red: 1 (0 black) + 4 (1 black) + 10 (2 black) = 15
+Total = 20</p>
+<p>OK, most of these number are hopefully intuitive, but how did I get to 10 as the number of arrangements of 3 red and 2 black cards? Well, you can imagine that there are 4 spaces around the 3 cards:</p>
+<pre><code>s R s R s R s
+</code></pre>
+<p>We want to draw from these spaces in an unordered manner with replacement, which we can do with this function (drawing $k$ times from $n$ options)</p>
+<p>$$uwr(n, k) = {n + k - 1 \choose k}$$</p>
+<p>So I used $uwr(4, 2) = {5 \choose 2} = 10$. In general, we can write a function for number of prefixes with up to $r$ red and $b$ black cards:</p>
+<pre><code class="language-python">import math
+def n_pos(r, b):
+	total = 0
+	for r_p in range(1, r+1):
+		total += 1 # zero black
+		for b_p in range(1, min(r_p, b+1)):
+			total += math.comb(r_p + b_p, b_p)
+	return total
+</code></pre>
+<p><em>note: since there are always n+1 spaces around n objects, the +1 and -1 cancel and we get r_p + b_p</em></p>
+<p>We can confirm that <code>n_pos(3) = 20</code>. Let&rsquo;s see <code>n_pos(100, 100)</code>:</p>
+<pre><code class="language-python">&gt;&gt;&gt; n_pos(100, 100):
+119733200176664861055409214554645754349825484924704582796270
+</code></pre>
+<p>This is still 10x higher than <code>math.comb(200, 100)</code>! Clearly, something is still wrong.</p>
+<p>I think the problem is that we&rsquo;re double-counting items that are prefixes of each other. For instance, if we call <code>n_pos(2,1)</code> it returns 5, correctly counting prefixes {&lsquo;R&rsquo;, &lsquo;RR&rsquo;, &lsquo;RRB&rsquo;, &lsquo;RBR&rsquo;, &lsquo;BRR&rsquo;}. But there are only 3 ways 2 red cards and 1 black card can be arranged! If we instead removed items which were prefixes of other items, we&rsquo;d find that only the longest strings remained: {&lsquo;RRB&rsquo;, &lsquo;RBR&rsquo;, &lsquo;BRR&rsquo;}. This lets us remove an outer for loop!</p>
+<pre><code class="language-python">import math
+def n_pos(r, b):
+	if r == 0:
+		return 0
+	total = 1 # bp = 0 case
+	for b_p in range(1, min(r, b+1)):
+		total += math.comb(r + b_p, b_p)
+	return total
+</code></pre>
+<p>Now we have <code>n_pos(3,3) = 15</code>. Since we can shuffle 3 red and 3 black cards ${6 \choose 3} = 20$ ways, we expect that we expected positive value 15/20 = 75% of the time! Let&rsquo;s see if this matches our intuition:</p>
+<pre><code class="language-python">def get_shuffles_hlpr(accum, curr, r, b):
+	if r == 0:
+		accum.append(curr + 'B'*b)
+		return
+	if b == 0:
+		accum.append(curr + 'R'*r)
+		return
+	get_shuffles_hlpr(accum, curr+'R', r-1, b)
+	get_shuffles_hlpr(accum, curr+'B', r, b-1)
+
+def get_shuffles(r, b):
+	# here, r and b are the number of red and
+	# black cards in the hand
+	accum = []
+	get_shuffles_hlpr(accum, '', r, b)
+	return accum
+
+def p_win(r, b):
+	total_pos = 0
+	shuffles = get_shuffles(r, b)
+	for s in shuffles:
+		for i in range(1, len(s)):
+			n_red = len(s[:i].replace('B', ''))
+			if n_red &gt; (i/2):
+				total_pos += 1
+				# string has a pos prefix, break
+				break
+	return total_pos/len(shuffles)
+</code></pre>
+<p>Now we can do:</p>
+<pre><code class="language-python">&gt;&gt;&gt; p_win(3,3)
+0.75
+</code></pre>
+<p>Woo! I also verified this on a few more toy examples, eg:</p>
+<pre><code class="language-python">&gt;&gt;&gt; p_win(10, 10)
+0.9090909090909091
+&gt;&gt;&gt; n_pos(10,10)/math.comb(20, 10)
+0.9090909090909091
+</code></pre>
+<h1 id="part-3-optimization-future">Part 3: Optimization (Future)</h1>
+<p>Awesome! But do we beat Gwern? If we assume that <code>math.comb</code> has a constant-time implementation, yes, in a sense. In that case, we would have an $O(n)$ solution, while his solution is $O(n^2)$. But it probably doesn&rsquo;t.</p>
+<p>Gwern says he got an answer for 200,000 cards in like 5 seconds. Whether we can beat him really depends on how efficient <code>math.comb</code> is and how efficient computations on large numbers are in Python generally. It takes about 2 seconds to compute <code>n_pos(1000,1000)</code> on my old laptop, so I&rsquo;m about 2 orders of magnitude too slow with my mathy solution. Let&rsquo;s see if I can do better!</p>
+<p>n_pos(1000, 1000) is:</p>
+<p>2046105521468021692642519982997827217179245642339057975844538099572176010191891863964968026156453752449015750569428595097318163634370154637380666882886375203359653243390929717431080443509007504772912973142253209352126946839844796747697638537600100637918819326569730982083021538057087711176285777909275869648636874856805956580057673173655666887003493944650164153396910927037406301799052584663611016897272893305532116292143271037140718751625839812072682464343153792956281748582435751481498598087586998603921577523657477775758899987954012641033870640665444651660246024318184109046864244732001962029120000</p>
+<p>This is not an efficient number to work with, and we only care about the first significant figure to decide when to stop playing (since we stop playing when $p_{win} &lt; 0.5$). When I return to this problem, I&rsquo;ll try to find an approximation of the ${n \choose k}$ function in a faster language that returns a 64-bit float rather than an arbitrarily large (but exact) integer. I expect that this will do a lot for my performance - 100x probably isn&rsquo;t an unreasonable ask, and that&rsquo;s before I try any fancy multiprocessing (very easy to do for this method, since there&rsquo;s no DP or shared memory).</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

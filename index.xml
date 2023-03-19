@@ -6,7 +6,17 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 14 Mar 2023 22:03:48 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 19 Mar 2023 16:49:35 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Problem 14 Part 1</title>
+      <link>/post/2023/03/19/problem-14-part-1/</link>
+      <pubDate>Sun, 19 Mar 2023 16:49:35 -0400</pubDate>
+      
+      <guid>/post/2023/03/19/problem-14-part-1/</guid>
+      <description>I recently saw a post on Gwern&amp;rsquo;s blog on an interesting problem in probability and expected value:
+A shuffled deck of cards has an equal number of red and black cards. When you draw a red card from the deck, you get \$1, and when you draw a black card you lose \$1. You can stop whenever you want. If the deck has $N$ cards, what is the expected value of playing this game?</description>
+    </item>
+    
     <item>
       <title>About</title>
       <link>/about/</link>

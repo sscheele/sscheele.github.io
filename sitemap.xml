@@ -2,16 +2,19 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
+    <loc>/</loc>
+    <lastmod>2023-03-19T16:49:35-04:00</lastmod>
+  </url><url>
+    <loc>/post/</loc>
+    <lastmod>2023-03-19T16:49:35-04:00</lastmod>
+  </url><url>
+    <loc>/post/2023/03/19/problem-14-part-1/</loc>
+    <lastmod>2023-03-19T16:49:35-04:00</lastmod>
+  </url><url>
     <loc>/about/</loc>
     <lastmod>2023-03-14T22:24:16-04:00</lastmod>
   </url><url>
-    <loc>/</loc>
-    <lastmod>2023-03-14T22:03:48-04:00</lastmod>
-  </url><url>
     <loc>/post/2023/03/14/latex-packages/</loc>
-    <lastmod>2023-03-14T22:03:48-04:00</lastmod>
-  </url><url>
-    <loc>/post/</loc>
     <lastmod>2023-03-14T22:03:48-04:00</lastmod>
   </url><url>
     <loc>/post/2023/03/12/kalman-filtering-1-motivation-and-lumve/</loc>
