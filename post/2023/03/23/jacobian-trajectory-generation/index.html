@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Jacobian Trajectory Generation | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Jacobian Trajectory Generation</span></h1>
+
+<h2 class="date">2023/03/23</h2>
+</div>
+
+<main>
+<p>I wanted to make a mini-post with a sort of cute problem I solved today: let&rsquo;s say you want your robotic arm to travel from one joint-space position to another, but along the way you want it to follow a Cartesian end-effector trajectory. This actually isn&rsquo;t such an unrealistic scenario! You&rsquo;re basically constraining the start and end to be &ldquo;sort of reasonable&rdquo; (something you might want to do, given that 7+dof arms can have weird/slow ik), but you only care about the end effector path in between them, not the whole joint trajectory. My solution to this is to iteratively:</p>
+<ol>
+<li>Find the inverse Jacobian at the current state with respect to end effector linear velocity</li>
+<li>Use this to find a JS vector that matches a desired cartesian velocity: ($v_{j} = J^{-1} v_{c}$)</li>
+<li>Solve/find the null space of the Jacobian $N(J)$</li>
+<li>Project a vector towards the joint goal from the current state into the null space: $\texttt{proj}_{N(J)} v^*_j$</li>
+<li>Add the null space vector to the existing JS velocity vector from step 2 (this will change orientation/move towards the JS goal with no change to the linear velocity): $\hat{v} = v_{j} + \texttt{proj}_{N(J)} v^*_j$</li>
+<li>Step in the resulting direction by some small delta and starting this process over</li>
+</ol>
+<p>The resuting solution is very fast, even in Python, and seems pretty reliable! The fidelity to your desired trajectory mostly depends on the sampling, but something like this is fine for me:</p>
+<pre><code class="language-python">import numpy as np
+import kinpy as kp
+import scipy
+
+DT = 0.1
+PKG_DIR = '.'
+
+jaco_ee_link = &quot;EndEffector_Link&quot;
+urdf_path = os.path.join(PKG_DIR, 'gen3.urdf')
+gen3_chain = kp.build_serial_chain_from_urdf(open(urdf_path).read(), jaco_ee_link)
+
+def jaco_ee_fk(posn):
+    ee_trans = gen3_chain.forward_kinematics(posn)
+    return np.asarray(ee_trans.pos)
+
+def with_max_mag(vec, mag):
+    vec_norm = np.dot(vec, vec)
+    if np.sqrt(vec_norm) &lt; mag:
+        return vec
+    return (mag/vec_norm)*vec
+    
+def js_sub(vec1, vec2):
+    diff = vec1 - vec2
+    diff[diff &gt; np.pi] -= 2*np.pi
+    diff[diff &lt; -np.pi] += 2*np.pi
+    return diff
+    
+def cart2jnt(cart_traj, joint_start, joint_goal):
+    &quot;&quot;&quot;
+    cart_traj: (ts, 3) a cartesian-space ee trajectory to follow
+    joint_start: (7) starting joint-space position (must have 
+        ee_fk(joint_start) == cart_traj[0,:])
+    joint_goal: (7) ending joint-space position (must have
+        ee(fk(joint_goal) == cart_traj[-1,:]))
+        
+    Returns: (ts, 7) joint-space trajectory from joint_start to joint_goal
+        that follows cart_traj with the end effector 
+    &quot;&quot;&quot;
+    fake_goal = joint_start + js_sub(joint_goal, joint_start)
+    traj = cart2jnt_hlpr(cart_traj, joint_start, fake_goal)
+    if len(traj) == 0:
+        return np.array([fake_goal])
+    elif not np.all(traj[-1] == fake_goal):
+        traj.append(fake_goal)
+    return np.array(traj)
+
+def cart2jnt_hlpr(cart_traj, joint_start, joint_goal):
+    &quot;&quot;&quot;
+    INTERNAL
+    
+    cart_traj: (ts, 3) a cartesian-space ee trajectory to follow
+    joint_start: (7) starting joint-space position (must have 
+        ee_fk(joint_start) == cart_traj[0,:])
+    joint_goal: (7) ending joint-space position (must have
+        ee(fk(joint_goal) == cart_traj[-1,:]))
+        
+    Returns: non-np Array of joint-space states from joint_start to 
+        somewhere close to joint_goal that follows cart_traj with the 
+        end effector
+    &quot;&quot;&quot;
+    curr_state = joint_start.copy()
+    traj = []
+    cart_vel = 0.07
+    jnt_vel = 0.25
+    
+    next_traj_idx = 0
+    while True:
+        traj.append(curr_state)
+        # check for completed waypoints and get next state
+        curr_cart_posn = jaco_ee_fk(curr_state)
+        next_cart_pt = cart_traj[next_traj_idx,:]
+        while np.linalg.norm(curr_cart_posn - next_cart_pt) &lt; 0.05:
+            next_traj_idx += 1
+            if next_traj_idx == cart_traj.shape[0]:
+                return traj
+            next_cart_pt = cart_traj[next_traj_idx,:]
+                            
+        cart_dir = with_max_mag(next_cart_pt - curr_cart_posn, cart_vel)
+        # find robot jacobian, first 3 are linear vel
+        J = gen3_chain.jacobian(curr_state)[:3,:]
+        # inverse jacobian will let us go from cart vel to joint vel
+        J_inv = np.linalg.pinv(J)
+        # multiply robot direction by J_inv to get translation component
+        curr_vel = np.matmul(J_inv, cart_dir).ravel()
+        
+        joint_dir = with_max_mag(joint_goal - curr_state, jnt_vel)
+        # find the null space of the Jacobian to see vectors that can get us
+        # close jointwise
+        J_null = scipy.linalg.null_space(J)
+        # project JS-linear vector into the null space
+        J_null_inv = np.linalg.pinv(J_null)
+        null_weights = np.matmul(J_null_inv, joint_dir)
+        # get the null vector closest to the JS-linear vector and add to vel
+        null_proj = np.matmul(J_null, null_weights)
+        curr_vel += null_proj.ravel()
+        
+        curr_state = curr_state + DT*curr_vel
+        
+if __name__ == &quot;__main__&quot;:
+	# two positions relevant to my work
+    jnt_start = np.array([ 2.09840329,  0.92247539, -2.3143059 , -0.65085367, -0.88642678, -1.33266019, -0.83731862])
+    jnt_goal = np.array([ 0.82179658,  0.73568667, -2.32717109, -0.96308693, -0.59917077, -1.53383378, -1.67858404])
+    start_cart = jaco_ee_fk(jnt_start)
+    goal_cart = jaco_ee_fk(jnt_goal)
+    cart_traj = np.linspace(start_cart, goal_cart, 6)
+    traj = cart2jnt(cart_traj, jnt_start, jnt_goal)
+    print(&quot;Desired cart traj: &quot;)
+    print(repr(cart_traj))
+    print(&quot;=&quot;*20)
+    print(&quot;Actual cart traj: &quot;)
+    print(repr(np.array([jaco_ee_fk(x) for x in traj])))
+</code></pre>
+<p>I hope to add language-specific syntax highlighting to this blog at some point so this is actually readable :(</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 19 Mar 2023 16:49:35 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 23 Mar 2023 14:08:19 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Jacobian Trajectory Generation</title>
+      <link>/post/2023/03/23/jacobian-trajectory-generation/</link>
+      <pubDate>Thu, 23 Mar 2023 14:08:19 -0400</pubDate>
+      
+      <guid>/post/2023/03/23/jacobian-trajectory-generation/</guid>
+      <description>I wanted to make a mini-post with a sort of cute problem I solved today: let&amp;rsquo;s say you want your robotic arm to travel from one joint-space position to another, but along the way you want it to follow a Cartesian end-effector trajectory. This actually isn&amp;rsquo;t such an unrealistic scenario! You&amp;rsquo;re basically constraining the start and end to be &amp;ldquo;sort of reasonable&amp;rdquo; (something you might want to do, given that 7+dof arms can have weird/slow ik), but you only care about the end effector path in between them, not the whole joint trajectory.</description>
+    </item>
+    
     <item>
       <title>Problem 14 Part 1</title>
       <link>/post/2023/03/19/problem-14-part-1/</link>
