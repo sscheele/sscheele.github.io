@@ -3,12 +3,15 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>/</loc>
-    <lastmod>2023-03-23T14:08:19-04:00</lastmod>
+    <lastmod>2023-03-28T16:32:27-04:00</lastmod>
   </url><url>
-    <loc>/post/2023/03/23/jacobian-trajectory-generation/</loc>
-    <lastmod>2023-03-23T14:08:19-04:00</lastmod>
+    <loc>/post/2023/03/28/point-bw-points/</loc>
+    <lastmod>2023-03-28T16:32:27-04:00</lastmod>
   </url><url>
     <loc>/post/</loc>
+    <lastmod>2023-03-28T16:32:27-04:00</lastmod>
+  </url><url>
+    <loc>/post/2023/03/23/jacobian-trajectory-generation/</loc>
     <lastmod>2023-03-23T14:08:19-04:00</lastmod>
   </url><url>
     <loc>/post/2023/03/19/problem-14-part-1/</loc>

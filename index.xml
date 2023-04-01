@@ -6,7 +6,17 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 23 Mar 2023 14:08:19 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 28 Mar 2023 16:32:27 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Point Bw Points</title>
+      <link>/post/2023/03/28/point-bw-points/</link>
+      <pubDate>Tue, 28 Mar 2023 16:32:27 -0400</pubDate>
+      
+      <guid>/post/2023/03/28/point-bw-points/</guid>
+      <description>Here&amp;rsquo;s another short post on a problem I solved today. Suppose you have a point and want to see if it&amp;rsquo;s between two other points. If you&amp;rsquo;re working in a 2D space, you can use a solution along the lines of this one from Bryce Boe, but it&amp;rsquo;s not obvious how it would generalize to higher dimensions.
+So I thought I&amp;rsquo;d take a different approach: what do we mean when we say a point is &amp;ldquo;between two points?</description>
+    </item>
+    
     <item>
       <title>Jacobian Trajectory Generation</title>
       <link>/post/2023/03/23/jacobian-trajectory-generation/</link>

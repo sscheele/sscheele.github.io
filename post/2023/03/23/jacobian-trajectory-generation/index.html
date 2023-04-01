@@ -123,16 +123,18 @@ def cart2jnt_hlpr(cart_traj, joint_start, joint_goal):
                             
         cart_dir = with_max_mag(next_cart_pt - curr_cart_posn, cart_vel)
         # find robot jacobian, first 3 are linear vel
-        J = gen3_chain.jacobian(curr_state)[:3,:]
+        J = gen3_chain.jacobian(curr_state)
         # inverse jacobian will let us go from cart vel to joint vel
         J_inv = np.linalg.pinv(J)
         # multiply robot direction by J_inv to get translation component
-        curr_vel = np.matmul(J_inv, cart_dir).ravel()
+        oriented_cart_dir = np.zeros(6)
+        oriented_cart_dir[:3] = cart_dir
+        curr_vel = np.matmul(J_inv, oriented_cart_dir).ravel()
         
         joint_dir = with_max_mag(joint_goal - curr_state, jnt_vel)
         # find the null space of the Jacobian to see vectors that can get us
         # close jointwise
-        J_null = scipy.linalg.null_space(J)
+        J_null = scipy.linalg.null_space(J[:3, :])
         # project JS-linear vector into the null space
         J_null_inv = np.linalg.pinv(J_null)
         null_weights = np.matmul(J_null_inv, joint_dir)
