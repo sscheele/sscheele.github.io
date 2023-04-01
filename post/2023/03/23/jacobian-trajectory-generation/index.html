@@ -48,7 +48,7 @@
 import kinpy as kp
 import scipy
 
-DT = 0.1
+DT = 0.01
 PKG_DIR = '.'
 
 jaco_ee_link = &quot;EndEffector_Link&quot;
@@ -106,7 +106,7 @@ def cart2jnt_hlpr(cart_traj, joint_start, joint_goal):
     &quot;&quot;&quot;
     curr_state = joint_start.copy()
     traj = []
-    cart_vel = 0.07
+    cart_vel = 0.15
     jnt_vel = 0.25
     
     next_traj_idx = 0
@@ -141,6 +141,10 @@ def cart2jnt_hlpr(cart_traj, joint_start, joint_goal):
         # get the null vector closest to the JS-linear vector and add to vel
         null_proj = np.matmul(J_null, null_weights)
         curr_vel += null_proj.ravel()
+
+        curr_cart_vel = np.linalg.norm(np.matmul(J, curr_vel).ravel()[:3])
+        if curr_cart_vel &gt; cart_vel:
+            curr_vel = (cart_vel/curr_cart_vel)*curr_vel
         
         curr_state = curr_state + DT*curr_vel
         
