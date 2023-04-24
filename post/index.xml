@@ -6,7 +6,17 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 28 Mar 2023 16:32:27 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 23 Apr 2023 23:56:06 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Learning Rust - Week 1</title>
+      <link>/post/2023/04/23/learning-rust-1/</link>
+      <pubDate>Sun, 23 Apr 2023 23:56:06 -0400</pubDate>
+      
+      <guid>/post/2023/04/23/learning-rust-1/</guid>
+      <description>This is the first in (hopefully) a series of posts about my efforts to learn Rust! The goal is to track my progress and maybe see what techniques work better/worse.
+Thoughts on Rust Rust is a very cool language and definitely worth learning, if you already know C. If you don&amp;rsquo;t already know C, I think it would probably be a lot more frustrating. This is because a lot of Rust&amp;rsquo;s design, such as the ownership system, is based on high-level principles which are designed to eliminate problems you&amp;rsquo;d encounter in C.</description>
+    </item>
+    
     <item>
       <title>Point Bw Points</title>
       <link>/post/2023/03/28/point-bw-points/</link>
@@ -19,19 +29,19 @@ So I thought I&amp;rsquo;d take a different approach: what do we mean when we sa
     
     <item>
       <title>Jacobian Trajectory Generation</title>
-      <link>/post/2023/03/23/jacobian-trajectory-generation/</link>
+      <link>/post/2023/03/23/jacobian-traj/</link>
       <pubDate>Thu, 23 Mar 2023 14:08:19 -0400</pubDate>
       
-      <guid>/post/2023/03/23/jacobian-trajectory-generation/</guid>
+      <guid>/post/2023/03/23/jacobian-traj/</guid>
       <description>I wanted to make a mini-post with a sort of cute problem I solved today: let&amp;rsquo;s say you want your robotic arm to travel from one joint-space position to another, but along the way you want it to follow a Cartesian end-effector trajectory. This actually isn&amp;rsquo;t such an unrealistic scenario! You&amp;rsquo;re basically constraining the start and end to be &amp;ldquo;sort of reasonable&amp;rdquo; (something you might want to do, given that 7+dof arms can have weird/slow ik), but you only care about the end effector path in between them, not the whole joint trajectory.</description>
     </item>
     
     <item>
       <title>Problem 14 Part 1</title>
-      <link>/post/2023/03/19/problem-14-part-1/</link>
+      <link>/post/2023/03/19/problem-14-1/</link>
       <pubDate>Sun, 19 Mar 2023 16:49:35 -0400</pubDate>
       
-      <guid>/post/2023/03/19/problem-14-part-1/</guid>
+      <guid>/post/2023/03/19/problem-14-1/</guid>
       <description>I recently saw a post on Gwern&amp;rsquo;s blog on an interesting problem in probability and expected value:
 A shuffled deck of cards has an equal number of red and black cards. When you draw a red card from the deck, you get $1, and when you draw a black card you lose $1. You can stop whenever you want. If the deck has $N$ cards, what is the expected value of playing this game?</description>
     </item>
@@ -47,40 +57,40 @@ A shuffled deck of cards has an equal number of red and black cards. When you dr
     
     <item>
       <title>Kalman Filtering 1: Motivation and LUMVE</title>
-      <link>/post/2023/03/12/kalman-filtering-1-motivation-and-lumve/</link>
+      <link>/post/2023/03/12/kf-1/</link>
       <pubDate>Sun, 12 Mar 2023 13:44:51 -0400</pubDate>
       
-      <guid>/post/2023/03/12/kalman-filtering-1-motivation-and-lumve/</guid>
+      <guid>/post/2023/03/12/kf-1/</guid>
       <description>Welcome back to my Kalman filtering notes! In this post we&amp;rsquo;ll first back up and talk about when and why we would want to use a Kalman filter, and we&amp;rsquo;ll go all the way to deriving a filter with the same properties as KF.
 Kalman Filter Setup and Motivation Suppose you&amp;rsquo;re designing a satellite that needs to estimate its location in space very precisely. The two most obvious ways to do this are to use GPS and to infer your location by measuring it relative to background stars.</description>
     </item>
     
     <item>
       <title>Kalman Filtering: Intro</title>
-      <link>/post/2023/03/10/kalman-filtering-intro/</link>
+      <link>/post/2023/03/10/kf-intro/</link>
       <pubDate>Fri, 10 Mar 2023 22:38:16 -0500</pubDate>
       
-      <guid>/post/2023/03/10/kalman-filtering-intro/</guid>
+      <guid>/post/2023/03/10/kf-intro/</guid>
       <description>This is the first in a series of posts on the Kalman Filter! Over the series, we&amp;rsquo;ll first derive a filter with the same properties as the KF, then the KF itself, and finally more advanced variants such as EKF and UKF.
 I&amp;rsquo;ll assume for this series that you have some knowledge of linear algebra and probability theory. However, a quick refresher never hurt anyone, so the remainder of this post will cover that.</description>
     </item>
     
     <item>
       <title>Puzzle: Counting to 100</title>
-      <link>/post/2023/03/07/puzzle-counting-to-100/</link>
+      <link>/post/2023/03/07/100-puzzle/</link>
       <pubDate>Tue, 07 Mar 2023 13:18:41 -0500</pubDate>
       
-      <guid>/post/2023/03/07/puzzle-counting-to-100/</guid>
+      <guid>/post/2023/03/07/100-puzzle/</guid>
       <description>Here&amp;rsquo;s a puzzle I found in &amp;ldquo;The Moscow Puzzles&amp;rdquo;, by Boris Kordemsky and Martin Gardner:
 Person 1 can call any number from 1 to 10. Person 2 can then increment the last called number by any whole number from 1 to 10, then it&amp;rsquo;s Person 1&amp;rsquo;s turn again, and so on. The first person to call 100 wins. Give a strategy that allows Person 1 to win this game every time</description>
     </item>
     
     <item>
       <title>Hello, world!</title>
-      <link>/post/2023/03/07/hello-world/</link>
+      <link>/post/2023/03/07/test/</link>
       <pubDate>Tue, 07 Mar 2023 12:30:35 -0500</pubDate>
       
-      <guid>/post/2023/03/07/hello-world/</guid>
+      <guid>/post/2023/03/07/test/</guid>
       <description>Hello, world!
 I made this site based on a very minimal hugo theme. Despite the fact that this theme is only 150 lines of code, I still don&amp;rsquo;t understand it! There are two reasons for this:
 I&amp;rsquo;m not familiar with Hugo (the static site generator I&amp;rsquo;m using) or really web development There seem to be a lot of magic constants in hugo that I don&amp;rsquo;t like. I think this was part of an effort to make Hugo &amp;ldquo;creator-friendly&amp;rdquo; by hiding complexity from users of the tool.</description>

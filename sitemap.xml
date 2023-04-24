@@ -3,18 +3,21 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>/</loc>
-    <lastmod>2023-03-28T16:32:27-04:00</lastmod>
+    <lastmod>2023-04-23T23:56:06-04:00</lastmod>
+  </url><url>
+    <loc>/post/2023/04/23/learning-rust-1/</loc>
+    <lastmod>2023-04-23T23:56:06-04:00</lastmod>
+  </url><url>
+    <loc>/post/</loc>
+    <lastmod>2023-04-23T23:56:06-04:00</lastmod>
   </url><url>
     <loc>/post/2023/03/28/point-bw-points/</loc>
     <lastmod>2023-03-28T16:32:27-04:00</lastmod>
   </url><url>
-    <loc>/post/</loc>
-    <lastmod>2023-03-28T16:32:27-04:00</lastmod>
-  </url><url>
-    <loc>/post/2023/03/23/jacobian-trajectory-generation/</loc>
+    <loc>/post/2023/03/23/jacobian-traj/</loc>
     <lastmod>2023-03-23T14:08:19-04:00</lastmod>
   </url><url>
-    <loc>/post/2023/03/19/problem-14-part-1/</loc>
+    <loc>/post/2023/03/19/problem-14-1/</loc>
     <lastmod>2023-03-19T16:49:35-04:00</lastmod>
   </url><url>
     <loc>/about/</loc>
@@ -23,16 +26,16 @@
     <loc>/post/2023/03/14/latex-packages/</loc>
     <lastmod>2023-03-14T22:03:48-04:00</lastmod>
   </url><url>
-    <loc>/post/2023/03/12/kalman-filtering-1-motivation-and-lumve/</loc>
+    <loc>/post/2023/03/12/kf-1/</loc>
     <lastmod>2023-03-12T13:44:51-04:00</lastmod>
   </url><url>
-    <loc>/post/2023/03/10/kalman-filtering-intro/</loc>
+    <loc>/post/2023/03/10/kf-intro/</loc>
     <lastmod>2023-03-10T22:38:16-05:00</lastmod>
   </url><url>
-    <loc>/post/2023/03/07/puzzle-counting-to-100/</loc>
+    <loc>/post/2023/03/07/100-puzzle/</loc>
     <lastmod>2023-03-07T13:18:41-05:00</lastmod>
   </url><url>
-    <loc>/post/2023/03/07/hello-world/</loc>
+    <loc>/post/2023/03/07/test/</loc>
     <lastmod>2023-03-07T12:30:35-05:00</lastmod>
   </url><url>
     <loc>/categories/</loc>

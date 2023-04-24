@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Puzzle: Counting to 100 | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Puzzle: Counting to 100</span></h1>
+
+<h2 class="date">2023/03/07</h2>
+</div>
+
+<main>
+<p>Here&rsquo;s a puzzle I found in &ldquo;The Moscow Puzzles&rdquo;, by Boris Kordemsky and Martin Gardner:</p>
+<blockquote>
+<p>Person 1 can call any number from 1 to 10. Person 2 can then increment the last called number by any whole number from 1 to 10, then it&rsquo;s Person 1&rsquo;s turn again, and so on. The first person to call 100 wins. Give a strategy that allows Person 1 to win this game every time</p>
+</blockquote>
+<p>Take a minute to try and solve it!</p>
+<p>A hint here is that it&rsquo;s useful to think about problems like this in terms of invariants. What invariants can Person 1 preserve that allow him to win? One example might be that Person 1 wants to call 100, which is congruent to 0 mod 10. Can we preserve the invariant that Person 1 always calls a number congruent to 0 mod 10?</p>
+<p>Yes, but it&rsquo;s not useful! For instance, Person 1 might call 90, and then Person 2 would get to call 100 and win. In fact, we were on the right track, but we chose a number that doesn&rsquo;t adequately take Person 2&rsquo;s moves into account. Let&rsquo;s formalize this a bit: Person 1 needs to find a mod base \(b\) and a number \( n \) such that \(100 \equiv n\ (\mod b)\) <em>and</em> Person 1 can ensure that he will always call number congruent to \(n\) mod \(b\) and Person 2 can <em>never</em> call a congruent number. Person 1 can then call \(n\) as his first move and ensure that all subsequent moves are congruent to \(n\) mod \(b\). We can simplify by asking ourselves an easier, equivalent question: can Person 1 find a number \(b\) such that his move and Person 2&rsquo;s last move always sum to \(b\)?</p>
+<p>Clearly, the only possible such number is 11. Using 11 for \(b\), we can see that we must use 1 for \(n\), because \(100 \equiv 1\ (\mod 11)\). Person 1 calls 1, and after 9 pairs of moves which sum to 11, Person 1 will also call 100.</p>
+<p>Kordemsky phrases the answer differently:</p>
+<blockquote>
+<p>To call 100, first call 89. To call 89, first call 78, 67, 56&hellip; starting with 1.</p>
+</blockquote>
+<p>This is more concise, but it also doesn&rsquo;t scale so well. For instance, it takes me just a moment to tell you that if the first person to call 500 wins (instead of 100), then Person 1 can always win by starting on 5, because 500 is congruent to 5 mod 11.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
