@@ -6,7 +6,17 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 23 Apr 2023 23:56:06 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 30 Apr 2023 19:45:48 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Learning Rust: Week 2</title>
+      <link>/post/2023/04/30/learning-rust-2/</link>
+      <pubDate>Sun, 30 Apr 2023 19:45:48 -0400</pubDate>
+      
+      <guid>/post/2023/04/30/learning-rust-2/</guid>
+      <description>This week of Rust was focused almost entirely on last week&amp;rsquo;s technique #4, open source contribution! I spent the week working on three issues.
+Issue #1: Documentation This issue dealt with documenting two specific commands which had been added to Helix as part of a recent update that introduced soft line wrapping. I proposed extending the documentation generator to automatically document all commands, but then it turned out that someone was already doing the same thing (but probably better than I would have), so I just manually updated the docs.</description>
+    </item>
+    
     <item>
       <title>Learning Rust - Week 1</title>
       <link>/post/2023/04/23/learning-rust-1/</link>
