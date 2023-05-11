@@ -35,7 +35,7 @@
 
 <main>
 <p>I recently saw a post on <a href="https://gwern.net/problem-14">Gwern&rsquo;s blog</a> on an interesting problem in probability and expected value:</p>
-<p><strong>A shuffled deck of cards has an equal number of red and black cards. When you draw a red card from the deck, you get $1, and when you draw a black card you lose $1. You can stop whenever you want. If the deck has $N$ cards, what is the expected value of playing this game? When should you stop?</strong></p>
+<p><strong>A shuffled deck of cards has an equal number of red and black cards. When you draw a red card from the deck, you get \$1, and when you draw a black card you lose \$1. You can stop whenever you want. If the deck has $N$ cards, what is the expected value of playing this game? When should you stop?</strong></p>
 <p>The first part of this post has been written without reading past the question, though I did slip and see that Gwern used DP to solve this. Fortunately, it&rsquo;s pretty obvious that DP is a good option for this (the $N=2$ case is a trivially easy starting point). I&rsquo;ll start by giving a few thoughts on the problem, maybe try to do some probability math to solve it outright, and then give whatever solutions I think of. After that, I&rsquo;ll analyze Gwern&rsquo;s ideas and see what I think!</p>
 <h1 id="part-1-thoughts">Part 1: Thoughts</h1>
 <ul>
@@ -316,6 +316,10 @@ window.MathJax = {
 </script>
 <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
 <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
   
   <hr/>
   © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
