@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Animated Plot Collection | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Animated Plot Collection</span></h1>
+
+<h2 class="date">2023/05/13</h2>
+</div>
+
+<main>
+<p>I took a break from learning Rust to make <a href="https://github.com/sscheele/sys_anim">a repository of animated plots</a> using Matplotlib.</p>
+<p>I was initially going to use Rust for this, but ended up deciding not to - though <a href="https://github.com/plotters-rs/plotters/">plotters</a> looks very cool! This is mostly because I came to the conclusion that no Rust library is mature enough to do what I want, which is to make nice-looking stuff for one-off use cases like presentations. A Rust solution would probably be faster and more maintainable, but these Python scripts are simple and easy to extend, which is a better value proposition for one-off projects.</p>
+<p>This repository got started when I realized that, completely without my knowledge, someone upgraded Matplotlib to have a very intuitive interface for animations. I seem to remember it being awful, but when I checked on it, it was as simple as passing a function argument to <code>plt.FuncAnimation</code> and handling the rest yourself.</p>
+<p>Maybe the coolest thing I found is that you can overlay graphs on videos! We can do this by noticing that Matplotlib allows you to write output to arbitrary buffers, meaning that we can get a raw RGBA pixel array. I can&rsquo;t take the credit for this, I found it <a href="https://stackoverflow.com/questions/7821518/save-plot-to-numpy-array">on StackOverflow</a>:</p>
+<pre><code class="language-python">io_buf = io.BytesIO()
+fig.savefig(io_buf, format='raw', dpi=DPI)
+io_buf.seek(0)
+img_arr = np.reshape(np.frombuffer(io_buf.getvalue(), dtype=np.uint8),
+                     newshape=(int(fig.bbox.bounds[3]), int(fig.bbox.bounds[2]), -1))
+io_buf.close()
+</code></pre>
+<p>This gives a nice pipeline of load video frame -&gt; do pixel-level art -&gt; overlay graph relevant to frame -&gt; write prettier video. Note that I am not trying to write rendering library! This is an easy way to get nice videos, not a performant way.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

@@ -6,7 +6,17 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 11 May 2023 19:05:41 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sat, 13 May 2023 19:42:24 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Animated Plot Collection</title>
+      <link>/post/2023/05/13/sys_anim/</link>
+      <pubDate>Sat, 13 May 2023 19:42:24 -0400</pubDate>
+      
+      <guid>/post/2023/05/13/sys_anim/</guid>
+      <description>I took a break from learning Rust to make a repository of animated plots using Matplotlib.
+I was initially going to use Rust for this, but ended up deciding not to - though plotters looks very cool! This is mostly because I came to the conclusion that no Rust library is mature enough to do what I want, which is to make nice-looking stuff for one-off use cases like presentations. A Rust solution would probably be faster and more maintainable, but these Python scripts are simple and easy to extend, which is a better value proposition for one-off projects.</description>
+    </item>
+    
     <item>
       <title>Learning Rust: Week 3</title>
       <link>/post/2023/05/11/learning-rust-3/</link>

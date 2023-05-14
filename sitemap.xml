@@ -2,13 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>/</loc>
-    <lastmod>2023-05-11T19:05:41-04:00</lastmod>
+    <loc>/post/2023/05/13/sys_anim/</loc>
+    <lastmod>2023-05-13T19:42:24-04:00</lastmod>
   </url><url>
-    <loc>/post/2023/05/11/learning-rust-3/</loc>
-    <lastmod>2023-05-11T19:05:41-04:00</lastmod>
+    <loc>/</loc>
+    <lastmod>2023-05-13T19:42:24-04:00</lastmod>
   </url><url>
     <loc>/post/</loc>
+    <lastmod>2023-05-13T19:42:24-04:00</lastmod>
+  </url><url>
+    <loc>/post/2023/05/11/learning-rust-3/</loc>
     <lastmod>2023-05-11T19:05:41-04:00</lastmod>
   </url><url>
     <loc>/post/2023/04/30/learning-rust-2/</loc>
