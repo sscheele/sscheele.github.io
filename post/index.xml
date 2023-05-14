@@ -6,7 +6,17 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 13 May 2023 19:42:24 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 14 May 2023 12:46:22 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Learning Rust: Week 4</title>
+      <link>/post/2023/05/14/learning-rust-4/</link>
+      <pubDate>Sun, 14 May 2023 12:46:22 -0400</pubDate>
+      
+      <guid>/post/2023/05/14/learning-rust-4/</guid>
+      <description>This will be the last installment in my series on learning Rust, in which I give some notes on Cow. I finished re-implementing Cow for myself and found some performance stuff that surprised me! As my main testbed, I&amp;rsquo;m using this function:
+fn test_speed() { use rand::{thread_rng, Rng}; use std::time::{Duration, Instant}; use std::vec::*; let mut rng = thread_rng(); let pos_nums: Vec&amp;lt;i32&amp;gt; = (1..1000000).collect(); let neg_nums: Vec&amp;lt;i32&amp;gt; = (-50..999950).collect(); let t_start = Instant::now(); // naive method for _ in 1.</description>
+    </item>
+    
     <item>
       <title>Animated Plot Collection</title>
       <link>/post/2023/05/13/sys_anim/</link>
