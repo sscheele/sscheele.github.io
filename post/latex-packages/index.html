@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Latex Packages | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Latex Packages</span></h1>
+
+<h2 class="date">2023/03/14</h2>
+</div>
+
+<main>
+<p>I like to have the ability to run things locally on my computer, but getting LaTeX to work has always been a pain because of the package system. It tells me that I&rsquo;m missing packages, but they aren&rsquo;t on the AUR and I&rsquo;ve never been willing to invest the time to figure out how to install them. But now that I&rsquo;m working on my thesis I devoted the time to figure it out and I&rsquo;m posting it here so I don&rsquo;t forget.</p>
+<p>To install LaTeX packages, I first installed <code>tllocalmgr</code> from the AUR:</p>
+<pre><code>yay -S tllocalmgr-git
+</code></pre>
+<p>This allowed me to run the <code>tllocalmgr</code> command, which brings up its own prompt. From here, I needed several packages for my thesis:</p>
+<pre><code>&gt;&gt;&gt; install biblatex logreq siunitx biblatex-ieee
+&gt;&gt;&gt; texhash
+</code></pre>
+<p>The <code>texhash</code> command seems to update some index and needs to be run after installs.</p>
+<h2 id="biber">Biber</h2>
+<p>I also needed to install biber. It&rsquo;s available for arch, but out-of-date, so I built it from source. I needed to install perl pp (<code>sudo pacman -S perl-par-packer</code>) and then I could run <code>perl Build.PL</code> in the biber project source folder. This generated an executable file called <code>Build</code> and I ran <code>./Build installdeps</code>. Once this finished, I ran <code>./Build</code> and then <code>sudo ./Build install</code> to finish installing biber. I was then able to resolve the bibliography error messages from Texmaker by cd&rsquo;ing into the thesis directory and running <code>biber thesis</code></p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

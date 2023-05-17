@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Learning Rust: Week 1 | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Learning Rust: Week 1</span></h1>
+
+<h2 class="date">2023/04/23</h2>
+</div>
+
+<main>
+<p>This is the first in (hopefully) a series of posts about my efforts to learn Rust! The goal is to track my progress and maybe see what techniques work better/worse.</p>
+<h1 id="thoughts-on-rust">Thoughts on Rust</h1>
+<p>Rust is a very cool language and definitely worth learning, if you already know C. If you don&rsquo;t already know C, I think it would probably be a lot more frustrating. This is because a lot of Rust&rsquo;s design, such as the ownership system, is based on high-level principles which are designed to eliminate problems you&rsquo;d encounter in C. If you don&rsquo;t know about those problems, the ownership system will feel dumb and obstructive instead of a cool formalization of good memory management practice. There are a lot of other things like this too - Rust concepts will feel natural, elegant, and expressive if you already understand the problems they were designed to address, but will feel unintuitive and pointless if you&rsquo;re new to systems programming, because it&rsquo;s much easier to map from systems constraints to Rust design principles than it is to map the other way.</p>
+<h1 id="techniques">Techniques</h1>
+<h2 id="technique-1-reading-the-book">Technique 1: Reading the Book</h2>
+<p>The Rust project has <a href="https://doc.rust-lang.org/book/">a book</a> to help you learn Rust. The book seems helpful as a reference, but I&rsquo;ve found that reading through it linearly hasn&rsquo;t helped much. My retention is poor, and I found as I moved into doing Rust projects that I would make mistakes that I had already read about in the book.</p>
+<p>One related option I haven&rsquo;t explored here is <a href="https://rust-book.cs.brown.edu/">the interactive edition</a>. Maybe that would be better for retention!</p>
+<h2 id="technique-2-reading-other-peoples-code">Technique 2: Reading Other People&rsquo;s Code</h2>
+<p>A more useful thing I&rsquo;ve been doing is reading other people&rsquo;s code. This is nice because I get to see common Rust design patterns that would otherwise probably be hard to discover. Retention is a downside here too, but it&rsquo;s not as bad because I get to see the concepts connect to each other in demonstrably useful ways.</p>
+<p>A really nice aspect of this technique has been the ability to incorporate Bing chat (Microsoft&rsquo;s GPT-4 search assistant). Though Bing chat has been pretty bad at writing anything more than basic Rust for me (and especially bad when crates with evolving APIs are involved), it&rsquo;s quite good at <em>reading</em> Rust. So, for example, I learned about lifetime parameters by seeing them in someone&rsquo;s code, asking Bing chat to translate that code, and then finding &ldquo;lifetime parameters&rdquo; in the book. Lifetimes are extremely common in Rust, and without this I would have had to wait to learn about them in Chapter 10.</p>
+<h2 id="technique-3-small-projects">Technique 3: Small Projects</h2>
+<p>The next thing I tried was implementing a small Rust project. I&rsquo;m interested in mathematical optimization, so I wrote a little gradient descent project that computes the gradient of an objective function using the <code>autograd</code> package and follows it to (in this case) maximize that function. This was super helpful, and was where I discovered a lot of the gaps in my knowledge. It&rsquo;s also very motivating to write something that you&rsquo;re personally interested in.</p>
+<p>One weakness in this technique, though, is the scale of the projects. Rust is designed to help you write bug-free code for very big projects and work well with parallelism/multithreading. For example, the <code>Result</code> struct in Rust is super useful for handling errors, but when your call stack is only 3-4 calls deep, it&rsquo;s very tempting to just <code>.expect()</code> or <code>.unwrap()</code> all of your Results without actually handling errors. Doing this would leave a lot of value on the table.</p>
+<h2 id="technique-4-open-source-contribution">Technique 4: Open Source Contribution</h2>
+<p>This is a thing I&rsquo;m just starting with. I&rsquo;ve chosen to contribute to Helix, since it&rsquo;s a project I love and has a relatively mature community with plenty of open issues. I was also thinking about Typst, but sadly the software and community aren&rsquo;t mature enough that I think it would work as well. I&rsquo;ll update on this as I try it!</p>
+<h2 id="technique-5-re-implementing-standard-library-components">Technique 5: Re-Implementing Standard Library Components</h2>
+<p>This seems promising to me, but I haven&rsquo;t given it a try yet either. I&rsquo;m thinking of starting with <code>Cow</code>, which seems relatively simple but also fundamental enough that I could learn a lot from it. Again, I&rsquo;ll update on this after I give it a shot.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

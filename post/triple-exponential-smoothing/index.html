@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Double and Triple Exponential Smoothing: Part 1 | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Double and Triple Exponential Smoothing: Part 1</span></h1>
+
+<h2 class="date">2023/05/16</h2>
+</div>
+
+<main>
+<p>Let&rsquo;s say you have some time-series data and you want to smooth it out and maybe run some prediction. You could design a FIR filter or something, but FIR filters involve a number of design decisions. What will your cutoff points be? What window size will you use? How will you handle data before your first full window? But, perhaps most importantly: if your data starts to move, how will you handle it? For example, let&rsquo;s say we&rsquo;re designing a robot to follow a wall at a certain distance, and controlling the steering angle $\theta$. If you start to drift towards the wall at a constant angle, your data will start to exhibit a linear trend. If you&rsquo;re expecting this, you have a couple of options if you decide to go the FIR filter route. If you&rsquo;re being fancy, you could run a changepoint detection algorithm that triggers a linear fit being run on the data after the detected change, then subtract out the trendline, filter the residual, and add the trendline back in. But your pipeline has now become complicated, heavyweight, and arguably relies on too many magic numbers.</p>
+<p>As a first approximation, you might just want to use an exponentially-weighted moving average. EWMA is easy to understand and sometimes it gets the job done without you having to do any extra work. But there&rsquo;s a problem: like FIR, EWMA predictably lags trended data.</p>
+<p><img src="./img/ewma.gif" alt="EWMA lags trended data"></p>
+<p>As a brief aside: in estimation generally, I like to use $x$ for the latent state of the thing we&rsquo;re measuring, $y$ for the observations themselves, and $\hat{x}$ as the state estimation (hat = estimation).</p>
+<p>However, there&rsquo;s a variant of EWMA that works well for trended data: double EWMA. Double EWMA does not have the issue of lagging trended data, because it models data as following a linear curve and constantly tries to estimate the slope of that curve - using EWMA:
+$$\begin{align}
+\hat{x}_ i &amp;=  (1 - \alpha) y_ i +  \alpha(\hat{x}_ {i-1} + \hat{\delta}) \\
+\hat{\delta}_ i &amp;= \beta \hat{\delta}_ {i-1} + (1 - \beta)(\hat{x}_ i - \hat{x}_ {i-1})
+\end{align}$$</p>
+<p>This looks more complicated than it is! Like normal EWMA, this has what I&rsquo;ll call &ldquo;credence parameters&rdquo; $\alpha$ and $\beta$, which describe how much credence we give to our current model versus our one most recent observation. Everything with a hat is a model parameter - that&rsquo;s what we&rsquo;re estimating. Finally, $y_i$ is our observation (noisy measurement) at time $i$. The only difference is that we switched from modeling the data as a constant $y_ {i+k} = \hat{x}_ i$ to modeling as a linear equation: $y_ {i+k} = \hat{x}_ i + k\hat{\delta}_ i$, for all integers $k$. We update $\hat{\delta}$, the expected difference between two timesteps, every time we make a new estimate. This method does a much better job of identifying trended data!</p>
+<p><img src="./img/double_ewma.gif" alt="Double EWMA does not lag trended data"></p>
+<p>Even when the robot stops moving and changes the rate at which it approaches the wall (to zero), the double EWMA converges to the steady-state estimate faster than the single EWMA.</p>
+<p>So what&rsquo;s <em>triple</em> EWMA then? I&rsquo;ve seen the term used for a couple of different things, but in general: it&rsquo;s EWMA with three parameters. The obvious example is to estimate a quadratic function (using a second difference), so I won&rsquo;t do that. Instead, I&rsquo;ll show how triple EWMAs can be used to estimate trended functions with periodic components!</p>
+<p>With a periodic component, we expect that each value will be equal to the value one period ago - we&rsquo;ll denote one period as $\tau$, so the value one period ago is $x_ i = x_ {i - \tau}$. With a (linear) <em>trended</em> periodic component, we expect that each value will be equal to the value one period ago plus $\tau \hat{\delta}$. I&rsquo;ll leave a derivation for that for a later time.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
