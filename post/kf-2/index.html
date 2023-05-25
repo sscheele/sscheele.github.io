@@ -34,12 +34,12 @@
 </div>
 
 <main>
-<p>In <a href="../kf-1">my last Kalman filtering post</a>, we derived a LUMVE (Linear, Unbiased, Minimum-Variance) estimator for a static object. Then, we showed that we could use that general estimator to make an estimator that incorporates <em>a priori</em> information (a prior best guess) by sort of pretending our prior guess was a measurement. You might be able to guess where we go next: if we can find the covariance matrix $\hat{P}$ for <em>that</em> estimator, then we could take our <em>last</em> estimation and use it as the <em>a priori</em> guess for our <em>next</em> estimation. In some sense, we could filter recursively.</p>
+<p>In <a href="../kf-1">my last Kalman filtering post</a>, we derived a LUMVE (Linear, Unbiased, Minimum-Variance) estimator for a static object. Then, we showed that we could use that general estimator to make an estimator that incorporates <em>a priori</em> information (a prior best guess) by sort of pretending our prior guess was a measurement. You might be able to guess where we go next: if we can find the covariance matrix $\hat{P}$ for <em>that</em> estimator, then we could take our <em>last</em> estimation and use it as the <em>a priori</em> guess for our <em>next</em> estimation. In other words, we could filter iteratively.</p>
 <p>Fortunately, the solution for $\hat{P}$ is very simple! Continuing our trick from last time of using the batch (non <em>a priori</em>) LUMVE estimator and bootstrapping LUMVE into it, we can just notice that all we needed was:</p>
 <p>$$\hat{P} = (\tilde{H}^T \tilde{R}^{-1} \tilde{H})^{-1} = (H^T R^{-1} H + \bar{P}^{-1})^{-1}$$</p>
 <p>We&rsquo;re now ready to do our first Kalman-esque filter, which can provide an optimal linear estimate of a stationary value! Our algorithm is:</p>
 <ol>
-<li>Start with a guess about the state $X^*$ (remember, $\bar{x}$ and $\hat{x}$ are guesses/estimations of the <em>residual</em>, not the state itself!). Since you didn&rsquo;t intentionally sandbag your guess, you also start with $\bar{x} = 0$. You also need a covariance matrix expressing your confidence in your guess, $\bar{P}$, and $R$, a constant covariance matrix for the measured values.</li>
+<li>Start with a guess about the state $X^*$ (remember, $\bar{x}$ and $\hat{x}$ are guesses/estimations of the <em>residual</em>, not the state itself!). Since you didn&rsquo;t intentionally sandbag your guess, you start with $\bar{x} = 0$. You also need a covariance matrix expressing your confidence in your guess, $\bar{P}$, and $R$, a constant covariance matrix for the measured values.</li>
 <li>Find $H = \texttt{Jac}_{X^ * }(G)$ ($H$ is the partials matrix/Jacobian/linearization of $G$, the measurement function, about $X^ * $). Typically we do this numerically, but it&rsquo;s sometimes possible to find an analytical form for $H(X^ * )$.</li>
 <li>Read your next measurement value $Y$, and compute the measurement residual $y = Y - G(X^ * + \bar{x})$</li>
 <li>Use our formula to compute the state residual estimate $\hat{x}$:
@@ -92,8 +92,8 @@ $$\hat{P} = (\tilde{H}^T \tilde{R}^{-1} \tilde{H})^{-1} = (H^T R^{-1} H + \bar{P
 <h1 id="lumve-with-dynamical-systems-the-algorithm">LUMVE with dynamical systems: the algorithm</h1>
 <p>We&rsquo;re finally ready to put together an algorithm which is mathematically equivalent to the Kalman filter!! Here it goes, with updates from the previous algorithm bolded:</p>
 <ol>
-<li>Start with a guess about the state $X^*$ (remember, $\bar{x}$ and $\hat{x}$ are guesses/estimations of the <em>residual</em>, not the state itself!). Since you didn&rsquo;t intentionally sandbag your guess, you also start with $\bar{x} = 0$. You also need a covariance matrix expressing your confidence in your guess, $\bar{P}$, and $R$, a constant covariance matrix for the measured values. <strong>You also have $A(X)$, a function which returns the system matrix $A$ for state $X$, and $Q$, the covariance matrix associated with your system.</strong></li>
-<li>Find $H = \texttt{Jac}_{X^ * }(G)$ ($H$ is the partials matrix/Jacobian/linearization of $G$, the measurement function, about $X^ * $). Typically we do this numerically, but it&rsquo;s sometimes possible to find an analytical form for $H(X^ * )$. <strong>Also set $F = I + A(X) \Delta t$.</strong></li>
+<li>Start with a guess about the state $X^*$ (remember, $\bar{x}$ and $\hat{x}$ are guesses/estimations of the <em>residual</em>, not the state itself!). Since you didn&rsquo;t intentionally sandbag your guess, you start with $\bar{x} = 0$. You also need a covariance matrix expressing your confidence in your guess, $\bar{P}$, and $R$, a constant covariance matrix for the measured values. <strong>You also have $A(X)$, a function which returns the system matrix $A$ for state $X$, and $Q$, the covariance matrix associated with your system.</strong></li>
+<li>Find $H = \texttt{Jac}_{X^ * }(G)$ ($H$ is the partials matrix/Jacobian/linearization of $G$, the measurement function, about $X^ * $). Typically we do this numerically, but it&rsquo;s sometimes possible to find an analytical form for $H(X^ * )$. <strong>Also define $F = I + A(X) \Delta t$.</strong></li>
 <li><strong>Perform the time update and error propagation:</strong> $X^ * \leftarrow FX^ *$, $\bar{x} \leftarrow F\bar{x}$, $\bar{P} \leftarrow F \bar{P} F^T + Q$</li>
 <li>Read your next measurement value $Y$, and compute the measurement residual $y = Y - G(X^ * + \bar{x})$</li>
 <li>Use our formula to compute the state residual estimate $\hat{x}$:
@@ -105,6 +105,7 @@ $$\hat{P} = (\tilde{H}^T \tilde{R}^{-1} \tilde{H})^{-1} = (H^T R^{-1} H + \bar{P
 </ol>
 <p>Beyond the obvious benefits of adding the ability to handle dynamical systems, here&rsquo;s another one: before, we could only ever increase our confidence in our estimate. From a purely statistical point of view, this made sense: we only ever got more information about our values, so we <em>should</em> keep getting more confident. In practice, though, this can lead to <em>filter divergence,</em> where your filter begins to ignore new measurements because it&rsquo;s so confident in its existing estimate. Now, we add $Q$ every step, meaning that $Q$ can serve as a sort of ceiling on how confident we can ever be, preventing filter divergence!</p>
 <p>Next time, we&rsquo;ll test our updated LUMVE estimator against double EWMA. Then, we&rsquo;ll show how the Kalman filter can be derived from the LUMVE estimator, finishing our derivation!</p>
+<p><a href="../kf-1/">&lt; Kalman Filtering: Part 1</a></p>
 
 </main>
 
