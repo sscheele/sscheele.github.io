@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kalman Filtering: Part 2 | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Kalman Filtering: Part 2</span></h1>
+
+<h2 class="date">2023/05/21</h2>
+</div>
+
+<main>
+<p>In <a href="../kf-1">my last Kalman filtering post</a>, we derived a LUMVE (Linear, Unbiased, Minimum-Variance) estimator for a static object. Then, we showed that we could use that general estimator to make an estimator that incorporates <em>a priori</em> information (a prior best guess) by sort of pretending our prior guess was a measurement. You might be able to guess where we go next: if we can find the covariance matrix $\hat{P}$ for <em>that</em> estimator, then we could take our <em>last</em> estimation and use it as the <em>a priori</em> guess for our <em>next</em> estimation. In some sense, we could filter recursively.</p>
+<p>Fortunately, the solution for $\hat{P}$ is very simple! Continuing our trick from last time of using the batch (non <em>a priori</em>) LUMVE estimator and bootstrapping LUMVE into it, we can just notice that all we needed was:</p>
+<p>$$\hat{P} = (\tilde{H}^T \tilde{R}^{-1} \tilde{H})^{-1} = (H^T R^{-1} H + \bar{P}^{-1})^{-1}$$</p>
+<p>We&rsquo;re now ready to do our first Kalman-esque filter, which can provide an optimal linear estimate of a stationary value! Our algorithm is:</p>
+<ol>
+<li>Start with a guess about the state $X^*$ (remember, $\bar{x}$ and $\hat{x}$ are guesses/estimations of the <em>residual</em>, not the state itself!). Since you didn&rsquo;t intentionally sandbag your guess, you also start with $\bar{x} = 0$. You also need a covariance matrix expressing your confidence in your guess, $\bar{P}$, and $R$, a constant covariance matrix for the measured values.</li>
+<li>Find $H = \texttt{Jac}_{X^ * }(G)$ ($H$ is the partials matrix/Jacobian/linearization of $G$, the measurement function, about $X^ * $). Typically we do this numerically, but it&rsquo;s sometimes possible to find an analytical form for $H(X^ * )$.</li>
+<li>Read your next measurement value $Y$, and compute the measurement residual $y = Y - G(X^ * + \bar{x})$</li>
+<li>Use our formula to compute the state residual estimate $\hat{x}$:
+$$\hat{x} = (H^T R^{-1} H + \bar{P}^{-1})^{-1} (H^T R^{-1} y  + \bar{P}^{-1} \bar{x})$$</li>
+<li>Use our other formula to compute $\hat{P}$, the covariance of $\hat{x}$:
+$$\hat{P} = (\tilde{H}^T \tilde{R}^{-1} \tilde{H})^{-1} = (H^T R^{-1} H + \bar{P}^{-1})^{-1}$$</li>
+<li>Set $X^ * \leftarrow X^ * + \hat{x}$, $\bar{x} \leftarrow 0, \bar{P} \leftarrow \hat{P}$.</li>
+<li>Go back to step 2</li>
+</ol>
+<p>One thing that might strike you as a little dumb is that $\bar{x}$ is all over the place, even though it&rsquo;s always zero. In fact, we didn&rsquo;t actually need to set it to zero in step 6, because it never gets updated. In this example, that&rsquo;s true! But having $\bar{x}$ in general is actually very nice, because it lets you test different linearizations without changing your estimate. The linearization can be a source of error, so re-running it even in the absence of a measurement update can be helpful to your solution accuracy. In this case, updating $X^ * $ in one direction while updating $\bar{x}$ to compensate lets you express the idea that you&rsquo;re going to change your linearization point without changing your estimate.</p>
+<p>Let&rsquo;s test LUMVE versus another estimation I&rsquo;ve written about recently, <a href="../triple-exponential-smoothing">EWMA</a>. Since LUMVE can only estimate a stationary value so far, single EWMA is the appropriate comparison class. And we find in general that LUMVE performs a little better than EWMA, but nothing stellar. Here&rsquo;s a representative example based on that post&rsquo;s cart+rangefinder environment:</p>
+<p><img src="./img/lumve.gif" alt=""></p>
+<p>LUMVE both converges faster than EWMA and is a bit more robust to noise after it&rsquo;s run for a while. The next thing it needs is the ability to consider dynamical systems, like double EWMA.</p>
+<h2 id="dynamical-systems">Dynamical Systems</h2>
+<p>Most real-world systems change over time, and incorporating this fact into LUMVE will be pretty simple! Essentially, all we have to do is add a time update step where we take our last estimation of the state and run it through a dynamics function to get a current estimate of the state. At a more nuts-and-bolts level:</p>
+<ol>
+<li>Advancing the state of our system through time. We&rsquo;ll do this by finding a matrix $F$ such that $F x_ {t-1} = x_ t$ (remember, $x$ is a deviation, not the state itself).</li>
+<li>Since the previous step will typically involve some approximation of the dynamics, and the dynamics itself may not be exact, we need some way to account for the fact that the dynamics function itself may have errors. We&rsquo;ll do this by introducing a second covariance matrix $Q$.</li>
+<li>Even if step 1 had perfect system dynamics and $Q$ was 0 (and we do sometimes assume this), propagating an error through a dynamical system affects that error. Specifically, if we multiply a vector $x$ with covariance matrix $P$ by $F$, the covariance matrix of $F x$ will be $F P F^ T$. As a nice little callback to the original LUMVE derivation, this is related to the identity $Cov(A\nu) = A\ Cov(\nu) A^T$.</li>
+</ol>
+<h3 id="dynamics-1-finding-f">Dynamics 1: Finding $F$</h3>
+<p>Let&rsquo;s start with the first step. Typically, we start with a system dynamics equation that looks like this:</p>
+<p>$$\dot{X} = AX + Bu + w$$</p>
+<p>From the sysem dynamics, we wish to extract the <em>state transition function</em>, which looks like this, remembering that capital $X$ is a state and not a deviation:</p>
+<p>$$X_k = F_{k-1} X_{k-1} + G_{k-1}u_{k-1} + L_{k-1}\tilde{w}_{k-1}$$</p>
+<p>Here, $u$ is some known input, and $w$ is a random variable with covariance matrix $\tilde{Q}_k$. In general, the solution for $X(k_t)$ is:</p>
+<p>$$X(t_k) = e^{A(t_k - t_{k-1})}X(t_{k-1}) + \int_{t_{k-1}}^{t_k} e^{A(t_k - \tau)}[B(\tau)u(\tau) + w(\tau)] d\tau$$</p>
+<p>If input is zero ($u(t) = 0$), we have the much simpler $X(t) = e^{A(t - t_0)} x(t_0)$ The $e^{A(t - t_0)}$ matrix is the same as $F$. We could also write $F = e^{A \Delta t}$. However, we don&rsquo;t even have to worry about solving this matrix exponential! Most of the time, we can simply approximate $F$ with our old friend the first-order Taylor polynomial, as</p>
+<p>$$F \approx I + A \Delta t$$</p>
+<p>It doesn&rsquo;t matter, of course, that $x$ is a deviation and not the state itself, because for a linear $F$, $F(X_ {t-1} + \bar{x}_ {t-1}) = FX_ {t-1} + F\bar{x}_ {t-1}$</p>
+<h3 id="f-ballistic-trajectory-example">$F$: Ballistic Trajectory Example</h3>
+<p>Suppose you were estimating the state of a thrown baseball. Then your state vector might be 6-dimensional: $[x, y, z, \dot{x}, \dot{y}, \dot{z}]$. $F$ would obviously be $6 \times 6$, and since it represents how much a deviation in the state changes over time, it&rsquo;s sort of a derivative evaluated for a particular value of $dt$. In this example, we would have:</p>
+<p>$$ F \approx I + A \Delta t = \begin{bmatrix}
+1 &amp; 0 &amp; 0 &amp; \Delta t &amp; 0        &amp; 0 \\
+0 &amp; 1 &amp; 0 &amp; 0        &amp; \Delta t &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0        &amp; 0        &amp; \Delta t \\
+0 &amp; 0 &amp; 0 &amp; 1        &amp; 0        &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0        &amp; 1        &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0        &amp; 0        &amp; 1 \\
+\end{bmatrix}$$</p>
+<p>You don&rsquo;t see any term here accounting for gravity, because gravity is one of the known inputs to the equation. It&rsquo;s part of $Gu$, not part of $FX$.</p>
+<h3 id="dynamics-2-finding-q">Dynamics 2: Finding $Q$</h3>
+<p>$Q$ is much easier to find than $F$! Notice that when we went from using the state transition matrix $F$ to the system matrix $A$, we also started using $w$ instead of $\tilde{w}$. That&rsquo;s because we just introduced $w = L\tilde{w}$, and when we did that, we of course propagated our error properly:</p>
+<p>$$ Q = L \tilde{Q} L^T $$</p>
+<p>That&rsquo;s it!</p>
+<h3 id="dynamics-3-propagating-error">Dynamics 3: Propagating Error</h3>
+<p>We need to make sure that when we do a time update, we both propagate our existing error through the dynamical system <em>and</em> incorporate the error we got from the fact that we&rsquo;re not certain about that dynamical system. Fortunately, we can simply do this by adding covariance matrices, so the whole time update becomes:</p>
+<p>$$ \bar{P}_ t = F \hat{P}_ {t - 1} F^T + Q $$</p>
+<p>Interestingly, this doesn&rsquo;t end up depending on $u$ (the known inputs to the system equation) at all. This makes sense, however, when you consider that uncertainty in $u$ is already baked into $Q$!</p>
+<h1 id="lumve-with-dynamical-systems-the-algorithm">LUMVE with dynamical systems: the algorithm</h1>
+<p>We&rsquo;re finally ready to put together an algorithm which is mathematically equivalent to the Kalman filter!! Here it goes, with updates from the previous algorithm bolded:</p>
+<ol>
+<li>Start with a guess about the state $X^*$ (remember, $\bar{x}$ and $\hat{x}$ are guesses/estimations of the <em>residual</em>, not the state itself!). Since you didn&rsquo;t intentionally sandbag your guess, you also start with $\bar{x} = 0$. You also need a covariance matrix expressing your confidence in your guess, $\bar{P}$, and $R$, a constant covariance matrix for the measured values. <strong>You also have $A(X)$, a function which returns the system matrix $A$ for state $X$, and $Q$, the covariance matrix associated with your system.</strong></li>
+<li>Find $H = \texttt{Jac}_{X^ * }(G)$ ($H$ is the partials matrix/Jacobian/linearization of $G$, the measurement function, about $X^ * $). Typically we do this numerically, but it&rsquo;s sometimes possible to find an analytical form for $H(X^ * )$. <strong>Also set $F = I + A(X) \Delta t$.</strong></li>
+<li><strong>Perform the time update and error propagation:</strong> $X^ * \leftarrow FX^ *$, $\bar{x} \leftarrow F\bar{x}$, $\bar{P} \leftarrow F \bar{P} F^T + Q$</li>
+<li>Read your next measurement value $Y$, and compute the measurement residual $y = Y - G(X^ * + \bar{x})$</li>
+<li>Use our formula to compute the state residual estimate $\hat{x}$:
+$$\hat{x} = (H^T R^{-1} H + \bar{P}^{-1})^{-1} (H^T R^{-1} y  + \bar{P}^{-1} \bar{x})$$</li>
+<li>Use our other formula to compute $\hat{P}$, the covariance of $\hat{x}$:
+$$\hat{P} = (\tilde{H}^T \tilde{R}^{-1} \tilde{H})^{-1} = (H^T R^{-1} H + \bar{P}^{-1})^{-1}$$</li>
+<li>Set $X^ * \leftarrow X^ * + \hat{x}$, $\bar{x} \leftarrow 0, \bar{P} \leftarrow \hat{P}$.</li>
+<li>Go back to step 2</li>
+</ol>
+<p>Beyond the obvious benefits of adding the ability to handle dynamical systems, here&rsquo;s another one: before, we could only ever increase our confidence in our estimate. From a purely statistical point of view, this made sense: we only ever got more information about our values, so we <em>should</em> keep getting more confident. In practice, though, this can lead to <em>filter divergence,</em> where your filter begins to ignore new measurements because it&rsquo;s so confident in its existing estimate. Now, we add $Q$ every step, meaning that $Q$ can serve as a sort of ceiling on how confident we can ever be, preventing filter divergence!</p>
+<p>Next time, we&rsquo;ll test our updated LUMVE estimator against double EWMA. Then, we&rsquo;ll show how the Kalman filter can be derived from the LUMVE estimator, finishing our derivation!</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

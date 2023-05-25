@@ -55,25 +55,44 @@
 </ul>
 <p>Useful property of positive definite matrix is that for all nontrivial $x$, $x^T A x &gt; 0$.</p>
 <h3 id="modeling-error">Modeling Error</h3>
-<p>In real life, we may have measurement error. Keeping our $G$ function, we&rsquo;ll model this error as $y_i = G(x, t) + \epsilon_i$. We can also model this as a linear function $y = Hx + \epsilon$. We are able to do this by having row $i$ of matrix $H$ be: $H^{(i)} = [\dfrac{\partial G_t}{\partial x_1} \dfrac{\partial G_t}{\partial x_2} \dots]$ (that is, $H$ is the paritial derivatives matrix, or Jacobian, of $G$ with respect to $x$ at time $t$). Here, $H$ is $m \times n$, where $m$ is the number of observations and $n$ is the number of parameters.</p>
-<p>With this linear modeling, we have our cost function as $J(x) = [y - Hx]^T [y - Hx]$. Setting the derivative equal to zero, we arrive at the formula to minimize error without weighting:</p>
+<p>In real life, we may have measurement error. Keeping our $G$ function, we&rsquo;ll model this error as $y_i = G(x, t) + \epsilon_i$, where $\epsilon$ is a vector of random variables representing our error. However, $G$ may be a nonlinear function which we can&rsquo;t represent as a matrix. We address this by finding a $H$, a linearization of $G$ about $x$. We are able to do this by having row $i$ of matrix $H$ be: $H^{(i)} = [\dfrac{\partial G_t^{(i)}}{\partial x_1} \dfrac{\partial G_t^{(i)}}{\partial x_2} \dots]$ (that is, $H$ is the paritial derivatives matrix, or Jacobian, of $G$ with respect to $x$ at time $t$). Here, $H$ is $m \times n$, where $m$ is the number of observations and $n$ is the dimensionality of the state space. We can now say that locally:</p>
+<p>$$y = Hx + \epsilon$$</p>
+<p>To do this, we need to make a crucial switch: <strong>we&rsquo;ll change from estimating the state of the system directly to estimating the deviation between where the system is and where we would have thought it would be based on our last estimate.</strong> In other words, say we have a system dynamics function $F$, where $F(x_ {i-1}) = x_ i$ (in fact, we <em>don&rsquo;t</em> have this yet, for the sake of simplicity, and we&rsquo;ll go back to ignoring it after this paragraph by assuming for now that the system is stationary). We now want to estimate $\hat{x} = X _ {i} - F(X^* _ {i-1})$, where $X^{* }$ is the estimated system state (previously denoted $\hat{x}$). Similarly, we&rsquo;ll switch from using the observation itself to the observation residual, $y = Y - G(F(X^* _ {i-1}))$. As a brief note on notation: I denoted the state and observation as uppercase $X$ and $Y$ in the last sentences not because they somehow turned into matrices but because I&rsquo;m running out of variants to attach to letters. Fortunately, these should be the last variants, and $x$ and $y$ will denote residual values from here on out.</p>
+<p>With this linear modeling, we have our cost function as $J(x) = [y - H\hat{x}]^T [y - H\hat{x}]$. Setting the derivative equal to zero, we arrive at the formula to minimize error without weighting:</p>
 <p>$$\hat{x} = (H^T H)^{-1}H^Ty$$</p>
+<p>This is essentially a rederivation of the Moore-Penrose method of taking the left pseudoinverse of $H$, since the left pseudoinverse $H^+$ of matrix $H$ defines the least-squares solution to $y = A\hat{x}$. In other words, we have found that the left pseudoinverse is defined as $H^+ = (H^T H)^{-1}H^T$.</p>
 <p>Note that $H^T H$ must be invertible - this implies that $H$ must contain $n$ linearly independent observations/rows.</p>
-<p>But what if our error varies across different observations? We can address this by weighting each observation separately by adding an $m \times m$ weight matrix $w$. Then, we can show that:</p>
+<p>But what if our error varies across different observations? We can address this by weighting each observation separately by adding an $m \times m$ weight matrix $w$ and setting $J&rsquo;(x) = [y - H\hat{x}]^T W [y - H\hat{x}]$. You can probably tell by inspection that setting up the objective function this way basically lets you set up a linear weighting function. If $W$ is a diagonal matrix, then it basically lets us scale the relative importance of optimizing each dimension. This time, I&rsquo;ll show a more detailed derivation for finding the optimal solution.</p>
+<p>We start with</p>
+<p>$$\begin{align}
+J&rsquo;(\hat{x}) &amp;= [y - H\hat{x}]^T W [y - H\hat{x}] \\
+&amp;= y^TWy - yWH\hat{x} - \hat{x}^T H^T Wy + \hat{x}^TH^T W H\hat{x} \\
+\end{align}$$</p>
+<p>Taking the partial derivative and setting to zero will let us find the minimum:</p>
+<p>$$\frac{\partial J}{\partial \hat{x}} = -y^T W^{-1} H + \hat{x}^T H^T W H = 0$$</p>
 <p>$$\hat{x} = (H^T W H)^{-1}H^T W y$$</p>
 <p>Note that now $H^T W H$ must be invertible.</p>
 <h3 id="lumve-1">LUMVE</h3>
-<p>By treating our weighting matrix from before in a statistically rigorous way, we can arrive at a Linear, Unbiased, Minimum-Variance Estimate (LUMVE). To do this, we simply replace $W$ with the inverse of the covariance matrix of our measurement noise. We&rsquo;ll denote the covariance matrix of the measurement noise as $R = \epsilon \epsilon^T$, so we&rsquo;re setting $W = R^{-1}$. Note that if the covariance matrix is diagonal, this is equivalent to weighting by inverse variances of each measurement, which makes sense.</p>
-<p>An unbiased estimate is one where $E[\hat{x}] = x$. The estimate is linear in the observation $y$, so we&rsquo;re looking for a matrix $M$ such that $\hat{x} = M y$. Since, by definition, $y = H x + \epsilon$, then clearly if $\hat{x} = M y$, any unbiased $M$ will satisfy $M H = I$. However, this problem leaves many possible solutions for $M$, so we add an optimality criterion: we want the unbiased estimate that minimizes the trace of the covariance matrix $P$ between $x$ and $\hat{x}$. We can show that $P = MRM^T$.</p>
-<p>The above problem is a constrained optimization problem (minimize sum of variances subject to unbiased estimate). We constrain optimization problems using Lagrange multipliers:</p>
-<p>$$J(x) = Tr[MRM^T + \Lambda^T[I - MH]^T + [I - MH]\Lambda]$$</p>
-<p>Where $\Lambda$ is an $n \times n$ matrix of Lagrange multipliers. To solve this, we assume that $R$ is symmetric and positive-definite. After some derivation, we get:</p>
+<p>By treating our weighting matrix from before in a statistically rigorous way, we can arrive at a Linear, Unbiased, Minimum-Variance Estimate (LUMVE). To do this, we simply replace $W$ with the inverse of the covariance matrix of our measurement noise. We&rsquo;ll denote the covariance matrix of the measurement noise as $R = E[(y - Hx)(y - Hx)^T] = \epsilon \epsilon^T$, so we&rsquo;re setting $W = R^{-1}$. Note that if the covariance matrix is diagonal, this is equivalent to weighting by inverse variances of each measurement, which makes sense.</p>
+<p>We now find that the optimal gain matrix is:</p>
 <p>$$M = (H^T R^{-1} H)^{-1}H^T R^{-1}$$</p>
-<p>By using this in $\hat{x} = My$, we have a LUMVE estimator. The covariance matrix of this estimator can be shown to be:</p>
-<p>$$\hat{P} = (H^T R^{-1}H)^{-1}$$</p>
-<p>As an interesting substitution:</p>
-<p>$$M = P H^T R^{-1}$$</p>
-<p>This, as usual, assumes that $H$ is full-rank (that is, it has rank $n$).</p>
+<p>$M$ has some interesting properties. For instance, it&rsquo;s actually still a left pseudoinverse of $H$, meaning that $MH = I$. However, it&rsquo;s now a pseudoinverse that also satisfies the optimality condition of minimizing the covariance (which we accomplished by weighting our least-squares estimator with the inverse of the measurement covariance matrix).</p>
+<p>By using this in $\hat{x} = My$, we have a LUMVE estimator. We can use our setup from before to find the covariance of the estimator:</p>
+<p>$$\begin{align}
+\hat{P} &amp;= Cov(\hat{x}) \\
+&amp;= Cov(My) \\
+&amp;= M\ Cov(y) M^T \\
+&amp;= M R M^T \\
+&amp;= (H^T R^{-1} H)^{-1} H^T R^{-1} R ((H^T R^{-1} H)^{-1} H^T R^{-1})^T \\
+&amp;= (H^T R^{-1} H)^{-1} H^T R^{-T} H (H^T R^{-1} H)^{-T} \\
+&amp;= (H^T R^{-1} H)^{-1} H^T R^{-T} H H^{-1} R^T H^{-T} \\
+&amp;= (H^T R^{-1} H)^{-1}
+\end{align}$$</p>
+<p>Wow, that was a pain! Note that here, the notation $A^{-T}$ is used to denote the inverse transpose of $A$. But now we also have the interesting substitution:</p>
+<p>$$M = \hat{P} H^T R^{-1}$$</p>
+<p>Or, if we wanted $\hat{P}$:</p>
+<p>$$\hat{P} = M R H^{-T}$$</p>
+<p>Though the first substitution feels somehow more deep to me. This, as usual, assumes that $H$ is full-rank (that is, it has rank $n$).</p>
 <h3 id="dealing-with-biased-noise">Dealing with Biased Noise</h3>
 <p>If $\epsilon$ has some bias $b$, how can we deal with it? If $b$ is known, we can just solve the problem for $y - b$, but what if it&rsquo;s not? It&rsquo;s actually very simple - we can simply add $b$ as a parameter in $x$, so that it will be estimated as part of the filter. <strong>Dealing with biased noise isn&rsquo;t any different from dealing with regular biases in the data.</strong></p>
 <h2 id="incorporating-priors">Incorporating Priors</h2>

@@ -6,7 +6,16 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 16 May 2023 15:38:24 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 21 May 2023 18:14:41 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kalman Filtering: Part 2</title>
+      <link>/post/kf-2/</link>
+      <pubDate>Sun, 21 May 2023 18:14:41 -0400</pubDate>
+      
+      <guid>/post/kf-2/</guid>
+      <description>In my last Kalman filtering post, we derived a LUMVE (Linear, Unbiased, Minimum-Variance) estimator for a static object. Then, we showed that we could use that general estimator to make an estimator that incorporates a priori information (a prior best guess) by sort of pretending our prior guess was a measurement. You might be able to guess where we go next: if we can find the covariance matrix $\hat{P}$ for that estimator, then we could take our last estimation and use it as the a priori guess for our next estimation.</description>
+    </item>
+    
     <item>
       <title>Double and Triple Exponential Smoothing: Part 1</title>
       <link>/post/triple-exponential-smoothing/</link>
