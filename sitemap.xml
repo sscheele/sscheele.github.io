@@ -3,12 +3,15 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>/</loc>
-    <lastmod>2023-05-21T18:14:41-04:00</lastmod>
+    <lastmod>2023-05-25T23:39:41-04:00</lastmod>
   </url><url>
-    <loc>/post/kf-2/</loc>
-    <lastmod>2023-05-21T18:14:41-04:00</lastmod>
+    <loc>/post/kf-3/</loc>
+    <lastmod>2023-05-25T23:39:41-04:00</lastmod>
   </url><url>
     <loc>/post/</loc>
+    <lastmod>2023-05-25T23:39:41-04:00</lastmod>
+  </url><url>
+    <loc>/post/kf-2/</loc>
     <lastmod>2023-05-21T18:14:41-04:00</lastmod>
   </url><url>
     <loc>/post/triple-exponential-smoothing/</loc>

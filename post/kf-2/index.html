@@ -106,6 +106,7 @@ $$\hat{P} = (\tilde{H}^T \tilde{R}^{-1} \tilde{H})^{-1} = (H^T R^{-1} H + \bar{P
 <p>Beyond the obvious benefits of adding the ability to handle dynamical systems, here&rsquo;s another one: before, we could only ever increase our confidence in our estimate. From a purely statistical point of view, this made sense: we only ever got more information about our values, so we <em>should</em> keep getting more confident. In practice, though, this can lead to <em>filter divergence,</em> where your filter begins to ignore new measurements because it&rsquo;s so confident in its existing estimate. Now, we add $Q$ every step, meaning that $Q$ can serve as a sort of ceiling on how confident we can ever be, preventing filter divergence!</p>
 <p>Next time, we&rsquo;ll test our updated LUMVE estimator against double EWMA. Then, we&rsquo;ll show how the Kalman filter can be derived from the LUMVE estimator, finishing our derivation!</p>
 <p><a href="../kf-1/">&lt; Kalman Filtering: Part 1</a></p>
+<div style="text-align: right"> <a href="../kf-3/">Kalman Filtering: Part 3 ></a> </div>
 
 </main>
 

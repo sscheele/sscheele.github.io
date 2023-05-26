@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kalman Filtering: Part 3 | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Kalman Filtering: Part 3</span></h1>
+
+<h2 class="date">2023/05/25</h2>
+</div>
+
+<main>
+<p>Welcome to my third Kalman Filtering post! We <a href="../kf-2">left off</a> on a cliffhanger. How will the LUMVE algorithm perform against Double EWMA?</p>
+<p><img src="./img/lumve_full.gif" alt=""></p>
+<p>Pretty well! In the graph, DEWMA starts out with a better estimate than LUMVE, but LUMVE stays pretty consistently closer to ground truth by being initially more willing to update based on new measurements and later more reluctant to fit noise. Of course, DEWMA has tunable parameters that let it be more willing to update, too. In fact, this graph is in some ways a good illustration of why you might prefer DEWMA: it has just two simple formulas, but it performs almost as well as the Kalman filter on this example! DEWMA has two parameters you need to define, $\alpha$ and $\beta$ - in setting up a Kalman filter even on a 2D state space, you might easily define 10 magic numbers without seeing a huge improvement. But you do get a payoff for all of those constants in the form of greater accuracy and flexibility. Additionally, this system is probably <em>way</em> more friendly to DEWMA than you&rsquo;ll typically see in real life: while KF may leave you wondering just how many first-order Taylor approximations we should really be letting Rudolph Kalman get away with here, those approximations are usually good enough in practice (when they&rsquo;re not, nonlinear extensions of KF like EKF and UKF are often effective). What&rsquo;s often not good enough is DEWMA&rsquo;s approach of effectively ignoring the measurement and system dynamics functions. If we were dealing with, for example, a pendulum, DEWMA would have a really hard time, while KF would handle it like a champ (probably - though with oscillators you also have to take into account questions like your sampling rate vs the oscillation frequency).</p>
+<p>You probably noticed that I started using LUMVE and KF interchangably: this is because they&rsquo;re mathematically the same thing! It&rsquo;s time for us to show this, completing our derivation of the Kalman filter.</p>
+<h2 id="the-kalman-filter">The Kalman Filter</h2>
+<p>The issue with LUMVE is that it does two $n \times n$ inverses every step ($n$, conventionally, is the dimension of the state space). Inverting matrices is a difficult problem (it typically takes $O(n^3)$ time), and while our $n$ is small for these examples, you can start getting high-dimensional $n$ much faster than you might think. For example, on a plane you might want to estimate a 6D pose, plus velocities and accelerations in each of these dimensions, and parameters of your physical model like the thrust being delivered by each engine, the angles of the flaps and ailerons, 3D wind velocity, 3D plane center of mass, etc. You&rsquo;re plausibly looking at a 50-dimensional state space. Now, this probably doesn&rsquo;t matter on a plane because you can bring up a beefy computer that can invert a 50x50 matrix inside of a couple of microseconds, but what if you also had power and weight requirements and wanted to run this on an embedded device? Finding an efficient formulation would be very useful.</p>
+<p>For this, we turn to Schur&rsquo;s identity, which states that:</p>
+<p>$$(A - BD^{-1}C)^{-1} = A^{-1} + A^{-1}B(D - C A^{-1}B)^{-1}CA^{-1}$$</p>
+<p>Which, for our purposes, means:</p>
+<p>$$\hat{P} = (H^T R^{-1}H + \bar{P}^{-1})^{-1} = \bar{P} - \bar{P}H^T(R + H \bar{P} H^T)^{-1} H \bar{P}$$</p>
+<p>The first part of the second term is called the <strong>Kalman gain</strong> matrix and is denoted $K$:</p>
+<p>$$\tag{0} K = \bar{P}H^T(R + H \bar{P} H^T)^{-1}$$
+$$\hat{P} = \bar{P} - KH \bar{P} = (I - KH)\bar{P}$$</p>
+<p>Now, when we get an $\bar{x}$ and $\bar{P}$, we can use:</p>
+<p>$$\hat{x} = \hat{P}(H^T R^{-1}y + \bar{P}^{-1}\bar{x}) = \hat{P}H^T R^{-1}y + \hat{P}\bar{P}^{-1}\bar{x}$$</p>
+<p>Substituting $\hat{P} = (I - KH)\bar{P}$:</p>
+<p>$$\tag{1}
+\hat{x} = \hat{P}H^T R^{-1}y + (I - KH)\bar{P}\bar{P}^{-1}\bar{x}
+$$</p>
+<p>Noting from our original expression for $K$ that:</p>
+<p>$$\bar{P}H^T = KR + KH \bar{P} H^T$$
+$$(I - KH)\bar{P} H^T = KR$$</p>
+<p>From our derivation of $\hat{P}$, we had: $\hat{P} = (I - KH)\bar{P}$. From this, we see:</p>
+<p>$$\hat{P}H^T = KR$$</p>
+<p>Substituting this into (1), we have:</p>
+<p>$$ \hat{x} = KR R^{-1}y + (I - KH)\bar{P}\bar{P}^{-1}\bar{x} $$</p>
+<p>Cancelling:</p>
+<p>$$ \hat{x} = Ky + (I - KH)\bar{x} $$</p>
+<p>Distributing $\bar{x}$ and then factoring out $K$:</p>
+<p>$$\tag{2} \hat{x} = \bar{x} + K(y  - H\bar{x}) $$</p>
+<p>This is the fundamental update of the Kalman filter!!! The last two equations also make it more clear that the Kalman filter is basically doing the more rigorous version of EWMA, where $K$ is analogous to the EWMA credence parameters (eg: $\alpha$), except that $K$ gets updated in a statistically rigorous way to reflect a <em>current</em> credence.</p>
+<h2 id="the-three-equations-of-kalman-filtering">The Three Equations of Kalman Filtering</h2>
+<p>$$K = \bar{P}H^T(R + H \bar{P} H^T)^{-1}$$
+$$\hat{P} = (I - KH)\bar{P}$$
+$$\hat{x} = \bar{x} + K(y  - H\bar{x})$$</p>
+<h3 id="kalman-vs-lumve">Kalman vs LUMVE</h3>
+<p><strong>Efficiency:</strong>
+The Kalman filter and the LUMVE with <em>a priori</em> give the same result (we have just seen how the Kalman filter is simply a different formulation of LUMVE).</p>
+<p>Examining the Kalman Filter, though, we see that in (0), our definition of $K$, the term that&rsquo;s being inverted is very low-dimensional (it&rsquo;s $m \times m$, where $m$ is the dimensionality of the measurement vector - $m$ is almost always smaller, and often significantly smaller, than $n$). Since we don&rsquo;t need to take any inverses anywhere else in our three fundamental equations, we&rsquo;ve completely avoided the need for an $n \times n$ inverse (as compared to LUMVE).</p>
+<p>Over these 3 posts, we&rsquo;ve derived the Kalman filter from scratch and compared it to the much simpler EWMA/DEWMA estimation algorithms. I&rsquo;ve tried to take a much simpler approach than the rigorous literature I&rsquo;ve seen on KF without eliding too much in the way of mathematical detail. If you find any issues with it, I&rsquo;d love it if you could file an issue on <a href="https://github.com/sscheele/sscheele.github.io/issues">the site Github</a>.</p>
+<p><a href="../kf-2/">&lt; Kalman Filtering: Part 2</a></p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

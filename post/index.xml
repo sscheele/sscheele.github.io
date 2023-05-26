@@ -6,7 +6,17 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 21 May 2023 18:14:41 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 25 May 2023 23:39:41 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Kalman Filtering: Part 3</title>
+      <link>/post/kf-3/</link>
+      <pubDate>Thu, 25 May 2023 23:39:41 -0400</pubDate>
+      
+      <guid>/post/kf-3/</guid>
+      <description>Welcome to my third Kalman Filtering post! We left off on a cliffhanger. How will the LUMVE algorithm perform against Double EWMA?
+Pretty well! In the graph, DEWMA starts out with a better estimate than LUMVE, but LUMVE stays pretty consistently closer to ground truth by being initially more willing to update based on new measurements and later more reluctant to fit noise. Of course, DEWMA has tunable parameters that let it be more willing to update, too.</description>
+    </item>
+    
     <item>
       <title>Kalman Filtering: Part 2</title>
       <link>/post/kf-2/</link>
