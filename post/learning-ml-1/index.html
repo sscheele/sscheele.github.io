@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Learning ML 1 | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Learning ML 1</span></h1>
+
+<h2 class="date">2023/06/06</h2>
+</div>
+
+<main>
+<p>I&rsquo;ve decided to get a lot better at ML, and I enjoyed my Rust learning log so much that I&rsquo;m going to do something similar for this. However, I think there will be a lot of differences between learning ML and learning Rust. Rust is an easier learning environment in some important ways:</p>
+<ul>
+<li><strong>Causal models</strong> - In Rust, we have a reasonably good idea of what&rsquo;s going on, and we can look things up when we don&rsquo;t. We can understand, for example, why we can&rsquo;t take a second mutable reference to some object: this would violate the invariants of the borrow checker. If we want to understand why the borrow checker is set up this way, we can do that. In ML, most explanations for why something works well are post-hoc, and solutions built from first principles fail more often than they succeed. <em>We can&rsquo;t simply learn the underlying logic of ML to predict what will and won&rsquo;t work.</em></li>
+<li><strong>Iteration speed</strong> - Rust allows you to fail even faster than most compiled languages, because so many errors are caught by the compiler, and it also gives you incredibly helpful error messages. In ML, on the other hand, slow training makes it hard to test your ideas, and when they fail you typically don&rsquo;t know why.</li>
+</ul>
+<p>I expect that learning ML will be a lot like learning to be a mason or herbalist used to be: lots of arcane tricks without much grounding in a causal system, with expensive experimentation getting in the way of rapid improvement. Learning masonry or herbalism(?) on your own is not the move: you need to apprentice yourself to someone and watch how they do it. Absent that, here are some of my ideas:</p>
+<h2 id="online-courses">Online Courses</h2>
+<p>I&rsquo;ve taken online ML courses before and consider them more or less worthless, as they focus way more on theory than on practice. If we continue the masonry metaphor, it appears to me that online ML courses consider it extremely important that all masons should have a deep background in geology. Sure, rocks are important to masonry, and knowing which ones to use is probably really helpful. But at some point those rocks have to be assembled into a building, and I&rsquo;m not convinced that most college professors even know how to do that. It would be very fair to point out that sooner or later, masonry gets revolutionized by stronger theoretical understanding (like trigonometry), but I&rsquo;m not trying to invest time in that at the moment.</p>
+<p>I&rsquo;d be delighted to be wrong here, a good online course would be super convenient, and I&rsquo;ll keep trying to find one.</p>
+<h2 id="reading-kaggle">Reading Kaggle</h2>
+<p>Kaggle seems like a great resource, though they maybe (understandably) underemphasize robotics applications. I expect that one of the best ways to improve will be to look at the top 3 submissions to a contest relative to the 50th percentile or so to try and get an idea of what the best people in the world do differently than the middle of the pack (I assume the bottom 50% aren&rsquo;t really trying, which isn&rsquo;t a very interesting way to fail).</p>
+<h2 id="small-experiments-maybe-competing-in-kaggle">Small experiments (maybe competing in Kaggle?)</h2>
+<p>My computer is a 2016 Dell laptop, and I absolutely love it. I plan to get another one just like it if it ever breaks for good, but it&rsquo;s not exactly an ML powerhouse, so I can&rsquo;t train big neural nets unless I&rsquo;m willing to pay for time on a cluster (which I currently can&rsquo;t afford). But that doesn&rsquo;t stop me from training small neural nets. I&rsquo;m not sure how well I should expect this to work, though. If the last year or two in ML has made anything clear, it&rsquo;s that large NNs have fundamentally different capabilities than small ones. Shouldn&rsquo;t we expect that they need different approaches, too?</p>
+<h2 id="reading-reddit">Reading Reddit</h2>
+<p>There seem to be two relevant Reddit communities if you want to learn ML: <a href="https://www.reddit.com/r/learnmachinelearning/">r/learnmachinelearning</a> and <a href="https://www.reddit.com/r/MachineLearning/">r/MachineLearning</a>. I don&rsquo;t expect that reading Reddit alone would be a good way to learn, but maybe it will be a good way to track the field and see what other people are doing.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
