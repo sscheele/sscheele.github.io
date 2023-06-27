@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>SVD Interpretations | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">SVD Interpretations</span></h1>
+
+<h2 class="date">2023/06/27</h2>
+</div>
+
+<main>
+<p>Steve Brunton recently released the second edition of his textbook, entitled &ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&rdquo; Since ML, dynamical systems, and control are three of my favorite things to learn about, I&rsquo;ve decided to read all 761 pages of the book and do a writeup in many parts. This is the first part, and will cover interpretations of the Singular Value Decomposition (SVD), pages 1-55 of the book.</p>
+<h1 id="svd-overview">SVD Overview</h1>
+<p>SVD is a matrix factorization method which can represent <em>any</em> matrix $A$, which has $n$ rows and $m$ columns, as a product of three other matrices:</p>
+<p>$$A = U \Sigma V^*$$</p>
+<p>Where $X^*$ is the complex conjugate transpose of $X$. The shapes of these matrices are:</p>
+<ul>
+<li>$U$: $n \times n$ - a unitary matrix with orthonormal columns</li>
+<li>$\Sigma$: $n \times m$ - a matrix with real, non-negative values on the diagonal and zeros off the diagonal</li>
+<li>$V$: $m \times m$ - a unitary matrix with orthonormal columns</li>
+</ul>
+<p>(A <em>unitary</em> matrix is one for which $U U^{<em>}= U^{</em>}U = I$ - that is, its complex conjugate transpose is its inverse).</p>
+<p>The matrix product form of SVD is equivalent to:</p>
+<p>$$A = \sum\limits_{k=1}^{r} \sigma_{k} u_{k} v^{*}_{k}$$</p>
+<p>Where $u_{k}$ and $v^{ * }_ {k}$ are respectively the $k$th columns of $U$ and $V$ (such that $u_{k} v^{ * }_ {k}$ is an $n \times m$ matrix).</p>
+<p>In the event that  $n \geq m$ (a tall-skinny matrix), $\Sigma$ is also tall-skinny, meaning that it&rsquo;s sort of a diagonal matrix resting on a block of zeros:</p>
+<p>$$\Sigma = \begin{bmatrix} \hat{\Sigma} \ 0 \end{bmatrix}$$</p>
+<p>If we similarly break $U$ into $U = [\hat{U}\ \hat{U}^\bot]$, we see that $\hat{U}^\bot$ will be nulled out by the block of zeros in $\Sigma$, so we can exactly represent $A$ using the <em>economy SVD</em>:</p>
+<p>$$A = \hat{U} \hat{\Sigma} V^*$$</p>
+<p>The diagonal elements of $\Sigma$ are called the <em>singular values</em> of the matrix, and their associated columns in $U$ and $V$ are called the left and right <em>singular vectors</em>.</p>
+<h1 id="interpretation-1-matrix-approximation">Interpretation 1: Matrix Approximation</h1>
+<p>Looking at the summation form of the SVD:</p>
+<p>$$A = \sum\limits_{k=1}^{r} \sigma_{k} u_{k} v^{*}_{k}$$</p>
+<p>$u_{k}$ and $v_{k}$ are both columns in an orthonormal basis, meaning that all their entries are bounded between -1 and 1. In the matrix $u_ {k} v^{ * }_ {k}$, each entry must then have the same bounds. The singular value $\sigma_{k}$ could then be thought of as assigning a weight to each $(u_{k}, v_{k})$ pair. If we took the $\tilde{r}$ largest few singular values and their associated singular vectors, we could get a rank-$\tilde{r}$ approximation for $A$ using the economy SVD.</p>
+<p>As it turns out, this is an optimal low-rank matrix approximation for $A$ for all $\tilde{r}$. This means that we can, for example, use SVD as an image compression algorithm.</p>
+<h1 id="interpretation-2-directions-of-maximum-variance">Interpretation 2: Directions of Maximum Variance</h1>
+<p>In the singular value decomposition of a matrix $A$, we can see that the left singular vectors are eigenvectors of the row-wise correlation matrix $AA^*$ and the right singular vectors are eigenvectors of the column-wise correlation matrix $A^{ * }A$. The obvious question is: why should we care about this? What can we do with the eigenvectors of correlation matrices?</p>
+<p>The answer is: we can do PCA. As a refresher, PCA, or Principal Components Analysis, is a dimensionality reduction technique where we try to find the $k$ vectors which explain as much of the <em>variance</em> in $A$ as possible (in this case, $A$ is probably a collection of datapoints, so the row-wise variance, by convention, is variance between the datapoints). As it turns out, <em>the eigenvectors of the correlation matrix of $A$ are the directions of maximum variance</em>, so SVD is used to perform PCA. We might intuitively expect something like this to be true based on interpretation 1 (if the first $\tilde{r}$ columns explain most of the data in the matrix, surely they also explain most of the variance), but when I asked GPT-4 to prove that the eigenvectors of the correlation matrix are the directions of maximum variance it spent like 5 minutes writing an answer that relied on &ldquo;Rayleigh quotients&rdquo; (fun new LLM game: &ldquo;real math thing, or hallucintation?&rdquo;), so I&rsquo;m just going to trust that someone has figured this out.</p>
+<h1 id="wrapup">Wrapup</h1>
+<p>Steve Brunton&rsquo;s book goes into way more detail than I have here, which is why this post is like two pages and the book chapter is 50. In particular, he spends a lot of time on when the SVD does and doesn&rsquo;t provide good approximations of a matrix/dataset, gives some alternatives and generalizations (like randomized SVD and tensor decomposition), and provides cool examples.</p>
+<p>The next chapter of the book covers one of my favorite techniques: Fourier and wavelet transforms.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

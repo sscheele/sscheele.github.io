@@ -6,7 +6,16 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 06 Jun 2023 11:49:09 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 27 Jun 2023 12:17:39 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>SVD Interpretations</title>
+      <link>/post/svd-interp/</link>
+      <pubDate>Tue, 27 Jun 2023 12:17:39 -0400</pubDate>
+      
+      <guid>/post/svd-interp/</guid>
+      <description>Steve Brunton recently released the second edition of his textbook, entitled &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo; Since ML, dynamical systems, and control are three of my favorite things to learn about, I&amp;rsquo;ve decided to read all 761 pages of the book and do a writeup in many parts. This is the first part, and will cover interpretations of the Singular Value Decomposition (SVD), pages 1-55 of the book.</description>
+    </item>
+    
     <item>
       <title>Learning ML 1</title>
       <link>/post/learning-ml-1/</link>
