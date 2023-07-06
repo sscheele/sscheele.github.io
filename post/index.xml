@@ -6,7 +6,19 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 27 Jun 2023 12:17:39 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Wed, 05 Jul 2023 19:00:39 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Fourier and Wavelet Transforms</title>
+      <link>/post/fourier-wavelet/</link>
+      <pubDate>Wed, 05 Jul 2023 19:00:39 -0400</pubDate>
+      
+      <guid>/post/fourier-wavelet/</guid>
+      <description>Welcome! This post, on the Fourier and wavelet transforms, is a continuation of my series summarizing the new edition of Steve Brunton&amp;rsquo;s textbook, &amp;ldquo;Data-Driven Science and Engineering.&amp;rdquo; In the current edition, this post covers pages 64-117.
+You can think of the Fourier transform as a specific kind of projection, similar to a vector projection:
+$$\text{proj}_{v}(u) = \frac{v}{v \cdot v} u \cdot v$$
+That&amp;rsquo;s how you project a vector $u$ onto a vector $v$, but it relies on the dot product.</description>
+    </item>
+    
     <item>
       <title>SVD Interpretations</title>
       <link>/post/svd-interp/</link>

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fourier and Wavelet Transforms | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Fourier and Wavelet Transforms</span></h1>
+
+<h2 class="date">2023/07/05</h2>
+</div>
+
+<main>
+<p>Welcome! This post, on the Fourier and wavelet transforms, is a continuation of my series summarizing the new edition of Steve Brunton&rsquo;s textbook, &ldquo;Data-Driven Science and Engineering.&rdquo; In the current edition, this post covers pages 64-117.</p>
+<p>You can think of the Fourier transform as a specific kind of projection, similar to a vector projection:</p>
+<p>$$\text{proj}_{v}(u) = \frac{v}{v \cdot v} u \cdot v$$</p>
+<p>That&rsquo;s how you project a vector $u$ onto a vector $v$, but it relies on the dot product. If we wanted to project a function $f$ onto another function $g$, we&rsquo;ll first need the equivalent of a dot product for functions. If we sampled $f$ and $g$ over some $n$ points on some domain $[a, b]$, we could construct vectors and dot them:</p>
+<p>$$[f_ {1}, f_ {2}, \dots, f_ {n}] \cdot [\bar{g}_ {1}, \bar{g}_ {2}, \dots, \bar{g}_ {n}] = \sum\limits_ {i = a}^{b} f_ {i} \bar{g}_ {i}$$</p>
+<p>We take the complex conjugate of $g$, $\bar{g}$, for reasons I don&rsquo;t understand. This function, though, isn&rsquo;t very useful, because as $n$ grows, this function also grows unboundedly. We want to grow $n$ infinitely, and so we&rsquo;ll normalize the function by the space between the sampling points, in the style of a Riemann integral:</p>
+<p>$$\frac{b - a}{n - 1} \sum\limits_{i = a}^{b} f_{i} \bar{g}_{i}$$</p>
+<p>As I maybe gave away, this is just a Riemann approximation of:</p>
+<p>$$\int_{a}^{b} f(x)\bar{g}(x) dx$$</p>
+<p>Which is called the Hermetian inner product. Since this is an inner product of functions (in the same way that the dot product is an inner product of vectors), we&rsquo;ll denote it $\langle f, g \rangle$. We can now perform our projection operation using this inner product!</p>
+<h2 id="function-projections-example">Function Projections: Example</h2>
+<p>For instance, we can project the function $f(x) = x$ onto $g(x) = x^2$ on the interval 0 to 2:</p>
+<p>$$\begin{align}
+\text{proj}_ {g}(f) = \frac{g}{\langle g, g \rangle} \langle f, g \rangle \\
+\langle g, g \rangle = \int_ {0}^{2} x^2 x^{2} dx = \frac{1}{5}x^{5} ]_ {0}^{2} = \frac{32}{5} \\
+\langle f, g \rangle = \int_ {0}^{2} x x^{2} dx = \frac{1}{4}x^{4} ]_ {0}^{2} = 4 \\
+\text{proj}_ {g}(f) = \frac{g}{\frac{32}{5}} 4 = \frac{5g}{8} = \frac{5}{8}x^2
+\end{align}$$</p>
+<p>In English, this means that the best approximation of $x$ on the interval 0 to 2 is $\frac{5}{8}x^2$.</p>
+<h1 id="fourier-series">Fourier Series</h1>
+<p>One of the fundamental insights of Fourier analysis is that <em>any</em> periodic function (as long as it&rsquo;s piecewise smooth, meaning that its derivative is piecewise continuous) can be represented by an infinite number of sine and cosine functions of different frequencies. Mathematically:</p>
+<p>$$f(x) = \frac{a_ {0}}{2} + \sum\limits_ {k=1}^{\infty} \text{proj}_ {\cos(kx)}(f(x)) + \text{proj}_ {\sin(kx)}(f(x))$$</p>
+<p>More commonly, you&rsquo;ll see:</p>
+<p>$$\sum\limits_{k=1}^{\infty} a_{k}\cos(kx) + b_{k} \sin(kx)$$</p>
+<p>Where $a_{k}$ and $b_{k}$ are defined by the inner product of $f$ with the respective cosine and sine functions, typically on the interval of $[-\pi, \pi]$ (we assume that $f$ is $2\pi$-periodic, and typically do changes of basis to ensure this before we start using the Fourier series). Since $\sin$ is odd (that is, $\sin(x) = -\sin(-x)$), it has the nice property that its inner product with even functions is always zero (and vice versa for $\cos$ - its inner product with odd functions is always zero).</p>
+<p>The big problem with this is that it&rsquo;s not cool. As any mathematician will tell you, all the cool kids use phasors. So we can instead do:</p>
+<p>$$f(x) = \sum\limits_{k=1}^{\infty} \text{proj}_{e^{ikx}}(f(x))$$</p>
+<p>Or, again more commonly:</p>
+<p>$$f(x) = \sum\limits_{k=1}^{\infty} c_{k} e^{ikx}$$</p>
+<p>Where $i$ is now the imaginary unit. Instead of $a_{k}$ and $b_{k}$ (lame!) we now just have a $c_{k}$, which, in a mnemonically convenient twist, is a complex number:</p>
+<p>$$c_{k} = \frac{1}{2\pi} \int_{-\pi}^{\pi} e^{-ikx} f(x)$$</p>
+<p>The leading $\frac{1}{2\pi}$ term comes from the $\langle g, g \rangle$ in the projection. The $-ikx$ exponent is negative because we had a complex conjugate in our inner product definition.</p>
+<h1 id="the-fourier-transform">The Fourier Transform</h1>
+<p>The Fourier series tells us how to turn a periodic function into a bunch of sines and cosines. The Fourier transform tells us how to turn a <em>non</em>-periodic function into a bunch of sines and cosines! The trick here is to extend the period of of the Fourier series $[a, b]$ to be infinitely large, while also increasing the sampling resolution (the number of frequency samples, or $c_{k}$ items) to be infinite (turning a sum into an integral). The textbook goes through a proof of this, but basically all this ends up doing is dropping the leading term from our $c_{k}$ integral. Of course, &ldquo;increasing the sampling resolution to be infinite&rdquo; basically just means a switch from defining a discrete series $c_{k}$ to defining a continuous function $\hat{f}(\omega)$, where $\omega$ is a frequency term just like $k$ was. All together, we get:</p>
+<p>$$\hat{f}(\omega) = \int_{-\infty}^{\infty} e^{-i\omega x} f(x)$$</p>
+<p>If we wanted to undo this (that is, to go from a function that tells us about the amplitude and phase of the sinusoidal components in the <em>frequency domain</em> to a function that tells us about values in the <em>time domain</em>), we could use the Fourier analysis integral:</p>
+<p>$$f(x) = \frac{1}{2\pi} \int_{-\infty}^{\infty} e^{i\omega x} \hat{f}(\omega)$$</p>
+<p>We can denote a Fourier transform with the operator $\mathcal{F}$, in the sense of $\hat{f}(\omega) = \mathcal{F}(f(x))$</p>
+<h1 id="discrete-fourier-transform-dft">Discrete Fourier Transform (DFT)</h1>
+<p>The DFT is really a lot more like a Fourier <em>series</em> than a Fourier <em>transform</em>. It extends the Fourier series to work with discretely sampled data rather than a continuous function. It does this by pretending that the data you feed it is all a single period of a periodic function:</p>
+<p>$$\hat{f}_ {k} = \sum\limits_ {j=0}^{n-1} f_ {j} e^{-ikj\frac{2\pi}{n}}$$</p>
+<p>You might be wondering about the normalization. Also for reasons I don&rsquo;t understand, this is traditionally done in the analysis:</p>
+<p>$$f_{k} = \frac{1}{n} \sum\limits_{j=0}^{n-1} \hat{f}_{j} e^{ikj\frac{2\pi}{n}}$$</p>
+<h2 id="fast-fourier-transform-fft">Fast Fourier Transform (FFT)</h2>
+<p>I have my own favorite explanation of the FFT algorithm, which differs from the one given in the book and is outside the scope of this summary. But suffice it to say that the FFT is a very cool algorithm which can perform DFTs quickly, which is important because the regular DFT scales with $O(n^2)$, which is bad. The FFT scales with $O(n \log n)$, which is the reason we can do modern signal processing.</p>
+<p>One of the very cool things Steve notes in the book is that apparently Gauss figured out the FFT in 1805 as an interpolation method, <em>before Fourier even figured out the regular Fourier transform. Gauss thought it wasn&rsquo;t a big deal and didn&rsquo;t bother publishing anything on it.</em> The FFT was then independently discovered in 1965 in the US, and it&rsquo;s not an exaggeration to say that modern information technology wouldn&rsquo;t be possible without it.</p>
+<h1 id="filtering">Filtering</h1>
+<p>If you know a signal is periodic, filtering it as a periodic signal (instead of a general time series) will be incredibly helpful. One way to do this is to look at the Power Spectral Density (the normalized squared magnitude of $\hat{f}$) of the signal to find a good threshold, then use only components that pass that threshold. Steve has a great illustration (Fig 2.9) of using this technique to get amazing results filtering a periodic function with lots of Gaussian noise added in - the results are much better than what you&rsquo;d get from a more general filtering technique.</p>
+<h1 id="solving-pdes">Solving PDEs</h1>
+<p>The Fourier Transform was invented by Fourier to solve a PDE (by turning it into an ODE). Steve actually shows how to do this in the book. This isn&rsquo;t so interesting to me and I skipped it.</p>
+<h1 id="gabor-transform-spectrogram">Gabor Transform (Spectrogram)</h1>
+<p>Spectrograms are a pretty basic DSP thing, and I don&rsquo;t want to cover them in detail either. The Gabor transform is a way of getting a spectrogram, and it involves taking your function of interest and multiplying it by a Gaussian centered at the time you&rsquo;re interested in. Then you do a Fourier transform on that. You can find a spectrogram by doing something other than a Gaussian, but Gaussians are particularly well-behaved because they&rsquo;re continuous (meaning your spectrogram won&rsquo;t have high-frequency artifacts at discontinuities, as it would if you tried to use a rectangular window).</p>
+<h1 id="laplace-transform">Laplace Transform</h1>
+<p>This one is cooler! You might know about Laplace transforms from differential equations; Steve points out that the Laplace transform actually follows very naturally from the Fourier transform. Let&rsquo;s say you want to use Fourier transforms to solve a PDE. If you&rsquo;re going to do a Fourier transform, the square of the function you&rsquo;re integrating over an infinite domain needs to have a finite area (more precisely, $\langle f, f \rangle$ must be finite over $[-\infty, \infty]$). Most functions&hellip; are not like that. So the first insight is to multiply your function $f(x)$ by $e^{-\gamma x}$, so your Fourier transform is now:</p>
+<p>$$\mathcal{F}(f(x) e^{-\gamma x}) = \int_{-\infty}^{\infty} f(x) e^{-\gamma x} e^{-i \omega x} dx$$</p>
+<p>This is also nice because we&rsquo;re trying to solve differential equations, and differential equations don&rsquo;t typically mind being multiplied by an exponential function because it has such a simple derivative. Except, whoops, $e^{-\gamma x}$ diverges as $x \rightarrow -\infty$. The genius of the Laplace function is to not even try to fix this and just change the bounds instead:</p>
+<p>$$\begin{align}
+&amp; \int_{0}^{\infty} f(x) e^{-\gamma x} e^{-i \omega x} dx \
+&amp;= \int_{0}^{\infty} f(x) e^{-(\gamma + i \omega) x} dx \
+&amp;= \int_{0}^{\infty} f(x) e^{-sx} dx
+\end{align}$$</p>
+<p>Where we introduce $s = -(\gamma + i \omega)$ on the last line. That&rsquo;s literally the Laplace integral.</p>
+<p>$$\mathcal{L}(f(x)) = \int_{0}^{\infty} f(x) e^{-s x} dx$$</p>
+<p>Actually using Laplace integrals to solve PDEs is out of scope, but they&rsquo;re a very common technique, and it&rsquo;s cool to see them motivated in this way.</p>
+<h1 id="wavelet-transforms">Wavelet Transforms</h1>
+<h2 id="fourier-othogonality">Fourier Othogonality</h2>
+<p>One important property of the Fourier series is that it&rsquo;s an <em>orthogonal</em> basis set, meaning that adding a pure sine wave of a certain frequency to a signal only, in theory, changes the Fourier coefficient for that frequency. This is very useful because it allows us to compute coefficients independently of each other! This orthogonality is a property of the <em>Hilbert space</em> (infinite-dimensional vector space of functions) we chose to project into. Phrased more comprehensibly, the orthogonality property comes from this property of the vector space: the inner product $\langle e^{ijx}, e^{ikx} \rangle$ is equal to zero for all $j \neq k$:</p>
+<p>$$\int_{-\pi}^{\pi} e^{ijx} e^{-ikx} dx = \int_{-\pi}^{\pi} e^{(j-k)ix} dx = \frac{1}{(j-k)i} e^{(j-k)ix} ]_{x=-\pi}^{\pi}$$</p>
+<p>This evaluates to 0, unless $j = k$, because $e^{a\pi} = e^{-a\pi}$ for all $a$. In the event $j = k$, the initial integral is just the integral of the constant function $f(x)= 1$, so the integral evaluates to $2\pi$</p>
+<h2 id="wavelets">Wavelets</h2>
+<p>The key insight of the wavelet transform is that as long as you can generate an orthogonal basis from scaled and translated versions of a function, you don&rsquo;t <em>need</em> to use sines and cosines for your Fourier-like transform. The book doesn&rsquo;t go into very much detail on use cases for this, other than that it&rsquo;s good for &ldquo;extracting multi-scale structures in a hierarchy&rdquo; (because your wavelets can be on many different scales).</p>
+<h1 id="2d-transforms">2D Transforms</h1>
+<p>There are 2D versions of the Fourier and wavelet transform. The 2D version of the Fourier transform first does a 1D FFT of each row, then does a 1D FFT of the columns of the Fourier coefficients matrix generated in the first set. As it turns out, you can do the rows and columns in either order and get the same result. This coding can also be used for image compression, and Steve shows how it can get 99% compression ratios with pretty good reconstruction (for his test image). I don&rsquo;t see any reason this couldn&rsquo;t be extended to an arbitrary number of dimensions if you wanted to do video compression, for example.</p>
+<h1 id="next">Next</h1>
+<p>The next chapter in the book is on something I know virtually nothing about, &ldquo;sparsity and compressed sensing.&rdquo; Stay tuned!</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
