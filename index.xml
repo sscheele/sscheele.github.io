@@ -6,9 +6,19 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 05 Jul 2023 19:00:39 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 19 Sep 2023 08:31:33 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Fourier and Wavelet Transforms</title>
+      <title>Brunton Textbook Review - Compressed Sensing</title>
+      <link>/post/compressed-sensing/</link>
+      <pubDate>Tue, 19 Sep 2023 08:31:33 -0400</pubDate>
+      
+      <guid>/post/compressed-sensing/</guid>
+      <description>This essay continues my review of Steve Brunton&amp;rsquo;s textbook, &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo;.
+A while ago, I wanted to do machine learning on some time-series data, but I had a problem: some timesteps in the (otherwise regularly-sampled) dataset had been removed for being &amp;ldquo;low-quality.&amp;rdquo; I couldn&amp;rsquo;t get the original data, but I also couldn&amp;rsquo;t figure out a good way to interpolate the missing data. At the time, I think I just backfilled the data with the next non-null value, but in retrospect, it probably would have been a good idea to turn to compressed sensing.</description>
+    </item>
+    
+    <item>
+      <title>Brunton Textbook Review - Fourier and Wavelet Transforms</title>
       <link>/post/fourier-wavelet/</link>
       <pubDate>Wed, 05 Jul 2023 19:00:39 -0400</pubDate>
       
@@ -20,7 +30,7 @@ That&amp;rsquo;s how you project a vector $u$ onto a vector $v$, but it relies o
     </item>
     
     <item>
-      <title>SVD Interpretations</title>
+      <title>Brunton Textbook Review - SVD Interpretations</title>
       <link>/post/svd-interp/</link>
       <pubDate>Tue, 27 Jun 2023 12:17:39 -0400</pubDate>
       

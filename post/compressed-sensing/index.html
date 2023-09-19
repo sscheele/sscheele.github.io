@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Brunton Textbook Review - Compressed Sensing | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Brunton Textbook Review - Compressed Sensing</span></h1>
+
+<h2 class="date">2023/09/19</h2>
+</div>
+
+<main>
+<p>This essay continues my review of Steve Brunton&rsquo;s textbook, <a href="https://faculty.washington.edu/sbrunton/DataBookV2.pdf">&ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&rdquo;</a>.</p>
+<p>A while ago, I wanted to do machine learning on some time-series data, but I had a problem: some timesteps in the (otherwise regularly-sampled) dataset had been removed for being &ldquo;low-quality.&rdquo; I couldn&rsquo;t get the original data, but I also couldn&rsquo;t figure out a good way to interpolate the missing data. At the time, I think I just backfilled the data with the next non-null value, but in retrospect, it probably would have been a good idea to turn to compressed sensing. In this review, we&rsquo;ll first briefly review sparsity, which is an essential concept for compressed sensing, and then turn to compressed sensing itself. Then we&rsquo;ll learn some variations and applications of compressed sensing.</p>
+<h1 id="sparsity">Sparsity</h1>
+<p>A sparse vector is one with mostly zero-valued entries. A $k$-sparse vector is one with $k$ nonzero entries. We&rsquo;re often interested in finding sparse representations: for instance, the Fourier transform, as used for audio or image compression, is a basis which frequently yields sparse representations (you can, of course, null out small Fourier coefficients without doing much damage to reconstruction quality)</p>
+<p>A sparse representation of vector $x$ can be denoted:</p>
+<p>$$x = \Psi s$$</p>
+<p>Where $s$ is a sparse vector, and $\Psi$ is some basis space which admits a sparse representation of $x$.</p>
+<h1 id="compressed-sensing">Compressed Sensing</h1>
+<p>Compressed sensing is the idea of trying to sense a sparse representation of a state in order to then infer the state itself. Specifically, if you have a sparse measurement $y$ (which is typically very low-dimensional relative to $x$) derived from the state by some sensing matrix:</p>
+<p>$$y = Cx$$</p>
+<p>If $x$ is an image, $C$ might, for example, be random rows of the identity matrix (sampling random pixels), or contain Gaussian or Bernoulli distributed random numbers (random projections).</p>
+<p>We are ultimately interested in $x$, but to find it we wish to find a good value for $s$:</p>
+<p>$$y = Cx = C \Psi s = \Theta s$$</p>
+<p>Since this equation is under-determined (by design, since fully determining $x$ is what we&rsquo;re trying to avoid), we must set some optimality criterion for $s$, like we did for the Kalman filter. Here, we assume that $x$ is maximally structured in our projection space, meaning that $s$ should be maximally sparse. As an optimization problem:</p>
+<p>$$\hat{s} = \text{argmin}_ {s} ||s||_ {0}\quad \text{s.t.} \quad y = C \Psi s$$</p>
+<p>Where $||s||_{0}$ is the L0 norm, the number of nonzero entries in $s$.</p>
+<p>The problem using the L0 norm is non-convex and requires a combinatorial search to solve in general, but in certain cases we can relax it into a (convex) L1-norm minimization:</p>
+<p>$$\hat{s} = \text{argmin}_ {s} ||s||_ {1}\quad \text{s.t.} \quad y = C \Psi s$$</p>
+<p>Where the L1 norm is the sum of absolute values of the vector entries.</p>
+<p>The conditions required for this relaxation to be valid are:</p>
+<ol>
+<li>The measurement matrix $C$ must be incoherent with respect to the sparsifying basis $\Psi$, meaning that the rows of $C$ are not correlated with the columns of $\Psi$.</li>
+<li>The number of measurements $p$ must be sufficiently large:</li>
+</ol>
+<p>$$p \approx k_{1} K \log(n/K)$$</p>
+<p>Where $K$ is the sparsity of $s$, $n$ is the dimensionality of $x$, and $k_{1}$ is a constant related to the incoherence of $C$ and $\Psi$.</p>
+<h1 id="variations-on-optimization-problem">Variations on Optimization Problem</h1>
+<p>You can do a few different variations on the optimization. For instance, if you have a noisy sensor then you might do:</p>
+<p>$$\hat{s} = \text{argmin}_ {s} ||s||_ {1}\quad \text{s.t.} \quad y - C \Psi s &lt; \epsilon$$</p>
+<p>Or perhaps you might even make the error term part of the optimization and solve an unconstrained problem:</p>
+<p>$$\hat{s} = \text{argmin}_ {s} ||y - C \Psi s &lt; \epsilon||_ {2} + \lambda||s||_ {1}$$</p>
+<p>There are also greedy algorithms that solve compressed sensing problems without actually doing convex optimization, such as CoSaMP. A downside of this approach is that these algorithms typically require that $K$, the sparsity of $s$, be specified ahead of time. In practice, overestimating $K$ typically doesn&rsquo;t do much harm, and CoSaMP is used often.</p>
+<h1 id="why-you-cant-do-compressed-sensing-of-images">(Why You Can&rsquo;t Do) Compressed Sensing of Images</h1>
+<p>We can imagine doing compressed sensing to recover images by viewing only a few pixels, but the formula for the number of measurements above can give us an idea of why this is difficult. If we want to recover the 5% of the Fourier coefficients necessary to reconstruct a 1024x768 image accurately, we would have $K = 0.5 * 1024 * 768 \approx 40000$. If we use $k_ {1} = 3$, we find that we need 350,000 measurements - about 45% of the original pixels. Also, even with convex optimization, $K=40000$ is still a massive number of simultaneous variables to be solving, and the problem is probably too computationally intensive.</p>
+<h1 id="time-series-example">Time-Series Example</h1>
+<p>Returning to my earlier time-series problem: my data had strong periodic components, so it&rsquo;s probably obvious now why compressed sensing would have worked well for me. I can try to sense in the Fourier domain, then find the values that yield the sparsest representation there. Here, we would have $C$ as a set of rows of an identity matrix, representing the fact that I&rsquo;m sparsely sampling the hidden true time series. $\Psi$ would be a Discrete Cosine Transform of an identity matrix (multiplication by $\Psi$ would be a discrete Fourier transform). Then we could use either convex optimization or CoSaMP to back out Fourier coefficients that matched my data, and from there do a Fourier analysis to figure out the missing values. A similar example, with code, is given in the book (&ldquo;Recovering an Audio Signal from Sparse Measurements&rdquo;).</p>
+<h1 id="sparse-regression">Sparse Regression</h1>
+<p>In regression, we have to find some $x$ that best describes the relationship between the columns of a matix $A$ and a vector $b$ ($Ax = b$).</p>
+<p>Usually, the goal of regression is to minimize square error. However, this can have the problem of being overly sensitive to outliers. Sometimes it&rsquo;s better to do regression based on the L1 norm. There&rsquo;s also a technique called LASSO, which finds:</p>
+<p>$$x = \text{argmin}_ {x&rsquo;} ||Ax&rsquo; - b||_ {2} + \lambda||x&rsquo;||_ {1}$$</p>
+<h1 id="sparse-representation-rpca-sparse-sensor-placement">Sparse Representation, RPCA, Sparse Sensor Placement</h1>
+<p>The last sections of the book were less interesting to me, but they dealt with other applications of sparsity. First was finding sparse representations of high-dimensional data and things you can do with that (for example: you can find sparse bases to represent faces and use this to create a highly robust face dictionary). Then there was Robust Principal Components Analysis, which solves the outlier sensitivity of PCA by first decomposing data into its robust components and its outlier/corrupt components: $X = L + S$. There&rsquo;s a cool example of this being used to fix images of faces by removing occlusions and replacing them with the most consistent facial elements from the eigenfaces. Then there&rsquo;s some stuff on where to place your sparse sensors in order to get the best reconstruction accuracy. All useful if you have an application in mind for sparse sensing, but out of scope for this overview.</p>
+<p>This finishes part 1 of the textbook! As the next part (pages 158-303) is on machine learning, a topic I already know the basics of well, I&rsquo;ve decided to skip it. So I&rsquo;ll pick up in part 3, Dynamics and Control!</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
