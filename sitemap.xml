@@ -2,13 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>/post/compressed-sensing/</loc>
-    <lastmod>2023-09-19T08:31:33-04:00</lastmod>
+    <loc>/post/data-driven-dynamics/</loc>
+    <lastmod>2023-09-21T08:48:12-04:00</lastmod>
   </url><url>
     <loc>/</loc>
-    <lastmod>2023-09-19T08:31:33-04:00</lastmod>
+    <lastmod>2023-09-21T08:48:12-04:00</lastmod>
   </url><url>
     <loc>/post/</loc>
+    <lastmod>2023-09-21T08:48:12-04:00</lastmod>
+  </url><url>
+    <loc>/post/compressed-sensing/</loc>
     <lastmod>2023-09-19T08:31:33-04:00</lastmod>
   </url><url>
     <loc>/post/fourier-wavelet/</loc>

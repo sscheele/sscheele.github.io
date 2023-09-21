@@ -6,7 +6,18 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 19 Sep 2023 08:31:33 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 21 Sep 2023 08:48:12 -0400</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Data Driven Dynamics</title>
+      <link>/post/data-driven-dynamics/</link>
+      <pubDate>Thu, 21 Sep 2023 08:48:12 -0400</pubDate>
+      
+      <guid>/post/data-driven-dynamics/</guid>
+      <description>Welcome! This post is my first review in the Dynamics and Control section of &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo;.
+This chapter focuses on analyzing dynamical systems by pure observation (that is, deducing their properties purely by observing the system, rather then from some first-principles analysis). First, it introduces some basic principles of dynamical systems, then gives a few methods for discovering their dynamics.
+There are a few things we want to do with dynamical systems:</description>
+    </item>
+    
     <item>
       <title>Brunton Textbook Review - Compressed Sensing</title>
       <link>/post/compressed-sensing/</link>

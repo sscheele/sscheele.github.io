@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Data Driven Dynamics | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Data Driven Dynamics</span></h1>
+
+<h2 class="date">2023/09/21</h2>
+</div>
+
+<main>
+<p>Welcome! This post is my first review in the Dynamics and Control section of <a href="https://faculty.washington.edu/sbrunton/DataBookV2.pdf">&ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&rdquo;</a>.</p>
+<p>This chapter focuses on analyzing dynamical systems by pure observation (that is, deducing their properties purely by observing the system, rather then from some first-principles analysis). First, it introduces some basic principles of dynamical systems, then gives a few methods for discovering their dynamics.</p>
+<p>There are a few things we want to do with dynamical systems:</p>
+<ul>
+<li>Future state prediction</li>
+<li>Design and optimization (eg: tuning the fins on a rocket)</li>
+<li>Estimation and control</li>
+<li>Interpretability, understanding</li>
+</ul>
+<p>There are two main things in our way:</p>
+<ul>
+<li>Unknown dynamics: oftentimes, people will want to apply dynamical systems to fields like ecology, neuroscience, or epidemiology. To say the least, it&rsquo;s not obvious what the dynamics of systems in these fields look like.</li>
+<li>Nonlinearity: even if we know the dynamics, we have a very hard time with the general problem of making global statements about nonlinear functions.</li>
+</ul>
+<p>And to deal with these things, we will use two main approaches:</p>
+<ul>
+<li>Operator-theoretic: it&rsquo;s sometimes possible to represent a nonlinear function as a linear operator on (an infinite-dimensional) Hilbert space, as in Koopman theory</li>
+<li>Regression and machine learning: the bulk of the content in this section focuses on these techniques, which are designed to learn or extract the dynamics of a system purely based on observations of how its state evolves</li>
+</ul>
+<h1 id="basics-of-dynamical-systems">Basics of Dynamical Systems</h1>
+<p>A dynamical system is typically defined by its derivative function:</p>
+<p>$$\dot{x} = f(x, t; \beta)$$</p>
+<p>Where $\dot{x}$ is the time derivative of $x$, $t$ is the time, and $\beta$ is a parameter set. However, we can also define discrete-time dynamical functions:</p>
+<p>$$x_ {t+1} = F(x_ {t})$$</p>
+<p>Discrete-time functions are, perhaps unintuitively, more general than continuous-time functions, in that they can describe discontinuous behavior. You can turn a continuous-time dynamical system into a discrete-time system by forward-integrating it over the appropriate timestep.</p>
+<h2 id="linear-systems-spectral-decomposition">Linear Systems, Spectral Decomposition</h2>
+<p>Basically the only kinds of dynamical systems we actually know how to work with are linear systems ($\dot{x} = Ax$). For these, we can forward-integrate solutions for arbitrary times: $x_ {t_ {0} + t} = e^{At}x_ {t_ {0}}$. But we can also find the <em>spectral decomposition</em>, which is a fancy way to say that we find the eigenvectors and eigenvalues of $A$:</p>
+<p>$$AT = T\Lambda$$</p>
+<p>Where $T$ is a matrix of eigenvectors and $\Lambda$ is a matrix of corresponding eigenvalues. A useful property of the spectral decomposition is that we can also see that $A = T \Lambda T^{-1}$, so $\dot{x} = Ax = T \Lambda T^{-1}x$. If we define a new coordinate space $z = T^{-1}x$, then there is an equivalent dynamics in this space where:</p>
+<p>$$\begin{align}
+\dot{x} &amp;= Ax \\
+\dot{Tz} &amp;= ATz \\
+T\dot{z} &amp;= T \Lambda T^{-1} T z \\
+\dot{z} &amp;= \Lambda z
+\end{align}$$</p>
+<p>Which is super cool, because since $\Lambda$ is a diagonal matrix of eigenvalues we can do dynamics super easily in this space and then transform back to the original.</p>
+<h1 id="dynamic-mode-decomposition-dmd">Dynamic Mode Decomposition (DMD)</h1>
+<h2 id="intuition-basic-math">Intuition, Basic Math</h2>
+<p>Let&rsquo;s say you have some data that represents a system evolving over time. The example in the book is vortex shedding by a cylinder, which means you have a series of 2D matrices whose values represent vorticity at a certain point in space. The dimensionality of your data doesn&rsquo;t really matter, since you immediately vectorize it into a series of $n$-dimensional vectors $x_ {1} \dots x_ {m}$. What you get out of DMD is (the equivalent of) a matrix $A$, which is a best-fit linear approximation for how this system tends to evolve over time. You can imagine that it minimizes $|x_ {k} - Ax_ {k-1}|$.</p>
+<p>I say you get the _ equivalent of_  $A$ because, as you can see, $A$ is $n \times n$, and if $n$ is the dimension of a vectorized image, $A$ might be huge. So instead we solve for the rank-$r$ SVD approximation of $A$. To do this, we start by finding splitting our data into $X = [x_ {1}\dots x_ {m-1}], X&rsquo; = [x_ {2}\dots x_ {m}]$, so that $X&rsquo; = AX$ and, therefore, $A = X&rsquo;X^{\dagger}$ (where $X^{\dagger}$ is the pseudoinverse of $X$). Since we wish to find a version of $A$ that works in a reduced state space, we now compute the SVD $X = \tilde{U} \tilde{\Sigma} \tilde{V}^{*}$ (cf: <a href="https://sscheele.github.io/post/svd-interp/">SVD Interpretations</a>). The columns of $U$ are also known as the POD (Proper Orthogonal Decomposition) modes of $X$.</p>
+<p>Since $A = X&rsquo;X^{\dagger}$ and the pseudoinverse of $X$ can be easily be found from the SVD ($X^{\dagger} = \tilde{V} \tilde{\Sigma}^{-1} \tilde{U}^{*}$), we can now project $A$ into the POD basis of $U$:</p>
+<p>$$\tilde{A} = \tilde{U}^{* } A \tilde{U} = \tilde{U}^{* } X&rsquo; \tilde{V} \tilde{\Sigma}^{-1}$$</p>
+<p>Now, if we want to use $\tilde{A}$, we can simply find $\tilde{x}_ {k} = \tilde{U}^{* }x_ {k}$, then run it through the dynamical system ($\tilde{x}_ {k+1} = \tilde{A}\tilde{x}_ {k}$) and finally project it back into the expanded space with $x_ {k+1} = \tilde{U}\tilde{x}_ {k+1}$</p>
+<p>Here&rsquo;s the part of this that was a little tricky for me to understand: using the spectral decomposition of $\tilde{A}$ and a little extra math that I didn&rsquo;t really follow, you can find the spectral decomposition _ of the high-dimensional $A$ matrix_ . The eigenvectors in this decomposition are called the &ldquo;DMD modes.&rdquo; Understanding that the modes are just eigenvectors and associated eigenvalues can be helpful in realizing that the DMD modes are really just components of a low-rank approximation of $A$. However, DMD is special because these modes are both spatially and temporally coherent. One of the big reasons we like to use it is that it offers us a way to decompose a system into linear combinations of oscillating coherent structures.</p>
+<p>We can leverage the spectral decomposition of $A$ by using it to do _ another_  spectral decomposition of a state $x_ {k}$:</p>
+<p>$$x_ {k} = \sum\limits_ {j=1}^{r} \phi_ {j} \lambda_ {j}^{k-1} b_ {j}$$</p>
+<p>Where $\phi_ {j}$ and $\lambda_ {j}$ are the $j$th eigenvectors/eigenvalues of $A$, and $b_ {j}$ is a phasor giving a phase and amplitude to fully characterize the oscillatory behavior of the mode $\phi_ {j}$. Looking at this, we can see that the real component of each $\lambda_ {j}$ allows us to model exponential growth (or decay) in the magnitude of each phase, while the imaginary component allows us to fit a frequency to its oscillations. Magnitude and phase, as stated, come from $b_ {j}$.</p>
+<p>Another way of thinking of the DMD is that it&rsquo;s sort of a cross between a time-domain Fourier transform and a spatial PCA, extracting sets of coherent spatial structures which evolve similarly over time.</p>
+<h2 id="weaknesses-and-variations">Weaknesses and Variations</h2>
+<p>One big problem with vanilla DMD is that noisy data can create significant biases in the distribution of the eigenvalues. Worse, the bias is not resolved by larger sample sizes. A simple way to help this is by computing the DMD matrices for both the forward and backward directions in time, then taking the average of the forward direction and the inverse of the backwards direction. There are also a number of techniques which attempt to address the problem of bias by solving for the matrices, and also for the phasors in $b$, in explicit optimization problems which are handed off to nonlinear solvers.</p>
+<p>DMD also can&rsquo;t handle nonlinear and nonperiodic features, such as multiple fixed points or chaos. Further, the failure mode of DMD in these cases is such that it completely fails to capture even the linear features of the system. The next algorithm discussed, SINDy, can fully extract nonlinear dynamics, but doesn&rsquo;t scale well to high-dimensional systems unless they admit projection into a low-dimensional subspace. In the case of a high-dimensional, nonlinear system, a more recent algorithm called LANDO (linear and nonlinear disambiguation optimization) may be useful. LANDO extracts the full nonlinear dynamics, and allows you to use DMD to extract modes for a linearization of the system around some point.</p>
+<p>A few types of content in the DMD input data are particularly hard to capture. Travelling waves are difficult to break into stationary spatial modes. Transient spikes are both nonlinear and nonperiodic. Nonlinear interactions between a few dominant modes can produce what appears to be broadband frequency content, which will result in a large number of modes appearing in the DMD analysis.</p>
+<h2 id="extensions-applications">Extensions, Applications</h2>
+<p>DMD can be useful in compression and compressed sensing, since a relatively small number of modes can often describe most of the data. Extensions of DMD which optimize for sparsity in $b$ can improve quality here. Further, the modes themselves often admit sparse representation in a Fourier basis.</p>
+<p><strong>Extensions:</strong> Variations of DMD exist for a variety of systems, including systems which are subject to control rather than evolving naturally (DMDc), systems with nonlinear measurement functions (eDMD), systems with transient dynamics or dynamics on vastly different timescales (like climate data, the technique is mrDMD), and systems with incomplete/low-rank measurements (which can paradoxically produce <em>worse</em> results than overdefined systems because DMD needs a higher-rank measurement matrix to produce complex conjugate pairs of eigenvalues - the solution here is to stack delayed measurements into a larger matrix).</p>
+<p>DMD is actually used for compression in streaming, so there are versions which admit incremental and parallelized reconstruction of data for maximum speed.</p>
+<p>There are tensor formulations of DMD which preserve the spatial structure of the data rather than vectorizing it.</p>
+<p><strong>Applications:</strong> DMD was originally developed for analyzing fluid flows and is still used for this purpose, but also in epidemiology (modelling disease spread over time), neuroscience (analyzing neural recordings), video analysis (example: foreground/background separation can be done by noting that the background is likely to have low/zero eigenvalue), plasma dynamics, robotics, and probably many other fields.</p>
+<h1 id="sparse-identification-of-nonlinear-dynamics-sindy">Sparse Identification of Nonlinear Dynamics (SINDy)</h1>
+<p>SINDy is an extremely simple concept: it solves a linear programming problem to fit coefficients for a library of functions to a dynamics model. Specifically, if you have a data matrix $X$ with derivative $\dot{X}$ (which can be calculated numerically from $X$ using the total-variation regularized derivative), you can create a library $\Theta(X)$ of functions applied to $X$. The matrix of coefficients for $\Theta$ will be denoted $\Xi$, so we&rsquo;d ideally like $\dot{X} = \Theta(X)\Xi$. But instead of solving directly (with a pseudoinverse, for example), we just solve a minimization problem:</p>
+<p>$$\text{argmin}_ {\Xi} ||\dot{X} - \Theta(X)\Xi||_ {2} + \lambda ||\Xi||_ {1}$$</p>
+<p>Where $\lambda$ is a tunable parameter to promote sparsity in $\Xi$.</p>
+<p>You can also do SINDy with discrete-time dynamics - if you also set $\lambda$ to zero, then the SINDy problem reduces to DMD.</p>
+<h1 id="koopman-theory">Koopman Theory</h1>
+<p>The cool thing that Koopman Theory lets us do is express nonlinear dynamics in a high-dimensional linear space. In theory, this space is actually an infinite-dimensional Hilbert space (that is, a space of functions with some property), but in practice it is sometimes possible to find finite-dimensional approximations.</p>
+<h2 id="koopman-operators">Koopman Operators</h2>
+<p>Suppose you have a system being measured by measurement function $g$, a member of some infinite-dimensional Hilbert space. The Koopman operator for some timestep, $\mathcal{K}_ {\Delta t} g(x_ {t})$, returns the measurement value for the state of the system at that point in the future, $g(x_ {t+\Delta t})$. In a discrete-time system with timestep $\Delta t$, this becomes $g(x_ {t+1})$. There is also a fully continuous-time version of the Koopman operator, which is essentially equivalent to the time-derivative of $g$ (think of the limit definition of the derivative).</p>
+<p>The infinite dimensionality of the Koopman operator is, of course, inconvenient. Capturing just any subspace of the Hilbert space probably won&rsquo;t be sufficient, because there&rsquo;s no guarantee that a random subspace actually behaves linearly under the Koopman operator. However, eigenfunctions of the Koopman operator are, by definition, guaranteed to have this property. In discrete time, an eigenfunction $\phi$ with eigenvalue $\lambda$ would satisfy:</p>
+<p>$$\phi(x_ {t+1}) = K_ {\delta t} \phi(x_ {t}) = \lambda \phi(x_ {t})$$</p>
+<p>And in continuous time:</p>
+<p>$$\frac{d}{dt} \phi(x_ {t}) = K\phi(x_ {t}) = \lambda \phi(x_ {t})$$</p>
+<p>If we wanted to solve for the eigenfunction, we would apply the chain rule and try to solve the resulting PDE:</p>
+<p>$$\frac{d}{dt} \phi(x) = \lambda \phi(x) = \nabla \phi(x) \cdot f(x)$$</p>
+<p>The dynamics of a nonlinear system are linear in the eigenfunction coordinates. For example, any conserved quantity in a physical system corresponds to an eigenfunction of its Koopman operator with a corresponding eigenvalue of zero.</p>
+<h2 id="learning-koopman-operators">Learning Koopman Operators</h2>
+<p>It&rsquo;s possible to train a NN to give finite-dimensional approximations of a Koopman operator using a variation on autoencoders. A normal autoencoder trains two halves of a network, one an encoding function ($\phi$) and one a decoding function ($\phi^{-1}$). Typically, the loss function just enforces that $\phi^{-1}(\phi(x)) = x$. However, a Koopman network adds one fully-connected layer between the $\phi$ and $\phi^{-1}$ portions of the network. Since one fully-connected layer with no nonlinearities is equivalent to matrix multiplication, this layer is the $K$ matrix. In addition to a typical autoencoder loss, the Koopman networks require that:</p>
+<ul>
+<li>$\phi^{-1}(K\phi(x_ {t})) = x_ {t+1}$ (the measurement prediction/advancement aspect of the Koopman operator)</li>
+<li>$K\phi(x_ {t}) = \phi(x_ {t+1})$ (linearity of the Koopman operator)</li>
+</ul>
+<p>A variation on this technique has an additional network to predict the eigenvalues of the $K$ matrix, which is then constructed based on these eigenvalues; this makes it possible to linearize even systems which normally don&rsquo;t admit compact Koopman representations (such as those with an escalating series of harmonic eigenvalues or broadband frequency content).</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
