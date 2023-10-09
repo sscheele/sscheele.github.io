@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Brunton Textbook Review - Linear Control Theory | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Brunton Textbook Review - Linear Control Theory</span></h1>
+
+<h2 class="date">2023/10/08</h2>
+</div>
+
+<main>
+<p><em>This essay continues my review of Steve Brunton&rsquo;s textbook, <a href="https://faculty.washington.edu/sbrunton/DataBookV2.pdf">&ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&rdquo;</a>.</em></p>
+<p>When talking about control, we&rsquo;ll mostly discuss closed-loop feedback control, but it&rsquo;s worth briefly emphasizing that there are actually other kinds of control which are sometimes appropriate. For example, most traffic lights are purely on timers, with no sensing capabilities at all. This sort of nonreactive, pre-programmed control is called open loop. However, you might change the light timings and flow of traffic in a city close to a major sporting event. This sort of control, where you make changes to what is still essentially an open-loop control law based on exogenous changes to the system, is called disturbance feedforward control.</p>
+<p>OK, that&rsquo;s enough of other kinds of control systems, let&rsquo;s get to the good stuff:</p>
+<h1 id="closed-loop-feedback-control-lti">Closed-Loop Feedback Control, LTI</h1>
+<p>Closed-loop control is only necessary due to uncertainty: if we were able to predict the outputs of the controller ahead of time, we could use that to make an open-loop controller instead. However, we typically get uncertainty from a combination of two sources: model uncertainty ($w_{d}$) and measurement noise ($w_{n}$). We can think of these things as inputs to the system. Of course, there&rsquo;s also a reference trajectory, which we&rsquo;ll denote $w_{r}$.</p>
+<p>In closed-loop feedback control, we have a system function and a measurement function:</p>
+<p>$$\dot{x} = f(x, u, w_{d})$$
+$$y = g(x, u, w_{n})$$</p>
+<p>And we wish to construct a control law $u = k(y, w_{r})$ that minimizes a cost function $J(x, u, w_{r})$. In practice, however, $k$ is typically a dynamical system of some sort rather than a pure function (allowing state to propagate through time). This is true even if we do something simple like LQR control using a Kalman filter based estimation of the state, since KF is a type of dynamical system.</p>
+<p>Since, as we&rsquo;ve noted previously, we only know how to solve linear equations, we would prefer to have linear models for $\dot{x}$ and $y$:</p>
+<p>$$\dot{x} = Ax + Bu$$
+$$y = Cx + Du$$</p>
+<p>If the matrices $A, B, C, D$ don&rsquo;t change over time, we call the system LTI, or Linear Time-Invariant. If the actual system and measurement functions are nonlinear, we often just linearize the system about some point $\bar{x}, \bar{y}, \bar{u}$ and do this math in a coordinate space with those points at the origin so that the previous linear models hold.</p>
+<h1 id="controllability-and-observability">Controllability and Observability</h1>
+<h2 id="analyzing-lti-controllers">Analyzing LTI Controllers</h2>
+<p>Let&rsquo;s forget about the whole &ldquo;$k$ is actually a dynamical system&rdquo; thing and just assume it&rsquo;s some linear function $u = Kx$. Then $\dot{x} = Ax + Bu = Ax + BKx = (A + BK)x$. Also, we&rsquo;ll just assume we&rsquo;re trying to drive the system to $x = 0$, since ability to drive any linear system to zero implies the ability to drive any linear system anywhere (just drive a translated version of your system to zero).</p>
+<p>Since $A + BK$ is just a constant matrix, let&rsquo;s try to reason about how dynamical systems of the form $\dot{x} = Fx$ behave. From the spectral decomposition section of the last chapter, we know that if we do an eigendecomposition $F = T \Lambda T^{-1}$, then the dynamics in the coordinate space $z = T^{-1}x$ will just be $\dot{z} = \Lambda z$, which also means that forward-integrating the dynamics results in the extremely simple $z_{t + \Delta t}^{(i)} = z_{t}^{(i)} e^{\lambda_{i} \Delta t}$. While we do technically need to transform back into the $x = Tz$ coordinate space before the values of $z$ become meaningful, we should be able to see from this that positive real eigenvalues of $F$ result in the state diverging to infinity, while negative real eigenvalues cause it to decay to zero. In an LTI system, we can use this analysis to know ahead of time whether a controller is stable.</p>
+<p>It&rsquo;s fairly trivial to see that <em>no</em> control system of the form $u = Kx$ can achieve zero error in the presence of biased noise, but also that biased noise isn&rsquo;t very difficult to deal with, so we will assume mean-zero noise for now.</p>
+<h2 id="controllability-and-observability-1">Controllability and Observability</h2>
+<p>We know how to see if some particular $K$ is stable, but for some LTI systems there is <em>no</em> stable $K$. For example, what if we had:</p>
+<p>$$B = \begin{bmatrix}
+1 &amp; 0 \
+0 &amp; 0
+\end{bmatrix}, A = I $$</p>
+<p>Clearly, we cannot control the second dimension of $x$ at all! However, we also can&rsquo;t just check that $B$ is a rank-$n$ matrix, because of cases like:</p>
+<p>$$B = \begin{bmatrix}
+1 &amp; 2 \
+2 &amp; 4
+\end{bmatrix}$$</p>
+<p>Here, $B$ is a rank-1 matrix. But if we had $A = \begin{bmatrix}1 &amp; 0\ -1 &amp; 0 \end{bmatrix}$, then after one timestep our effect on the state would be propagated by the system dynamics: $AB = \begin{bmatrix}1 &amp; 2\ -1 &amp; -2 \end{bmatrix}$. The column space of $\begin{bmatrix}A &amp; AB\end{bmatrix}$ is rank-2! In other words, it&rsquo;s possible that even if the controller dynamics on their own aren&rsquo;t full-rank, the system dynamics are such that the system is actually controllable. We might manage to independently control different dimensions of $x$ based on the fact that their dynamics are different. In general, it should be fairly clear that in the worst case it will take $n-1$ steps of the system dynamics to propagate a change to every dimension it can reach. Therefore, we need to check the column space of:</p>
+<p>$$\begin{bmatrix}B &amp; AB &amp; A^{2}B &amp; \dots &amp; A^{n-1}B \end{bmatrix}$$</p>
+<p>If this space is rank-$n$, then the system is fully controllable. In fact, this column space is also the space of states to which we can drive the system in finite time using control.</p>
+<p>Observability can be constructed along parallel lines, though since sensing is not propagated through the dynamics we instead construct:</p>
+<p>$$\mathcal{O} = \begin{bmatrix} C \ CA \ CA^{2} \ \dots \ CA^{n-1} \end{bmatrix}$$</p>
+<p>And examine the row space, not the column space.</p>
+<h3 id="the-pbh-test">The PBH Test</h3>
+<p>The PBH test states that a pair of matrices $(A, B)$ is controllable if and only if the column rank of $\begin{bmatrix}(A - \lambda I) &amp; B \end{bmatrix} = n$ for all $\lambda$. Since the definition of the eigenvalue tells us that the rank of $A - \lambda I = n$ unless $\lambda$ is an eigenvalue of $A$, this means we only need to perform the PBH test for eigenvalues of $A$. Furthermore, the definition of the eigenvalue tells us that if $A - \lambda I$ is rank-deficient, the null space is spanned by the eigenvectors associated with $\lambda$. Therefore, $B$ must span the same space as the set of all eigenvectors of $A$ - or, in other words, the columns of $B$ must have some component in each of the eigenvector directions of $A$. This also tells us that we only need multiple control inputs in $B$ when the eigenvalues of $A$ are degenerate (associated with multiple eigenvectors, aka multiplicity &gt; 1).</p>
+<h3 id="relating-controllability-and-reachability-cayley-hamilton">Relating Controllability and Reachability: Cayley-Hamilton</h3>
+<p>The Cayley-Hamilton Theorem states that any matrix satisfies its own characteristic equation. This is actually a very simple statement, which I overthought for a long time after I heard it until I worked an example. The characteristic equation of a matrix is $det(A - \lambda I) = 0$. If you remember how to find the determinant, it should be pretty easy to see that $det(A - \lambda I)$ is a degree-$n$ polynomial, where $A$ is $n \times n$. Since we&rsquo;re setting it equal to zero, we can divide it so that the leading coefficient is one, putting it in a standard form of:</p>
+<p>$$\lambda^n + a_{n-1}\lambda^{n-1} + \dots + a_1 \lambda + a_0 = 0$$
+The Cayley-Hamilton theorem simply says that $\lambda = A$ satisfies this equation. This, however, is quite powerful! For example, it means that we can express $A^n$ as a sum of smaller powers of $A$:</p>
+<p>$$A^n = -(a_{n-1}A^{n-1} + \dots + a_1 A + a_0)$$</p>
+<p>Right-multiply by $A$, and you can see $A^{n+1}$, and in fact any power $A^{k \geq n}$ can be expressed as a sum of powers of $A^{{0..n-1}}$. And the very neat thing we can do with this is change from the infinite-sum Taylor definition of the matrix exponential:</p>
+<p>$$e^{At} = I + At + \dfrac{A^2t^2}{2!} + \dots$$
+To a finite sum:</p>
+<p>$$e^{At} = \beta_0(t)I + \beta_1(t)A + \beta_2(t)A^2 + \dots + \beta_{n-1}(t)A^{n-1}$$
+With a bit of clever math based on using this trick to expand the dynamics of a controlled system:</p>
+<p>$$\xi = \int_0^t e^{A(t - \tau)}Bu(\tau) d\tau$$
+We can prove that a controllable system does indeed admit the creation of an actuation function $u(\tau)$ that can drive to arbitrary points in $\mathbb{R}^n$.</p>
+<h3 id="degrees-of-controllabilityobservability">Degrees of Controllability/Observability</h3>
+<p>We can obtain continuous measurements of how easy it is to control or estimate a state using the concept of a Gramian. In linear algebra, a Gramian is a matrix of inner products from a set of (usually) vectors ${x_1 .. x_i}$:</p>
+<p>$$G_{ij} = \langle x_i, x_j \rangle$$</p>
+<p>We wish to apply this concept to find the controllability of a matrix on some time horizon. For the sake of simplicity, we&rsquo;ll start with a discrete-time approach: on a time horizon $\Delta t$, the response of a system to a unit control impulse can be represented by a matrix-valued function called the impulse response: $\Phi(t) = e^{A \Delta t}B$, an $n \times m$ matrix showing how each dimension of the state is affected by an impulse in each dimension of the control input. However, $\Phi(\Delta t)$ isn&rsquo;t quite what we&rsquo;re interested in: the geometric interpretation of the impulse response matrix is that each row tells you how much that dimension of the state responds to an impulse in each dimension of the control. We want a matrix that sort of accumulates this: if we apply a finite amount of control energy, how far can we get in each dimension of the state space, and how does energy &ldquo;leak&rdquo; from one state to another through some combination of the system and control dynamics?</p>
+<p>This is actually quite similar to the concept of finding the row-wise autocorrelation of the impulse response matrix. If a row of the impulse response matrix tells you how some dimension of the state responds to an impulse in each dimension of the control, then the inner product of two rows tells you how much an impulse calculated to maximize change in one dimension would also change another dimension (if you have finite energy to deliver and wish to maximize change in one dimension, you should deliver it as a control vector parallel to the corresponding row of the impulse response matrix). The row-wise autocorrelation of some $X$ can be found by computing $XX^<em>$, so we arrive at $e^{A \Delta t}B B^ * e^{A^</em> \Delta t}$, an $n \times n$ matrix.</p>
+<p>Yet we&rsquo;re still not quite done, because $\Phi(\Delta t)$ only tells us the directions a unit impulse will send us in <em>at time zero</em>, whereas we want a representation of the space we can reach if we can continuously control the system at all times. For this, we need to integrate our correlation matrix over a time horizon instead of using the discrete-time approximation with $\Delta t$:</p>
+<p>$$W_c(t) = \langle\Phi(t), \Phi(t) \rangle = \int_0^t e^{A \tau}B B^* e^{A^* \tau} d \tau$$</p>
+<p>$W_c(t)$ is called the &ldquo;controllability Gramian,&rdquo; and we typically evaluate this integral to infinity, so unless otherwise noted I&rsquo;ll use $W_c = \lim_{t \rightarrow \infty} W_c(t)$.</p>
+<p>Though it may not look like it, this is actually the Gramian of the impulse response matrix. As the formula above suggests, we can extend the idea of a Gramian beyond the original &ldquo;set of vectors&rdquo; formulation to apply to a vector-valued function using our friend from the Fourier transform section, the Hermitian inner product. In fact, the Hermitian inner product shows up in another context closely related to the Gramian: the vaguely-defined &ldquo;energy&rdquo; we discussed above can actually be found by taking the Hermitian inner product of the control function with itself over the interval of interest. Use of the Hermitian inner product of a function with itself to find energy appears surprisingly often in physical systems - for example, the energy/work done on/by an electrical charge is proportional to the Hermitian inner product of the voltage function with itself. In all three of these examples, the Hermitian inner product serves as a sort of &ldquo;accumulator of instantaneous response&rdquo; which results in a physically meaningful &ldquo;energy.&rdquo;</p>
+<p>While the controllability Gramian tells us how much energy is required to manipulate individual dimensions of the state space, its eigenvectors represent semi-axes of an ellipsoid that tells us which directions are easiest to travel in if we integrate our control impulses over time. The eigenvector diagonalization is often easier to work with than the controllability Gramian itself. However, $W_c$ is still useful in a number of ways:</p>
+<ul>
+<li>The scalar controllability of a direction $x$ is given by $x^* W_c x$ - the higher the controllability, the easier it is to travel in that direction</li>
+<li>The minimum-energy control $u(t)$ required to navigate a system from $x(0) = 0$ to $x(t) = t_f$ can be found as: $u(t) = B^* (e^{A (t_f - t)})^* W_c(t_f)^{-1} x(t_f)$, and the total energy expended by this control law is equal to $x^* W_c(t_f)^{-1} x$.</li>
+</ul>
+<p>The observability Gramian may be used analogously to the controllability Gramian, but as we are interested in the column-wise autocorrelations we integrate over $(C e^{A t})* C e^{A t}$ instead.</p>
+<h3 id="stabilizability-and-detectability">Stabilizability and Detectability</h3>
+<p>We may not actually need full controllability of a system - sometimes, stabilizability will do. Stabilizability means that the unstable eigenvector directions of the system dynamics matrix $A$ are in the span of the controllability matrix $\mathcal{C}$, such that even if the system is not fully controllable we can still use a controller to dampen instabilities.</p>
+<h1 id="end-part-1">End Part 1</h1>
+<p>As this review is 2400 words and so far only covers about half of the controls chapter, I&rsquo;ve decided to split it into two parts. The next part will cover LQR and its relationship with the Kalman filter, Linear-Quadratic Gaussians (LQGs), robust control and frequency-domain techniques, and possibly also work an example.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

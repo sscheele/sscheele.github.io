@@ -6,9 +6,28 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 21 Sep 2023 08:48:12 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 09 Oct 2023 10:41:17 -0400</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>Data Driven Dynamics</title>
+      <title>Backup Script</title>
+      <link>/post/backup-script/</link>
+      <pubDate>Mon, 09 Oct 2023 10:41:17 -0400</pubDate>
+      
+      <guid>/post/backup-script/</guid>
+      <description>I recently had my laptop&amp;rsquo;s SSD fail, and it took me a long time to get back up and running - partially because I tried to install and run Wayland instead of X (which worked out reasonably well - I ended up switching back to X mostly because OnlyOffice was super slow on Wayland/sway, but it seems to me like Wayland is coming within a couple of years!). But a lot of the issue was that I hadn&amp;rsquo;t made a proper backup in years, so I needed to remember how I had set up a ton of different software.</description>
+    </item>
+    
+    <item>
+      <title>Brunton Textbook Review - Linear Control Theory</title>
+      <link>/post/linear-control-theory/</link>
+      <pubDate>Sun, 08 Oct 2023 20:43:47 -0400</pubDate>
+      
+      <guid>/post/linear-control-theory/</guid>
+      <description>This essay continues my review of Steve Brunton&amp;rsquo;s textbook, &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo;.
+When talking about control, we&amp;rsquo;ll mostly discuss closed-loop feedback control, but it&amp;rsquo;s worth briefly emphasizing that there are actually other kinds of control which are sometimes appropriate. For example, most traffic lights are purely on timers, with no sensing capabilities at all. This sort of nonreactive, pre-programmed control is called open loop.</description>
+    </item>
+    
+    <item>
+      <title>Brunton Textbook Review - Data Driven Dynamics</title>
       <link>/post/data-driven-dynamics/</link>
       <pubDate>Thu, 21 Sep 2023 08:48:12 -0400</pubDate>
       

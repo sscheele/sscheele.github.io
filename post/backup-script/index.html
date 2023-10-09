@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Backup Script | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Backup Script</span></h1>
+
+<h2 class="date">2023/10/09</h2>
+</div>
+
+<main>
+<p>I recently had my laptop&rsquo;s SSD fail, and it took me a long time to get back up and running - partially because I tried to install and run Wayland instead of X (which worked out reasonably well - I ended up switching back to X mostly because OnlyOffice was super slow on Wayland/sway, but it seems to me like Wayland is coming within a couple of years!). But a lot of the issue was that I hadn&rsquo;t made a proper backup in years, so I needed to remember how I had set up a ton of different software. I&rsquo;d been using CloneZilla, which is basically a live disk that lets you clone entire disks/partitions, for backups, but there were some problems:</p>
+<ul>
+<li>No incremental backups, so unchanged files would be duplicated every time. This made backups take longer and take up more space.</li>
+<li>Unencrypted by default</li>
+<li>Restoring backups to disks or partitions of different sizes often didn&rsquo;t work</li>
+<li>Combination of slow and done from a live disk meant that my laptop was unusable for hours during backups</li>
+</ul>
+<p>The upshot of this, and the biggest problem of all, was that I wasn&rsquo;t actually using my backup software. After looking into alternatives, I&rsquo;ve decided to switch to <a href="https://restic.net/">restic</a>. The big disadvantage of restic is that it&rsquo;s designed to back up files, not systems. Restic (unlike, for example, timeshift) doesn&rsquo;t have a concept of &ldquo;configuration&rdquo; or &ldquo;bootloader&rdquo;, so to the extent that it&rsquo;s capable of backing these things up, it is backing up files on the disk. So when this hard drive fails, restoring my system won&rsquo;t be trivially easy. But in exchange for that, I get:</p>
+<ul>
+<li>Encrypted by default</li>
+<li>Incremental backups are supported and work well</li>
+<li>Network backups supported</li>
+<li>Backups can be stopped at any point with Ctrl-C and resumed automatically!</li>
+</ul>
+<p>Based on my tests, I suspect that each incremental backup will take up something like 5 minutes and 100 MB, assuming I haven&rsquo;t downloaded any huge files. To make creating backups (and eventually restoring them) easier, I wrote a script that:</p>
+<ol>
+<li>Uses <code>yay -Qqe</code> and <code>yay -Qqm</code> to export lists of explicitly installed repo and aur packages</li>
+<li>Uses restic to back up my home and /etc directories (hopefully backing up /etc and ~/.config captures most of my configuration files)</li>
+<li>Cleans up backups older than 1 year old</li>
+</ol>
+<p>The script is adapted from the Arch Linux wiki, and I&rsquo;ve included it below:</p>
+<pre><code class="language-bash">#!/bin/bash
+
+if [[ -n $(pgrep 'restic' | grep 'restic backup') ]]; then
+  echo 'restic is already running...' 1&gt;&amp;2
+  exit 0
+fi
+
+if [ ! -d &quot;$1&quot; ]; then
+  echo &quot;Backup directory not found: $1&quot;
+  exit 1
+fi
+BACKUP_DIR=&quot;$1&quot;
+
+set -e
+set -v
+
+######
+# Backup package list
+######
+PKG_DIR=&quot;$BACKUP_DIR/packages&quot;
+# set $date to string date
+printf -v date '%(%Y-%m-%d)T' -1
+# export only &quot;official&quot; packages
+yay -Qqe | grep -v &quot;$(yay -Qqm)&quot; &gt; &quot;$PKG_DIR/$date.official.txt&quot;
+# export aur packages
+yay -Qqm &gt; &quot;$PKG_DIR/$date.aur.txt&quot;
+
+######
+# Restic backup
+######
+
+export RESTIC_REPOSITORY=&quot;$BACKUP_DIR/restic&quot;
+export RESTIC_PASSWORD='ResticBackup123'
+export RESTIC_COMPRESSION='auto'
+export RESTIC_CACHE_DIR=~/.cache/restic
+export RESTIC_READ_CONCURRENCY=4
+
+mkdir -p &quot;${RESTIC_CACHE_DIR}&quot;
+
+restic unlock 
+restic backup /etc /home/sam --exclude-file=/etc/restic/excludes.txt --tag scheduled --exclude='**/mnt'
+restic check --with-cache --read-data-subset=5G
+restic forget --prune --keep-within 1y
+</code></pre>
+<p>This script looks for a file containing patterns to exclude from the backup, which doesn&rsquo;t come with restic: <code>/etc/restic/excludes.txt</code>. Mine looks like:</p>
+<pre><code>**/*cache
+**/*Cache
+**/lost+found
+**/tmp
+**/.Trash*
+**/Trash*
+**/trash*
+**/.trash*
+**/.venv
+</code></pre>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
