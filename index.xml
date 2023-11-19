@@ -6,8 +6,16 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 09 Oct 2023 10:41:17 -0400</lastBuildDate>
+    <lastBuildDate>Sun, 19 Nov 2023 17:31:30 -0500</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Llama Writeup</title>
+      <link>/post/llama/</link>
+      <pubDate>Sun, 19 Nov 2023 17:31:30 -0500</pubDate>
+      <guid>/post/llama/</guid>
+      <description>This post is an attempt to explain Facebook&amp;rsquo;s Llama LLM to myself.
+Part 1: Transformer Models, Architecture Tokenization and Initial Embedding First, the input string is split into tokens. These tokens are often &amp;ldquo;subword tokens,&amp;rdquo; meaning that word parts (like -ed and -tion) get their own tokens. This is useful in the case that a word is out-of-vocabulary (OOV). If the input is nonsense, the tokens may be individual characters. The tokens are then looked up in a dictionary of embeddings.</description>
+    </item>
     <item>
       <title>Backup Script</title>
       <link>/post/backup-script/</link>
