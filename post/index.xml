@@ -6,8 +6,16 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 19 Nov 2023 17:31:30 -0500</lastBuildDate>
+    <lastBuildDate>Sun, 26 Nov 2023 16:45:54 -0500</lastBuildDate>
     <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Multimodal LLMs and DALL-E Explained</title>
+      <link>/post/multimodal-llms/</link>
+      <pubDate>Sun, 26 Nov 2023 16:45:54 -0500</pubDate>
+      <guid>/post/multimodal-llms/</guid>
+      <description>I&amp;rsquo;m finding that writing here is a great way to make sure I have a complete understanding of various concepts. With that in mind, I decided to keep going along the LLM line. Scheduled programming on the Brunton textbook will probably resume soon.
+I imagined there would be some cool trick to multimodal LLMs, but that doesn&amp;rsquo;t actually seem to be the case! If there is a cool trick, it&amp;rsquo;s the cool trick of realizing that you can do an unusual amount of things with transformers, including image processing, which itself lets you do a surprising number of things.</description>
+    </item>
     <item>
       <title>Llama Writeup</title>
       <link>/post/llama/</link>

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Multimodal LLMs and DALL-E Explained | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Multimodal LLMs and DALL-E Explained</span></h1>
+
+<h2 class="date">2023/11/26</h2>
+</div>
+
+<main>
+<p><em>I&rsquo;m finding that writing here is a great way to make sure I have a complete understanding of various concepts. With that in mind, I decided to keep going along the LLM line. Scheduled programming on the Brunton textbook will probably resume soon.</em></p>
+<p>I imagined there would be some cool trick to multimodal LLMs, but that doesn&rsquo;t actually seem to be the case! If there is a cool trick, it&rsquo;s the cool trick of realizing that you can do an unusual amount of things with transformers, including image processing, which itself lets you do a surprising number of things.</p>
+<h1 id="image-inputoutput">Image Input/Output</h1>
+<p>If you want your LLM to accept image inputs, all you have to do is generate embeddings for the image. A common way to do this is with <a href="https://arxiv.org/pdf/2010.11929.pdf">vision transformers (ViT)</a>. Vision transformers have the idea to turn an image into a series of tokens by breaking it into 16x16 pixel patches. Each input token is a linear projection of a patch. Now you can take the output of one (one!) transformer and run it through a linear layer to get an embedding. One minor point is that the transformer&rsquo;s sequence length needs to cover the whole image, so 1024 tokens for nonoverlapping 16x16 patches to cover a 512x512 image.</p>
+<p>For image output, of course, you just use a diffusion model like DALL-E. In fact, you can be slightly more efficient, since text-to-whatever diffusion models need to use a transformer model to convert a sentence into an embedded vector. If you already have an embedded vector from your language model, you can just use the generation part of the diffusion model as an output head (similar to how you use a linear layer as an output head for next word prediction).</p>
+<h1 id="video-inputoutput">Video Input/Output</h1>
+<p>You can imagine doing video input by running ViT on each frame of a video to produce a series of frame embeddings, then passing those through another transformer to extract some information about a video (for instance, action recognition). In practice, you can actually do this! It&rsquo;s also common to &ldquo;temporally inflate&rdquo; the ViT patches, meaning that the linear projection in the first step of ViT becomes a projection of (for example), a 16x16x3 cube, where the last dimension is time.</p>
+<p>There are also video-based diffusion models(ex: <a href="https://arxiv.org/pdf/2303.08320.pdf">VideoFusion</a>), but they&rsquo;re currently less good than the image ones. Still not awful though!</p>
+<h1 id="audio-inputoutput">Audio Input/Output</h1>
+<p>For audio, you could imagine some 1D convolution over the audio stream (which is a series of intensities sampled at a very high rate, like 16 kHz or 44 kHz) to produce the tokenized inputs to the transformer. But in fact, there&rsquo;s another very clever option, which is to produce a spectrogram of the audio and use ViT <em>again</em>.</p>
+<p>We&rsquo;re only just starting to see good audio-based diffusion models (ex: <a href="https://arxiv.org/pdf/2301.12503.pdf">AudioLDM</a>), but we are getting there!</p>
+<h1 id="diffusion-models-and-dall-e-2">Diffusion Models and DALL-E 2</h1>
+<p>I&rsquo;ve been sort of hand-waving the generation aspect of each modality away by saying that diffusion models can do it, without explaining diffusion models. I&rsquo;ll do this by explaining DALLE-2.</p>
+<h3 id="clip">CLIP</h3>
+<p>But first, we have to take a little detour and talk about <a href="https://arxiv.org/pdf/2103.00020.pdf">CLIP</a>! CLIP is a neural network that learns to predict the probability that a natural-language caption is associated with an image, which I&rsquo;ll call $P(z | y)$. CLIP is trained in batched mode, so it gets (for example) 10 images and 10 captions and must essentially learn to generate the full 10x10 confusion matrix. This turns out to be really useful in inference mode! Have 10 images and want to see which one is most catlike? Have 10 possible captions and want to see which one best fits an image? CLIP can do it. The loss function for learning a confusion matrix, in case you&rsquo;re wondering, is called <em>multi-class N-pair loss</em>. CLIP was trained with a variety of architectures, but the best one seems to have used a transformer architecture as a text encoder and (you guessed it), ViT as the image encoder.</p>
+<h3 id="diffusion">Diffusion</h3>
+<p>Diffusion models learn to progressively denoise inputs given priors. For example, you might send in a noisy image $x_{I} = y + z, z \sim N(0, \sigma)$ and the CLIP embedding $x_{E}$ of the denoised image, and the decoder tries to output $z$. In this notation, $y$ is the denoised image, so $y = x_{I} - z$. Diffusion models actually take this a little further and learn to <em>progressively</em> denoise images, meaning that more and more random noise is added until the last noisy input $x_{I}^{(n)}$ basically resembles random noise, and the decoder is trying to predict $x_{I}^{(n)} - x_{I}^{(n-1)}$. You can apply the concept of diffusion to any number of datatypes, including images, audio, video, and even vectors in an embedding space.</p>
+<h3 id="dall-e-2">DALL-E 2</h3>
+<p>Once you have a CLIP network trained, you can train another neural network that takes CLIP text embeddings and uses them to predict the paired CLIP image embeddings. This first network is called the <em>prior</em>. The prior in DALLE-2 is typically a diffusion model. Architecture-wise, it&rsquo;s typically a transformer network.</p>
+<p>You also train a network that allows you to decode CLIP embeddings into regular images. Again, this is a diffusion model, and it takes as input a noisy image, the CLIP image embeddings predicted by the prior network, and optionally the CLIP text embeddings from the caption. Since you don&rsquo;t want to do this in a very high-dimensional space, you train this model to output 64x64 images, and then two upsampling models (ADMNets - interestingly, not conditioned on the caption) to get you from 64x64 to 256x256 and then to 1024x1024. Interestingly, the decoder network breaks from tradition and is <em>not</em> a ViT network, but a CNN.</p>
+<h1 id="imagebind">ImageBind</h1>
+<p><a href="https://arxiv.org/pdf/2305.05665.pdf">ImageBind</a> is a super cool paper out of Facebook research that showed you can actually create a single embedding space for images, text, video, and audio! They use pretty much the techniques described above (specifically, DALLE-2 is used as the diffusion model for images). They don&rsquo;t bother with video or audio generation. There are also very cool experiments with, for example, latent space arithmetic, where you can take the embedded vector for an image of a bird, add it to the embedded vector of the sound of waves, and use that to generate an image of the bird standing in water!</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
