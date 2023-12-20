@@ -6,8 +6,16 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 26 Nov 2023 16:45:54 -0500</lastBuildDate>
+    <lastBuildDate>Wed, 20 Dec 2023 11:47:00 -0500</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Brunton Textbook Review - Linear Control Theory 2</title>
+      <link>/post/linear-control-theory-2/</link>
+      <pubDate>Wed, 20 Dec 2023 11:47:00 -0500</pubDate>
+      <guid>/post/linear-control-theory-2/</guid>
+      <description>Welcome back to the Brunton Textbook Review series, where I&amp;rsquo;m reviewing all of Steve Brunton&amp;rsquo;s textbook, “Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.” This post will conclude chapter 8, on linear control systems. The next post will cover Chapter 9, on system identification and balanced representation.
+Optimal Control In part 1 of this review of the Linear Control Theory chapter, we found that you can stabilize a linear system by defining a control law $u = Kx$, such that $A - BK$ has negative eigenvalues (or, more precisely, eigenvalues with negative real components).</description>
+    </item>
     <item>
       <title>Multimodal LLMs and DALL-E Explained</title>
       <link>/post/multimodal-llms/</link>

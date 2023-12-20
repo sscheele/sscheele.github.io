@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Brunton Textbook Review - Linear Control Theory 2 | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Brunton Textbook Review - Linear Control Theory 2</span></h1>
+
+<h2 class="date">2023/12/20</h2>
+</div>
+
+<main>
+<p><em>Welcome back to the Brunton Textbook Review series, where I&rsquo;m reviewing all of Steve Brunton&rsquo;s textbook, “Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.” This post will conclude chapter 8, on linear control systems. The next post will cover Chapter 9, on system identification and balanced representation.</em></p>
+<h1 id="optimal-control">Optimal Control</h1>
+<p>In <a href="https://sscheele.github.io/post/linear-control-theory/">part 1</a> of this review of the Linear Control Theory chapter, we found that you can stabilize a linear system by defining a control law $u = Kx$, such that $A - BK$ has negative eigenvalues (or, more precisely, eigenvalues with negative real components). But there are an infinite number of negative eigenvalues, and we can choose any of them! Eigenvalues that are more negative will cause the system decay faster, but may actually lead it to be less robust (huge control efforts are more likely to make your system encounter unmodeled and possibly nonlinear dynamics, like back EMF, friction, slippage, flexion in your components, etc). Optimal control tells us which $K$ matrix we should choose.</p>
+<h2 id="lqr">LQR</h2>
+<p>In LQR, we choose weighting matrices $Q$ and $R$ to tell us how to weight deviation of the state from zero and control effort, respectively. We then decide we want to minimize:</p>
+<p>$$J(t) = \int_{0}^{t} x(\tau)^{* }Qx(\tau) + u(\tau)^{* } R u(\tau) d \tau$$</p>
+<p>Additionally, $Q$ must be positive semi-definite and $R$ must be positive definite.</p>
+<p>Having defined $Q$ and $R$, we can find $K$ as $K_{r} = R^{-1} B^{*} X$, where $X$ is the solution to an algebraic Riccati equation:</p>
+<p>$$A^{* } X + XA - XBR^{-1}B^{* }X + Q = 0$$</p>
+<p>Solving this equation scales in $O(n^3)$.</p>
+<h3 id="lqr-and-the-kalman-filter">LQR and the Kalman Filter</h3>
+<p>Oddly, the Kalman filter can be defined similarly to LQR. Remember that in KF, $Q$ and $R$ are covariance matrices for process and measurement noise. Then, instead for the normal $K_k = P_{k|k-1} H^T (H P_{k|k-1} H^T + R)^{-1}$, we can also say:</p>
+<p>$$K = YH^{T}R^{-1}$$
+Where $Y$ is the solution to another algebraic Riccati equation:</p>
+<p>$$YA^{* } + AY - YH^{* }Q^{-1}HY + R = 0$$</p>
+<p>This is the dual of the equation above, meaning that we can actually solve KF by pretending that it&rsquo;s an LQR problem (or vice versa).</p>
+<h2 id="lqg">LQG</h2>
+<p>Linear Quadratic Gaussians are what happens when you use a Kalman Filter for state estimation and an LQR for control. Interestingly, while LQG is perfectly suitable for a wide variety of problems, it&rsquo;s not entirely robust to model uncertainty. Particularly, delays in applying a control can destroy the robustness of LQGs.</p>
+<h1 id="robust-control-and-frequency-domain-techniques">Robust Control and Frequency-Domain Techniques</h1>
+<p>As we just discussed, LQG is fragile in certain ways - in fact, it&rsquo;s been proven that it can become arbitrarily unstable. We can improve on the robustness of LQG by optimizing for worst-case performance. Most of this work will rely on frequency domain techniques, where instead of tracking the derivative of our state at different times, we look at various <em>transfer functions</em> on our state.</p>
+<p>In the frequency domain, of course, functions are parameterized on frequencies rather than times. A transfer function defines a transformation between two frequency domain functions - given an input frequency, it returns a gain relating how that frequency is amplified/attenuated and phase shifted in the output.</p>
+<p>For numerous reasons, it will be easier to use Laplace transforms for frequency domain analysis rather than Fourier transforms. We&rsquo;ve <a href="https://sscheele.github.io/post/fourier-wavelet/">already discussed</a> the Laplace transform and its relationship to the Fourier transform in a prior review.</p>
+<h2 id="transfer-function">Transfer function</h2>
+<p>Our system was defined as:
+$$\dot{x}(t) = Ax(t) + Bu(t)$$
+$$y(t) = Cx(t) + Du(t)$$</p>
+<p>(Note that while we previously denoted $x(t), y(t), u(t)$ as $x, y, u$, these variables have always been a time series - this becomes important now, because we&rsquo;re going to transform them to the frequency domain). If we take the Laplace transform of these equations, we get:</p>
+<p>$$sx(s) = Ax(s) + Bu(s)$$
+$$y(s) = Cx(s) + Du(s)$$</p>
+<p>If we solve for $x(s)$ in the first equation, we get:</p>
+<p>$$x(s) = (sI-A)^{-1}Bu(s)$$
+Plugging into the second equation and factoring out $u(s)$:</p>
+<p>$$\begin{align}
+y(s) &amp;= C((sI - A)^{-1}Bu(s)) + Du(s) \\
+y(s) &amp;= [C(sI - A)^{-1}B + D]u(s)
+\end{align}$$
+This allows us to find a fixed ratio at a given frequency $s$ between $y(s)$ and $u(s)$. We denote this $G(s)$ and call it the <em>transfer function:</em></p>
+<p>$$G(s) = \frac{y(s)}{u(s)} = C(sI - A)^{-1}B + D$$
+One nice property of the transfer function is that we can use it to learn about the frequency response of the system. If the control value of an LTI system is a pure sinusoid, then the observations should also be sinusoids of the same frequency (though perhaps scaled and phase shifted):</p>
+<p>$$u(t) = \sin(\omega t), y(t) = A \sin(\omega t + \phi)$$</p>
+<p>The transfer function $G$ returns a phasor value given a frequency $\omega$:</p>
+<p>$$A(\omega) = |G(i\omega)|, \phi(\omega) = \angle G(i \omega)$$
+The <strong>Bode plot</strong> of a system is a pair of graphs, showing the values of $A$ and $\phi$ for different values of $\omega$. The change in magnitude at various frequencies is called the frequency response, and it can give you an idea of how the system will respond to, for example, fast and slow forcing.</p>
+<h2 id="formalization-of-robustness-and-noise-in-the-frequency-domain">Formalization of Robustness and Noise in the Frequency Domain</h2>
+<p>Suppose that our system is fully observable and controllable, albeit through noisy measurement and control processes. We&rsquo;ll be working with the concept of robust control in the frequency domain, so we&rsquo;ll introduce some notation similar to what we already had for closed-loop control.</p>
+<ul>
+<li>$w_{r}$ is the goal/reference</li>
+<li>$K$ is the controller matrix</li>
+<li>$G$ is the system matrix/transfer function (it sort of combines the system, control, and measurement models, as you can see in the above equation for $G$. If this seems weird, remember that we&rsquo;re not working in the time domain anymore - neat separations of the measurement, control, and system partly come from the abstraction of causality, which is a temporal construct)</li>
+<li>$w_{d}$ is the system noise</li>
+<li>$G_{d}$ is the system noise model, such that noise is added into the system as $G_{d}w_{d}$</li>
+<li>$w_{n}$ is the measurement noise</li>
+</ul>
+<p>In this system, the invariant we have to maintain is:</p>
+<p>$$y = GK(w_{r} - y - w_{n}) + G_{d}w_{d}$$
+Remember, this is <em>not</em> a temporal system, so this equation is <em>not</em> shorthand for a discrete-time system like:</p>
+<p>$$y_{n+1} = GK(w_{r} - y_{n} - w_{n}) + G_{d}w_{d}$$</p>
+<p>Instead, we have to solve for $y$:</p>
+<p>$$
+\begin{align}
+y &amp;= GK(w_{r} - y - w_{n}) + G_{d}w_{d} \\
+(I + GK)y &amp;= GK(w_{r} - w_{n}) + G_{d}w_{d} \\
+y &amp;= [(I + GK)^{-1}GK](w_{r}- w_{n}) + (I + GK)^{-1}G_{d}w_{d} \\
+&amp;= T(w_{r} - w_{n}) + SG_{d}w_{d}
+\end{align}
+$$
+The matrix $(I + GK)^{-1}$ is called the <em>sensitivity function</em> and denoted $S$, while the portion in brackets is called the <em>complementary sensitivity function</em> and denoted $T$. You might notice that:</p>
+<p>$$\begin{align}
+S + T &amp;= (I + GK)^{-1} + (I + GK)^{-1}GK \\
+&amp;= (I + GK)^{-1} (I + GK) \\
+&amp;= I
+\end{align}$$</p>
+<p>Hence, the term &ldquo;complementary sensitivity function.&rdquo; We&rsquo;ll also introduce $L = GK$ as the <em>loop transfer function,</em> a new transfer function that combines our controller and our system. If we replace the $GK$ with $L$ in our definitions of $S$ and $T$, we can see that as $L(s)$ rises (especially above 0 dB), $S(s)$ falls. Since $S$ and $T$ are complementary, we can infer that $T$ demonstrates the opposite behavior: as $L(s)$ falls (especially below 0 dB), $T(s)$ falls.</p>
+<p>We may wish to think about our problem in terms of the transfer function of the tracking error $\epsilon$:</p>
+<p>$$\begin{align}
+\epsilon &amp;= w_{r} - y \\
+&amp;= w_{r} - [T(w_{r} - w_{n}) + SG_{d}w_{d}] \\
+&amp;= (I - T)w_{r} + Tw_{n} - SG_{d}w_{d} \\
+&amp;= Sw_{r} + Tw_{n} - SG_{d}w_{d}
+\end{align}$$
+Paying particular attention to the last two terms, we can see a tension where we would ideally like both $S$ and $T$ to be very small at all frequencies (minimizing effects of noise), but need them to sum to $I$. Going back to our reasoning about when $S$ and $T$ become small, we can see that we want $L$ to be small, minimizing $T$, at higher frequencies (where we&rsquo;re more likely to see sensor noise $w_{n}$). Noise in the model is more likely to be low-frequency, so we&rsquo;d like $L$ to be larger in the low frequencies so that $S$ can be smaller there.</p>
+<p>On the other hand, paying attention to the first term, we can see that feedback control only actually improves performance when $S &lt; 1$. If we&rsquo;re trying to be maximally robust, we want to minimize the peak (maximum value) of $S(s)$, since this peak is where the controller will have its greatest tendency to degrade performance.</p>
+<p>The controller bandwidth is the frequency above which feedback control is ineffective (or, if you prefer, the frequency below which it is effective). Often, we subjectively define it as the frequency at which the gain crosses -3 dB.</p>
+<h2 id="inverting-the-dynamics">Inverting the Dynamics</h2>
+<p>Suppose we wanted to design an open-loop controller in the Laplace domain. One way we might be tempted to do it is to note that if we want the output $s = GK w_{r}$ to track the reference $w_{r}$, then we can trivially say $K = G^{-1}$ and be done. The problem of this is that small uncertainties can produce a model that works well <em>almost</em> everywhere, and explodes at one particular point. In general, open-loop control can&rsquo;t stabilize an unstable system. However, the technique of open-loop model inversion is used in a few controlled settings where systems are well-characterized, constrained, and standardized.</p>
+<h2 id="h-infinity-robust-control">H-infinity Robust Control</h2>
+<p>The infinity norm of a function is just its maximum singular value. In $\mathcal{H}_ {\infty}$ control, you try to minimize the infinity norm of the transfer function from the exogenous inputs $w$ to a multi-objective cost function $J$, which balances aspects like accuracy, actuation cost, time-domain performance, etc. We&rsquo;ll call that new transfer function $G_ {w \rightarrow J}$. We typically find $G_ {w \rightarrow J}$ using numerical methods.</p>
+<p>Choice of $J$ is, of course, highly important, and typically uses the sensitivity and complementary sensitivity functions, $S$ and $T$, from earlier. A high weight for $S$ tends to improve disturbance rejection, for $T$ attenuates noise, and for the matrix $KS$ makes the controller more responsive. Since the &ldquo;weights&rdquo; are themselves gain functions of frequency (filters), you can do things like weighting $S$ by a low-pass filter and $KS$ by a high-pass filter, so the controller rejects low-frequency disturbances and doesn&rsquo;t tend to respond to high-frequency inputs.</p>
+<p>We typically find H-infinity controllers through numerical methods.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
