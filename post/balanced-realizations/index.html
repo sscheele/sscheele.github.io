@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Brunton Textbook Review - Balanced Realizations | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Brunton Textbook Review - Balanced Realizations</span></h1>
+
+<h2 class="date">2024/01/14</h2>
+</div>
+
+<main>
+<p>Welcome to the tenth installment of my review of <a href="https://faculty.washington.edu/sbrunton/DataBookV2.pdf">&ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control&rdquo;</a> (technically a review of chapter 9, because one chapter got split into two reviews). This review gives a high-level overview of the math behind balancing tranformations.</p>
+<p>Suppose you have a typical linear system which you&rsquo;re observing somehow and potentially also exerting control on, as we&rsquo;ve been discussing for several chapters:</p>
+<p>$$
+\begin{align}
+\dot{x} &amp;= Ax + Bu \\
+y &amp;= Cx + Du
+\end{align}
+$$
+It might be useful to you to find some reduced-order input-output model based on a projection of $x$, given as $x = T \tilde{x}$. This gives rise to a new set of matrices such that:</p>
+<p>$$\begin{align}
+\dot{\tilde{x}} &amp;= \tilde{A}\tilde{x} + \tilde{B}u \\
+y &amp;= \tilde{C}\tilde{x} + \tilde{D}u
+\end{align}$$
+The reduced-order model can then be used as a more computationally efficient way to control a very high-dimensional system.</p>
+<p>If we have a history of states, we could infer $T$ from that data using the Proper Orthogonal Decomposition (POD), which we discussed briefly when we looked at <a href="https://sscheele.github.io/post/data-driven-dynamics/">DMD</a> and is basically just an estimate based on the SVD. The point of the POD is to capture the maximum variance, or energy, within a dataset. This sounds appealing, except that it might not always be useful for purposes of control. This is because, especially in high-dimensional systems, the most controllable directions might not account for very much of the energy. In that case, you&rsquo;re effectively collapsing the controllable aspects of a system before you try to efficiently control it.</p>
+<p>Instead, we&rsquo;d prefer for our reduced-order system to be both controllable and observable. Even more, we&rsquo;d like it to be controllable and observable in similar directions. You may remember from the first <a href="https://sscheele.github.io/post/linear-control-theory/">linear control theory</a> post that the Gramian provides a scalar-valued measure of controllability (specifically, on-diagonal elements indicate the amount of energy required to move along a certain dimension of state space, and off-diagonal elements indicate the level of coupling between dimensions).</p>
+<h2 id="computing-a-balanced-transformation">Computing a Balanced Transformation</h2>
+<p>Based on the definition of the controllability and observability Gramians, we can find that under the transformation $x = T \tilde{x}$, the controllability Gramian is $\hat{W}_ {c} = T^{-1}W_ {c}T^{-* }$ and the observability Gramian $\hat{W}_ {o} = T^{*}W_ {o}T$. We&rsquo;d like to require that the controllability and observability Gramians are equal and diagonal, introducing $\Sigma = \hat{W}_ {c} = \hat{W}_ {o}$. As an aside, you may have noticed that we&rsquo;re talking about $T^{-1}$ even though the $T$ we discussed earlier ought to be a non-square matrix (it would be $n \times r$, where $r$ is the reduced rank). For now, we&rsquo;re going to actually compute a square $T$ that doesn&rsquo;t reduce the rank but instead only transforms into a space where the Gramians are balanced (diagonal and equal). Later, we&rsquo;ll truncate this $T$ to form the $n \times r$ version we&rsquo;re expecting.</p>
+<p>In order to find, $T$, we&rsquo;ll first determine $\Sigma$. To find $\Sigma$, first consider the product:</p>
+<p>$$\hat{W}_ {c} \hat{W}_ {o} = \Sigma^{2} = T^{-1}W_ {c}W_ {o}T$$
+Left multiplying by $T$:</p>
+<p>$$T \Sigma^{2} = W_ {c}W_ {o}T$$</p>
+<p>This looks extremely similar to the eigendecomposition of $W_ {c}W_ {o}$, where $T$ is the eigenvector matrix and $\Sigma$ (which, as you recall, is diagonal) is the eigenvalue matrix. However, the columns of $T$ might be eigenvectors of $W_ {c} W_ {o}$ scaled by any factor and this expression would still be true for some diagonal $\Sigma$ matrix without necessarily having $\hat{W}_ c = \hat{W}_ o$. Therefore, the next step will be to find a balancing matrix $\Sigma_ {s}$ that correctly scales the columns of the <em>unbalanced eigenvector matrix</em> $T_ {u}$ relative to one another, such that $T = T_ {u} \Sigma_ {s}$ and:</p>
+<p>$$(T_ {u} \Sigma_ {s}) \Sigma^{2} = W_ {c} W_ {o} T$$</p>
+<p>Next, recall the formulas for $\hat{W}_c$ and $\hat{W}_o$:</p>
+<p>$$\begin{align}
+\hat{W}_ {c} &amp;= T^{-1}W_ {c}T^{-* } \\
+\hat{W}_ {o} &amp;= T^{*}W_ {o}T
+\end{align}$$</p>
+<p>If $T = T_ {u} \Sigma_ {s}$, then, noting that diagonal matrices commute, and that the transpose of a diagonal matrix is itself, we have:</p>
+<p>$$\begin{align}
+\hat{W}_ {c} &amp;= \Sigma_ {s}^{-2} T_ {u}^{-1}W_ {c}T_ {u}^{-* } \\
+\hat{W}_ {o} &amp;= \Sigma_ {s}^{2} T_ {u}^{*}W_ {o}T_ {u}
+\end{align}$$</p>
+<p>Since these matrices are diagonal, we can equivalently say that given corresponding unbalanced diagonal elements of $W_ c$ and $W_ o$, $\sigma_ {c}$ and $\sigma_ {o}$, are respectively scaled by $\sigma_ {s}^{-2}$ and $\sigma_ {s}^{2}$ under the balancing diagonal matrix $\Sigma_ {s}$. If these rescaled diagonal elements are to be equal, then:</p>
+<p>$$\begin{align}
+\sigma_ {s}^{-2}\sigma_ {c} &amp;= \sigma_ {s}^{2}\sigma_ {o} \\
+\sigma_ {s} &amp;= \left( \frac{\sigma_ {c}}{\sigma_ {o}} \right)^{\frac{1}{4}}
+\end{align}$$</p>
+<p>Therefore, if we introduce symbols for the &ldquo;unbalanced Gramians&rdquo; $\Sigma_ {c} = T_ {u}^{-1}W_ {c}T_ {u}^{-* }$ and $\Sigma_ {o} = T_ {u}^{*}W_ {o}T_ {u}$, then $\Sigma_ {s} = \Sigma_c^{\frac{1}{4}} \Sigma_ {o}^{\frac{-1}{4}}$. Through our definition $T = T_ {u} \Sigma_ {s}$, we now have an algorithm for computing the balancing transformation $T$. I promised earlier that we&rsquo;d truncate $T$ to attain the $n \times r$ version; I&rsquo;m actually going to coyly leave this as an exercise to the reader as the math isn&rsquo;t too hard. Remember, the Gramian matrix $\Sigma$ orders the modes by both controllability and observability.</p>
+<h2 id="data-driven-methods">Data-Driven Methods</h2>
+<p>I&rsquo;m personally more interested in the high-level concept of balanced models for control than doing a deep dive; suffice it to say that the textbook gives fast methods for computing Gramians empirically (since the Gramians of an $n \times n$ system can be expensive to compute), as well as data-driven techniques for computing a balancing transformation, including balanced POD, the Eigensystem Realization Algorithm and Observer Kalman Filter Identification. These last two, ERA, and OKFID, involve identifying the dynamics of a system by doing an impulse-response experiment.</p>
+<h2 id="conclusion">Conclusion</h2>
+<p>Next up we&rsquo;ll start the final section of the textbook, &ldquo;Advanced Data-Driven Modeling and Control,&rdquo; with a discussion of MPC! I wrote my thesis on MPC, so I&rsquo;m especially excited about this part. &lsquo;Till next time!</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

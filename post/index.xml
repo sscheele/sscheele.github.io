@@ -6,31 +6,35 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 20 Dec 2023 11:47:00 -0500</lastBuildDate>
+    <lastBuildDate>Sun, 14 Jan 2024 13:55:01 -0500</lastBuildDate>
     <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Brunton Textbook Review - Balanced Realizations</title>
+      <link>/post/balanced-realizations/</link>
+      <pubDate>Sun, 14 Jan 2024 13:55:01 -0500</pubDate>
+      <guid>/post/balanced-realizations/</guid>
+      <description>Welcome to the tenth installment of my review of &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control&amp;rdquo; (technically a review of chapter 9, because one chapter got split into two reviews). This review gives a high-level overview of the math behind balancing tranformations.&#xA;Suppose you have a typical linear system which you&amp;rsquo;re observing somehow and potentially also exerting control on, as we&amp;rsquo;ve been discussing for several chapters:&#xA;$$ \begin{align} \dot{x} &amp;amp;= Ax + Bu \\ y &amp;amp;= Cx + Du \end{align} $$ It might be useful to you to find some reduced-order input-output model based on a projection of $x$, given as $x = T \tilde{x}$.</description>
+    </item>
     <item>
       <title>Brunton Textbook Review - Linear Control Theory 2</title>
       <link>/post/linear-control-theory-2/</link>
       <pubDate>Wed, 20 Dec 2023 11:47:00 -0500</pubDate>
       <guid>/post/linear-control-theory-2/</guid>
-      <description>Welcome back to the Brunton Textbook Review series, where I&amp;rsquo;m reviewing all of Steve Brunton&amp;rsquo;s textbook, “Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.” This post will conclude chapter 8, on linear control systems. The next post will cover Chapter 9, on system identification and balanced representation.
-Optimal Control In part 1 of this review of the Linear Control Theory chapter, we found that you can stabilize a linear system by defining a control law $u = Kx$, such that $A - BK$ has negative eigenvalues (or, more precisely, eigenvalues with negative real components).</description>
+      <description>Welcome back to the Brunton Textbook Review series, where I&amp;rsquo;m reviewing all of Steve Brunton&amp;rsquo;s textbook, “Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.” This post will conclude chapter 8, on linear control systems. The next post will cover Chapter 9, on system identification and balanced representation.&#xA;Optimal Control In part 1 of this review of the Linear Control Theory chapter, we found that you can stabilize a linear system by defining a control law $u = Kx$, such that $A - BK$ has negative eigenvalues (or, more precisely, eigenvalues with negative real components).</description>
     </item>
     <item>
       <title>Multimodal LLMs and DALL-E Explained</title>
       <link>/post/multimodal-llms/</link>
       <pubDate>Sun, 26 Nov 2023 16:45:54 -0500</pubDate>
       <guid>/post/multimodal-llms/</guid>
-      <description>I&amp;rsquo;m finding that writing here is a great way to make sure I have a complete understanding of various concepts. With that in mind, I decided to keep going along the LLM line. Scheduled programming on the Brunton textbook will probably resume soon.
-I imagined there would be some cool trick to multimodal LLMs, but that doesn&amp;rsquo;t actually seem to be the case! If there is a cool trick, it&amp;rsquo;s the cool trick of realizing that you can do an unusual amount of things with transformers, including image processing, which itself lets you do a surprising number of things.</description>
+      <description>I&amp;rsquo;m finding that writing here is a great way to make sure I have a complete understanding of various concepts. With that in mind, I decided to keep going along the LLM line. Scheduled programming on the Brunton textbook will probably resume soon.&#xA;I imagined there would be some cool trick to multimodal LLMs, but that doesn&amp;rsquo;t actually seem to be the case! If there is a cool trick, it&amp;rsquo;s the cool trick of realizing that you can do an unusual amount of things with transformers, including image processing, which itself lets you do a surprising number of things.</description>
     </item>
     <item>
       <title>Llama Writeup</title>
       <link>/post/llama/</link>
       <pubDate>Sun, 19 Nov 2023 17:31:30 -0500</pubDate>
       <guid>/post/llama/</guid>
-      <description>This post is an attempt to explain Facebook&amp;rsquo;s Llama LLM to myself.
-Part 1: Transformer Models, Architecture Tokenization and Initial Embedding First, the input string is split into tokens. These tokens are often &amp;ldquo;subword tokens,&amp;rdquo; meaning that word parts (like -ed and -tion) get their own tokens. This is useful in the case that a word is out-of-vocabulary (OOV). If the input is nonsense, the tokens may be individual characters. The tokens are then looked up in a dictionary of embeddings.</description>
+      <description>This post is an attempt to explain Facebook&amp;rsquo;s Llama LLM to myself.&#xA;Part 1: Transformer Models, Architecture Tokenization and Initial Embedding First, the input string is split into tokens. These tokens are often &amp;ldquo;subword tokens,&amp;rdquo; meaning that word parts (like -ed and -tion) get their own tokens. This is useful in the case that a word is out-of-vocabulary (OOV). If the input is nonsense, the tokens may be individual characters. The tokens are then looked up in a dictionary of embeddings.</description>
     </item>
     <item>
       <title>Backup Script</title>
@@ -44,35 +48,28 @@ Part 1: Transformer Models, Architecture Tokenization and Initial Embedding Firs
       <link>/post/linear-control-theory/</link>
       <pubDate>Sun, 08 Oct 2023 20:43:47 -0400</pubDate>
       <guid>/post/linear-control-theory/</guid>
-      <description>This essay continues my review of Steve Brunton&amp;rsquo;s textbook, &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo;.
-When talking about control, we&amp;rsquo;ll mostly discuss closed-loop feedback control, but it&amp;rsquo;s worth briefly emphasizing that there are actually other kinds of control which are sometimes appropriate. For example, most traffic lights are purely on timers, with no sensing capabilities at all. This sort of nonreactive, pre-programmed control is called open loop.</description>
+      <description>This essay continues my review of Steve Brunton&amp;rsquo;s textbook, &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo;.&#xA;When talking about control, we&amp;rsquo;ll mostly discuss closed-loop feedback control, but it&amp;rsquo;s worth briefly emphasizing that there are actually other kinds of control which are sometimes appropriate. For example, most traffic lights are purely on timers, with no sensing capabilities at all. This sort of nonreactive, pre-programmed control is called open loop.</description>
     </item>
     <item>
       <title>Brunton Textbook Review - Data Driven Dynamics</title>
       <link>/post/data-driven-dynamics/</link>
       <pubDate>Thu, 21 Sep 2023 08:48:12 -0400</pubDate>
       <guid>/post/data-driven-dynamics/</guid>
-      <description>Welcome! This post is my first review in the Dynamics and Control section of &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo;.
-This chapter focuses on analyzing dynamical systems by pure observation (that is, deducing their properties purely by observing the system, rather then from some first-principles analysis). First, it introduces some basic principles of dynamical systems, then gives a few methods for discovering their dynamics.
-There are a few things we want to do with dynamical systems:</description>
+      <description>Welcome! This post is my first review in the Dynamics and Control section of &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo;.&#xA;This chapter focuses on analyzing dynamical systems by pure observation (that is, deducing their properties purely by observing the system, rather then from some first-principles analysis). First, it introduces some basic principles of dynamical systems, then gives a few methods for discovering their dynamics.&#xA;There are a few things we want to do with dynamical systems:</description>
     </item>
     <item>
       <title>Brunton Textbook Review - Compressed Sensing</title>
       <link>/post/compressed-sensing/</link>
       <pubDate>Tue, 19 Sep 2023 08:31:33 -0400</pubDate>
       <guid>/post/compressed-sensing/</guid>
-      <description>This essay continues my review of Steve Brunton&amp;rsquo;s textbook, &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo;.
-A while ago, I wanted to do machine learning on some time-series data, but I had a problem: some timesteps in the (otherwise regularly-sampled) dataset had been removed for being &amp;ldquo;low-quality.&amp;rdquo; I couldn&amp;rsquo;t get the original data, but I also couldn&amp;rsquo;t figure out a good way to interpolate the missing data. At the time, I think I just backfilled the data with the next non-null value, but in retrospect, it probably would have been a good idea to turn to compressed sensing.</description>
+      <description>This essay continues my review of Steve Brunton&amp;rsquo;s textbook, &amp;ldquo;Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.&amp;rdquo;.&#xA;A while ago, I wanted to do machine learning on some time-series data, but I had a problem: some timesteps in the (otherwise regularly-sampled) dataset had been removed for being &amp;ldquo;low-quality.&amp;rdquo; I couldn&amp;rsquo;t get the original data, but I also couldn&amp;rsquo;t figure out a good way to interpolate the missing data. At the time, I think I just backfilled the data with the next non-null value, but in retrospect, it probably would have been a good idea to turn to compressed sensing.</description>
     </item>
     <item>
       <title>Brunton Textbook Review - Fourier and Wavelet Transforms</title>
       <link>/post/fourier-wavelet/</link>
       <pubDate>Wed, 05 Jul 2023 19:00:39 -0400</pubDate>
       <guid>/post/fourier-wavelet/</guid>
-      <description>Welcome! This post, on the Fourier and wavelet transforms, is a continuation of my series summarizing the new edition of Steve Brunton&amp;rsquo;s textbook, &amp;ldquo;Data-Driven Science and Engineering.&amp;rdquo; In the current edition, this post covers pages 64-117.
-You can think of the Fourier transform as a specific kind of projection, similar to a vector projection:
-$$\text{proj}_{v}(u) = \frac{v}{v \cdot v} u \cdot v$$
-That&amp;rsquo;s how you project a vector $u$ onto a vector $v$, but it relies on the dot product.</description>
+      <description>Welcome! This post, on the Fourier and wavelet transforms, is a continuation of my series summarizing the new edition of Steve Brunton&amp;rsquo;s textbook, &amp;ldquo;Data-Driven Science and Engineering.&amp;rdquo; In the current edition, this post covers pages 64-117.&#xA;You can think of the Fourier transform as a specific kind of projection, similar to a vector projection:&#xA;$$\text{proj}_{v}(u) = \frac{v}{v \cdot v} u \cdot v$$&#xA;That&amp;rsquo;s how you project a vector $u$ onto a vector $v$, but it relies on the dot product.</description>
     </item>
     <item>
       <title>Brunton Textbook Review - SVD Interpretations</title>
@@ -86,16 +83,14 @@ That&amp;rsquo;s how you project a vector $u$ onto a vector $v$, but it relies o
       <link>/post/learning-ml-1/</link>
       <pubDate>Tue, 06 Jun 2023 11:49:09 -0400</pubDate>
       <guid>/post/learning-ml-1/</guid>
-      <description>I&amp;rsquo;ve decided to get a lot better at ML, and I enjoyed my Rust learning log so much that I&amp;rsquo;m going to do something similar for this. However, I think there will be a lot of differences between learning ML and learning Rust. Rust is an easier learning environment in some important ways:
-Causal models - In Rust, we have a reasonably good idea of what&amp;rsquo;s going on, and we can look things up when we don&amp;rsquo;t.</description>
+      <description>I&amp;rsquo;ve decided to get a lot better at ML, and I enjoyed my Rust learning log so much that I&amp;rsquo;m going to do something similar for this. However, I think there will be a lot of differences between learning ML and learning Rust. Rust is an easier learning environment in some important ways:&#xA;Causal models - In Rust, we have a reasonably good idea of what&amp;rsquo;s going on, and we can look things up when we don&amp;rsquo;t.</description>
     </item>
     <item>
       <title>Kalman Filtering: Part 3</title>
       <link>/post/kf-3/</link>
       <pubDate>Thu, 25 May 2023 23:39:41 -0400</pubDate>
       <guid>/post/kf-3/</guid>
-      <description>Welcome to my third Kalman Filtering post! We left off on a cliffhanger. How will the LUMVE algorithm perform against Double EWMA?
-Pretty well! In the graph, DEWMA starts out with a better estimate than LUMVE, but LUMVE stays pretty consistently closer to ground truth by being initially more willing to update based on new measurements and later more reluctant to fit noise. Of course, DEWMA has tunable parameters that let it be more willing to update, too.</description>
+      <description>Welcome to my third Kalman Filtering post! We left off on a cliffhanger. How will the LUMVE algorithm perform against Double EWMA?&#xA;Pretty well! In the graph, DEWMA starts out with a better estimate than LUMVE, but LUMVE stays pretty consistently closer to ground truth by being initially more willing to update based on new measurements and later more reluctant to fit noise. Of course, DEWMA has tunable parameters that let it be more willing to update, too.</description>
     </item>
     <item>
       <title>Kalman Filtering: Part 2</title>
@@ -116,48 +111,42 @@ Pretty well! In the graph, DEWMA starts out with a better estimate than LUMVE, b
       <link>/post/learning-rust-4/</link>
       <pubDate>Sun, 14 May 2023 12:46:22 -0400</pubDate>
       <guid>/post/learning-rust-4/</guid>
-      <description>This will be the last installment in my series on learning Rust, in which I give some notes on Cow. I finished re-implementing Cow for myself and found some performance stuff that surprised me! As my main testbed, I&amp;rsquo;m using this function:
-fn test_speed() { use rand::{thread_rng, Rng}; use std::time::{Duration, Instant}; use std::vec::*; let mut rng = thread_rng(); let pos_nums: Vec&amp;lt;i32&amp;gt; = (1..1000000).collect(); let neg_nums: Vec&amp;lt;i32&amp;gt; = (-50..999950).collect(); let t_start = Instant::now(); // naive method for _ in 1.</description>
+      <description>This will be the last installment in my series on learning Rust, in which I give some notes on Cow. I finished re-implementing Cow for myself and found some performance stuff that surprised me! As my main testbed, I&amp;rsquo;m using this function:&#xA;fn test_speed() { use rand::{thread_rng, Rng}; use std::time::{Duration, Instant}; use std::vec::*; let mut rng = thread_rng(); let pos_nums: Vec&amp;lt;i32&amp;gt; = (1..1000000).collect(); let neg_nums: Vec&amp;lt;i32&amp;gt; = (-50..999950).collect(); let t_start = Instant::now(); // naive method for _ in 1.</description>
     </item>
     <item>
       <title>Animated Plot Collection</title>
       <link>/post/sys_anim/</link>
       <pubDate>Sat, 13 May 2023 19:42:24 -0400</pubDate>
       <guid>/post/sys_anim/</guid>
-      <description>I took a break from learning Rust to make a repository of animated plots using Matplotlib.
-I was initially going to use Rust for this, but ended up deciding not to - though plotters looks very cool! This is mostly because I came to the conclusion that no Rust library is mature enough to do what I want, which is to make nice-looking stuff for one-off use cases like presentations. A Rust solution would probably be faster and more maintainable, but these Python scripts are simple and easy to extend, which is a better value proposition for one-off projects.</description>
+      <description>I took a break from learning Rust to make a repository of animated plots using Matplotlib.&#xA;I was initially going to use Rust for this, but ended up deciding not to - though plotters looks very cool! This is mostly because I came to the conclusion that no Rust library is mature enough to do what I want, which is to make nice-looking stuff for one-off use cases like presentations. A Rust solution would probably be faster and more maintainable, but these Python scripts are simple and easy to extend, which is a better value proposition for one-off projects.</description>
     </item>
     <item>
       <title>Learning Rust: Week 3</title>
       <link>/post/learning-rust-3/</link>
       <pubDate>Thu, 11 May 2023 19:05:41 -0400</pubDate>
       <guid>/post/learning-rust-3/</guid>
-      <description>This week I&amp;rsquo;m focusing on implementing my own version of Cow, which I&amp;rsquo;m increasingly convinced is helpful even though I haven&amp;rsquo;t made much progress on it.
-What I&amp;rsquo;ve Done Rust&amp;rsquo;s Smart Pointers and Cow Rust has raw pointers that you can pass around the way you&amp;rsquo;d pass around C pointers, but you&amp;rsquo;re not supposed to use them except in very specific circumstances. Raw pointers in Rust are unsafe and sort of ruin the point of following all of the ownership rules.</description>
+      <description>This week I&amp;rsquo;m focusing on implementing my own version of Cow, which I&amp;rsquo;m increasingly convinced is helpful even though I haven&amp;rsquo;t made much progress on it.&#xA;What I&amp;rsquo;ve Done Rust&amp;rsquo;s Smart Pointers and Cow Rust has raw pointers that you can pass around the way you&amp;rsquo;d pass around C pointers, but you&amp;rsquo;re not supposed to use them except in very specific circumstances. Raw pointers in Rust are unsafe and sort of ruin the point of following all of the ownership rules.</description>
     </item>
     <item>
       <title>Learning Rust: Week 2</title>
       <link>/post/learning-rust-2/</link>
       <pubDate>Sun, 30 Apr 2023 19:45:48 -0400</pubDate>
       <guid>/post/learning-rust-2/</guid>
-      <description>This week of Rust was focused almost entirely on last week&amp;rsquo;s technique #4, open source contribution! I spent the week working on three issues.
-Issue #1: Documentation This issue dealt with documenting two specific commands which had been added to Helix as part of a recent update that introduced soft line wrapping. I proposed extending the documentation generator to automatically document all commands, but then it turned out that someone was already doing the same thing (but probably better than I would have), so I just manually updated the docs.</description>
+      <description>This week of Rust was focused almost entirely on last week&amp;rsquo;s technique #4, open source contribution! I spent the week working on three issues.&#xA;Issue #1: Documentation This issue dealt with documenting two specific commands which had been added to Helix as part of a recent update that introduced soft line wrapping. I proposed extending the documentation generator to automatically document all commands, but then it turned out that someone was already doing the same thing (but probably better than I would have), so I just manually updated the docs.</description>
     </item>
     <item>
       <title>Learning Rust: Week 1</title>
       <link>/post/learning-rust-1/</link>
       <pubDate>Sun, 23 Apr 2023 23:56:06 -0400</pubDate>
       <guid>/post/learning-rust-1/</guid>
-      <description>This is the first in (hopefully) a series of posts about my efforts to learn Rust! The goal is to track my progress and maybe see what techniques work better/worse.
-Thoughts on Rust Rust is a very cool language and definitely worth learning, if you already know C. If you don&amp;rsquo;t already know C, I think it would probably be a lot more frustrating. This is because a lot of Rust&amp;rsquo;s design, such as the ownership system, is based on high-level principles which are designed to eliminate problems you&amp;rsquo;d encounter in C.</description>
+      <description>This is the first in (hopefully) a series of posts about my efforts to learn Rust! The goal is to track my progress and maybe see what techniques work better/worse.&#xA;Thoughts on Rust Rust is a very cool language and definitely worth learning, if you already know C. If you don&amp;rsquo;t already know C, I think it would probably be a lot more frustrating. This is because a lot of Rust&amp;rsquo;s design, such as the ownership system, is based on high-level principles which are designed to eliminate problems you&amp;rsquo;d encounter in C.</description>
     </item>
     <item>
       <title>Point Bw Points</title>
       <link>/post/point-bw-points/</link>
       <pubDate>Tue, 28 Mar 2023 16:32:27 -0400</pubDate>
       <guid>/post/point-bw-points/</guid>
-      <description>Here&amp;rsquo;s another short post on a problem I solved today. Suppose you have a point and want to see if it&amp;rsquo;s between two other points. If you&amp;rsquo;re working in a 2D space, you can use a solution along the lines of this one from Bryce Boe, but it&amp;rsquo;s not obvious how it would generalize to higher dimensions.
-So I thought I&amp;rsquo;d take a different approach: what do we mean when we say a point is &amp;ldquo;between two points?</description>
+      <description>Here&amp;rsquo;s another short post on a problem I solved today. Suppose you have a point and want to see if it&amp;rsquo;s between two other points. If you&amp;rsquo;re working in a 2D space, you can use a solution along the lines of this one from Bryce Boe, but it&amp;rsquo;s not obvious how it would generalize to higher dimensions.&#xA;So I thought I&amp;rsquo;d take a different approach: what do we mean when we say a point is &amp;ldquo;between two points?</description>
     </item>
     <item>
       <title>Jacobian Trajectory Generation</title>
@@ -171,8 +160,7 @@ So I thought I&amp;rsquo;d take a different approach: what do we mean when we sa
       <link>/post/problem-14-1/</link>
       <pubDate>Sun, 19 Mar 2023 16:49:35 -0400</pubDate>
       <guid>/post/problem-14-1/</guid>
-      <description>I recently saw a post on Gwern&amp;rsquo;s blog on an interesting problem in probability and expected value:
-A shuffled deck of cards has an equal number of red and black cards. When you draw a red card from the deck, you get \$1, and when you draw a black card you lose \$1. You can stop whenever you want. If the deck has $N$ cards, what is the expected value of playing this game?</description>
+      <description>I recently saw a post on Gwern&amp;rsquo;s blog on an interesting problem in probability and expected value:&#xA;A shuffled deck of cards has an equal number of red and black cards. When you draw a red card from the deck, you get \$1, and when you draw a black card you lose \$1. You can stop whenever you want. If the deck has $N$ cards, what is the expected value of playing this game?</description>
     </item>
     <item>
       <title>Latex Packages</title>
@@ -186,33 +174,28 @@ A shuffled deck of cards has an equal number of red and black cards. When you dr
       <link>/post/kf-1/</link>
       <pubDate>Sun, 12 Mar 2023 13:44:51 -0400</pubDate>
       <guid>/post/kf-1/</guid>
-      <description>Welcome back to my Kalman filtering notes! In this post we&amp;rsquo;ll first back up and talk about when and why we would want to use a Kalman filter, and we&amp;rsquo;ll go all the way to deriving a filter with the same properties as KF.
-Kalman Filter Setup and Motivation Suppose you&amp;rsquo;re designing a satellite that needs to estimate its location in space very precisely. The two most obvious ways to do this are to use GPS and to infer your location by measuring it relative to background stars.</description>
+      <description>Welcome back to my Kalman filtering notes! In this post we&amp;rsquo;ll first back up and talk about when and why we would want to use a Kalman filter, and we&amp;rsquo;ll go all the way to deriving a filter with the same properties as KF.&#xA;Kalman Filter Setup and Motivation Suppose you&amp;rsquo;re designing a satellite that needs to estimate its location in space very precisely. The two most obvious ways to do this are to use GPS and to infer your location by measuring it relative to background stars.</description>
     </item>
     <item>
       <title>Kalman Filtering: Intro</title>
       <link>/post/kf-intro/</link>
       <pubDate>Fri, 10 Mar 2023 22:38:16 -0500</pubDate>
       <guid>/post/kf-intro/</guid>
-      <description>This is the first in a series of posts on the Kalman Filter! Over the series, we&amp;rsquo;ll first derive a filter with the same properties as the KF, then the KF itself, and finally more advanced variants such as EKF and UKF.
-I&amp;rsquo;ll assume for this series that you have some knowledge of linear algebra and probability theory. However, a quick refresher never hurt anyone, so the remainder of this post will cover that.</description>
+      <description>This is the first in a series of posts on the Kalman Filter! Over the series, we&amp;rsquo;ll first derive a filter with the same properties as the KF, then the KF itself, and finally more advanced variants such as EKF and UKF.&#xA;I&amp;rsquo;ll assume for this series that you have some knowledge of linear algebra and probability theory. However, a quick refresher never hurt anyone, so the remainder of this post will cover that.</description>
     </item>
     <item>
       <title>Puzzle: Counting to 100</title>
       <link>/post/100-puzzle/</link>
       <pubDate>Tue, 07 Mar 2023 13:18:41 -0500</pubDate>
       <guid>/post/100-puzzle/</guid>
-      <description>Here&amp;rsquo;s a puzzle I found in &amp;ldquo;The Moscow Puzzles&amp;rdquo;, by Boris Kordemsky and Martin Gardner:
-Person 1 can call any number from 1 to 10. Person 2 can then increment the last called number by any whole number from 1 to 10, then it&amp;rsquo;s Person 1&amp;rsquo;s turn again, and so on. The first person to call 100 wins. Give a strategy that allows Person 1 to win this game every time</description>
+      <description>Here&amp;rsquo;s a puzzle I found in &amp;ldquo;The Moscow Puzzles&amp;rdquo;, by Boris Kordemsky and Martin Gardner:&#xA;Person 1 can call any number from 1 to 10. Person 2 can then increment the last called number by any whole number from 1 to 10, then it&amp;rsquo;s Person 1&amp;rsquo;s turn again, and so on. The first person to call 100 wins. Give a strategy that allows Person 1 to win this game every time</description>
     </item>
     <item>
       <title>Hello, world!</title>
       <link>/post/test/</link>
       <pubDate>Tue, 07 Mar 2023 12:30:35 -0500</pubDate>
       <guid>/post/test/</guid>
-      <description>Hello, world!
-I made this site based on a very minimal hugo theme. Despite the fact that this theme is only 150 lines of code, I still don&amp;rsquo;t understand it! There are two reasons for this:
-I&amp;rsquo;m not familiar with Hugo (the static site generator I&amp;rsquo;m using) or really web development There seem to be a lot of magic constants in hugo that I don&amp;rsquo;t like. I think this was part of an effort to make Hugo &amp;ldquo;creator-friendly&amp;rdquo; by hiding complexity from users of the tool.</description>
+      <description>Hello, world!&#xA;I made this site based on a very minimal hugo theme. Despite the fact that this theme is only 150 lines of code, I still don&amp;rsquo;t understand it! There are two reasons for this:&#xA;I&amp;rsquo;m not familiar with Hugo (the static site generator I&amp;rsquo;m using) or really web development There seem to be a lot of magic constants in hugo that I don&amp;rsquo;t like. I think this was part of an effort to make Hugo &amp;ldquo;creator-friendly&amp;rdquo; by hiding complexity from users of the tool.</description>
     </item>
   </channel>
 </rss>
