@@ -6,8 +6,15 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 14 Jan 2024 13:55:01 -0500</lastBuildDate>
+    <lastBuildDate>Sat, 27 Jan 2024 21:31:28 -0500</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Brunton Textbook Review - Data Driven Control</title>
+      <link>/post/data-driven-control/</link>
+      <pubDate>Sat, 27 Jan 2024 21:31:28 -0500</pubDate>
+      <guid>/post/data-driven-control/</guid>
+      <description>This essay continues my review of Steve Brunton’s textbook, “Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.”. This covers chapter 10, on data-driven control. Sadly, it is not all about MPC, but we&amp;rsquo;ll cover all of it anyway.&#xA;MPC The essence of MPC is to optimize a trajectory of control values by solving a nonlinear program:&#xA;$$\begin{align} \min_{u_{t:T}} \quad &amp;amp;J(x_{t:T}, u_{t:T})\quad \texttt{s.t.} \\ x_{t+1} &amp;amp;= f(x_{t}, u_{t}) \\ &amp;amp;\dots \end{align}$$ Where $J$ is some cost function on the trajectory of states $x_{t:T}$ and the trajectory of control values $u_{t:T}$.</description>
+    </item>
     <item>
       <title>Brunton Textbook Review - Balanced Realizations</title>
       <link>/post/balanced-realizations/</link>

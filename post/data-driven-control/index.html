@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Brunton Textbook Review - Data Driven Control | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Brunton Textbook Review - Data Driven Control</span></h1>
+
+<h2 class="date">2024/01/27</h2>
+</div>
+
+<main>
+<p>This essay continues my review of Steve Brunton’s textbook, <a href="https://faculty.washington.edu/sbrunton/DataBookV2.pdf">“Data-Driven Science and Engineering: Machine Learning, Dynamical Systems, and Control.”</a>. This covers chapter 10, on data-driven control. Sadly, it is not all about MPC, but we&rsquo;ll cover all of it anyway.</p>
+<h1 id="mpc">MPC</h1>
+<p>The essence of MPC is to optimize a trajectory of control values by solving a nonlinear program:</p>
+<p>$$\begin{align}
+\min_{u_{t:T}} \quad &amp;J(x_{t:T}, u_{t:T})\quad \texttt{s.t.} \\
+x_{t+1} &amp;= f(x_{t}, u_{t}) \\
+&amp;\dots
+\end{align}$$
+Where $J$ is some cost function on the trajectory of states $x_{t:T}$ and the trajectory of control values $u_{t:T}$. There might be arbitrary constraints: on the set of valid states, on the control bounds, on how much the control values change between timesteps, etc. You can then start rolling out your control trajectory as you re-solve the problem on a moving horizon basis.</p>
+<h2 id="learning-dynamics-for-mpc">Learning Dynamics for MPC</h2>
+<p>If you want to do MPC on a system but don&rsquo;t have a model for it, one option may be to learn the model and then use MPC. You&rsquo;d most naturally want to learn the input-output dynamics of some system (where you identify how different values of $u$ produce changes in $y$), but if you&rsquo;re measuring the full state, this reduces to learning $f(x, u)$. To simplify even further, we can try assuming that the dynamics function $f$ is a discrete-time linear function, so we get our familiar:</p>
+<p>$$x_{t+1} = Ax_{t} + Bu_{t}$$</p>
+<p>This is the core idea of the DMDc (Dynamic Mode Decomposition with Control) method, which builds on DMD (which we <a href="https://sscheele.github.io/post/data-driven-dynamics/">covered previously</a>). If the system is actually nonlinear, we can try finding a Hilbert space in which the dynamics are linear. You might recognize this as the Koopman method (also covered in the same post as DMD).</p>
+<h2 id="dmdc">DMDc</h2>
+<p>DMDc is pretty simple: you do DMD, except you augment the data matrix on one side of the equation with a data matrix containing the controls. In equation form, we were previously only trying to identify the dynamics matrix governing a system:</p>
+<p>$X_{1:t+1} = AX_{0:t}$</p>
+<p>Instead, we identify:</p>
+<p>$$X_{1:t+1} = \begin{bmatrix}A &amp; B\end{bmatrix} \begin{bmatrix} X_{0:t} \\ \Upsilon_{0:t} \end{bmatrix} = G \Omega$$</p>
+<p>As in DMD, it is possible to do this in a reduced-order basis so that even high-dimensional systems can be learned efficiently.</p>
+<h2 id="koopman-operator-nonlinear-control">Koopman Operator Nonlinear Control</h2>
+<p>If your system is highly nonlinear and DMDc isn&rsquo;t working, you might choose to use the Koopman method of projecting into a higher-dimensional coordinate space in which your system is linear. You might remember that the Koopman method relies on finding eigenfunctions with the form:</p>
+<p>$$\frac{d}{dt} \phi(x) = \nabla \phi(x) \cdot \frac{d}{dt}x = \lambda \phi(x)$$</p>
+<p>With the middle form coming from the chain rule. Normally, we assume that $x$ follows some unforced (that is, non-controlled) system dynamics:</p>
+<p>$$\frac{d}{dt}x = f(x)$$</p>
+<p>If we determine that $x$ actually follows a dynamics function that incorporates control:</p>
+<p>$$\frac{d}{dt}x = f(x) + Bu$$</p>
+<p>Then the chain rule tells us that:</p>
+<p>$$\begin{align}
+\frac{d}{dt} \phi(x) &amp;= \nabla \phi(x) \cdot (f(x) + Bu) \\
+&amp;= \lambda \phi(x) + \nabla \phi(x) \cdot Bu
+\end{align}$$</p>
+<p>This looks <em>almost</em> like our familiar $\dot{x} = Ax + Bu$ form, except that the effect of control is now dependent on the current state. According to Brunton:</p>
+<blockquote>
+<p>Note that, even with actuation, the dynamics of Koopman eigenfunctions remain linear, and the effect of actuation is still additive. However, now the actuation mode $\nabla \phi(x)$ may be state-dependent. In fact, the actuation <em>will</em> be state-dependent unless the directional derivative of the eigenfunction is constant in the B direction. Fortunately, there are many powerful generalizations of standard Riccati-based linear control theory (e.g., LQR, Kalman filters, etc.) for systems with a <em>state-dependent</em> Riccati equation.</p>
+</blockquote>
+<p>So that&rsquo;s good news, my own personal biases about Riccati equations aside.</p>
+<p>One also imagines that you could use NNs to learn Koopman operators for models with control, similarly to how you can learn them for models without control, but Brunton doesn&rsquo;t mention any work here. Maybe a nice undergrad research project?</p>
+<h2 id="sindy-with-control">SINDy with Control</h2>
+<p>If you can&rsquo;t find a good Koopman eigenspace, you can try just learning the nonlinear dynamics directly. In SINDy, Sparse Identification of Nonlinear Dynamics, you might remember we basically fit data from a library of nonlinear functions using a sparsity-promoting regression. In SINDYc, we do the same thing except the function library is now a library of functions on $x$, functions on $u$, and functions on $(x, u)$. At this point you might feel like we&rsquo;re pretty close to just using a universal function approximator (ie, machine learning), but getting this right has some significant advantages over pure ML. Trying to identify the actual system dynamics (to within some tolerance) will probably result in a more robust model that&rsquo;s faster at inference time and generalizes better than a neural net.</p>
+<h1 id="machine-learning-for-control">Machine Learning for Control</h1>
+<p>This section was going to appear sooner or later. The next chapter is all about RL, which is what immediately comes to mind when you&rsquo;re talking about ML for control, but there are actually some very interesting non-RL techniques I hadn&rsquo;t heard of discussed here!</p>
+<h2 id="iterative-learning-control-ilc">Iterative Learning Control (ILC)</h2>
+<p>ILC is a pretty old technique used to refine extremely repetitive motions in well-controlled environments, like the motion of a robot arm on a manufacturing line. Basically, the robot is taken to have an open-loop control law, and the sequence of control values is adjusted over time to refine the motion. The advantage is that you basically don&rsquo;t need to know anything about the system, and depending on your task and update rule you might be able to asymptotically approach optimal performance. ILC is mostly here to remind us of how easy researchers used to have it.</p>
+<h2 id="genetic-algorithms">Genetic Algorithms</h2>
+<p>I&rsquo;m going to assume you know what genetic algorithms do and how they work. They&rsquo;re mostly good for exploring medium-to-low-dimensional parameter spaces, but that still gives some interesting possibilities like tuning a PID controller or even various parameters of an aircraft design or something.</p>
+<h2 id="genetic-programming">Genetic Programming</h2>
+<p>This was new to me! You probably already know that (virtually) any mathematical expression can be expressed as a tree, where nodes are either functions or operands/variables/data. In genetic programming, you take the fundamental principles of genetic algorithms and apply them to trees. For example, if you do crossover then two trees might swap subtrees, or if you do mutation then a subtree might be replaced with a random subtree.</p>
+<p>Applying genetic programming to control means that you can learn/discover control laws for high-dimensional or extremely nonlinear systems, assuming you define the right node types.</p>
+<h1 id="adaptive-extremum-seeking-control-esc">Adaptive Extremum-Seeking Control (ESC)</h1>
+<p>Suppose you&rsquo;re working in an environment where you have access to an objective function but not its derivative. Furthermore, this objective function might change over time. This might seem a little contrived if you&rsquo;re used to sensor-rich environments (like me), but a good example is solar panels: you want to control the angle of the panel so it precisely faces the sun, but all you can see is the current power output. The key trick of ESC is to intentionally add a sinusoid into your control signal. When you see that performance improves where the sinusoid is positive, you know that your current (unperturbed) control output is too low.</p>
+<p>Let&rsquo;s briefly introduce some notation. The unperturbed control value is $\hat{u}$ and the perturbation takes the form of $a \sin(\omega t)$, so we have $u = \hat{u} + a \sin(\omega t)$. We also have an objective function which is probably parameterized only on the state, $J(x)$.</p>
+<p>Another way to phrase the intuition of ESC is that if you look at the changes in the objective function $J(x)$, they will be <em>in phase</em> with the perturbations if the current control value is too low ($J$ increases when the perturbation is positive and decreases when it&rsquo;s negative, meaning that if we&rsquo;re trying to maximize $J$ we should increase $u$). By analogous reasoning, if the changes are significantly <em>out of phase</em> with the perturbations then we should reduce $u$. If $J$ is neither consistently in phase nor out of phase, then we&rsquo;re probably quite close to the maximum.</p>
+<p>The advantage of talking in terms of being in phase or out of phase is that we can create a definition of this &ldquo;gradient estimation&rdquo; technique based on signal processing. The idea is that, barring some very strange nonlinear system dynamics, injecting a sinusoid of some frequency into the input should produce a sinusoid of the same frequency in the output. So if we design a notch filter that only passes frequencies close to $\omega$ and apply it to the output, we should get only the response of $J$ to the input, without other components, which we denote $\rho$. If we multiply this filtered signal $\rho$ by the input signal, we get a third signal, $\xi$, which we call the &ldquo;demodulated&rdquo; signal. If the average of $\xi$ is strongly positive, this means that the input signal and $\rho$ are in phase and $\hat{u}$ should be increased.  If $\xi$ is mostly negative, the input and $\rho$ are out of phase and it should be decreased, and if $\xi$ is close to zero then we are approaching a local maximum of $J$.</p>
+<p>As a technical note, it might take some time for our control signal to be reflected in the output, creating a phase shift that throws off the gradient estimation. Fortunately, this phase shift should be constant for each frequency in all but the most adversarial system dynamics, so after estimating it you can add it in as:</p>
+<p>$$\xi = a \sin(\omega t - \phi) \rho$$
+The reason I like this signal processing approach is that it readily generalizes to higher-dimensional gradient estimation! We can add various input perturbations of different frequencies to different dimensions of $u$, and attribute their impacts properly when we filter $J$.</p>
+<p>Hopefully it should be clear that the magnitude of the mean of $\xi$ grows larger when the magnitude of the gradient of $J$ grows larger; what may not be obvious is that these values are often approximately linear in their scaling (again, this depends on the system dynamics, but you can typically treat it as approximately linear). This means that you can treat $\xi$ as (almost) a gradient of $J$ and use it with a constant scaling factor for hill climbing.</p>
+<p>Weirdly, ESC has also been used in situations that involve turbulence or nonlinearity, including to stabilize plasma in Tokomaks (fusion reactors).</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
