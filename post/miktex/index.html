@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MikTeX on Arch Linux | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">MikTeX on Arch Linux</span></h1>
+
+<h2 class="date">2024/08/18</h2>
+</div>
+
+<main>
+<p>I recently got a new laptop and had to reinstall latex. The default way to do this is to install TeXLive with pacman, which is packaged into a set of groups which contain anything from the most basic installation (<code>texlive-basic</code>) to a virtually exhaustive installation (some combination of <code>texlive-latexextra</code>, <code>texlive-fontsextra</code> and a few others). I initially opted to install <code>texlive-latexrecommended</code>, until I tried to compile a document and realized I was missing <code>fullpage.sty</code>. This was only available in <code>texlive-latexextra</code>, and I also needed a font that was only present in <code>texlive-fontsextra</code>. So to get about 200 kB of .sty files, I was supposed to install &gt;2 GB of packages.</p>
+<p>Fortunately, I learned about MikTeX and made the switch. MikTeX, as I understand it, wraps traditional LaTeX tools like <code>pdflatex</code> in a script that detects missing .sty files and installs them (automatically, if so configured). Their motto is &ldquo;Just enough TeX.&rdquo; The installation requires a few steps, so I&rsquo;m documenting here:</p>
+<ol>
+<li>Install miktex from the AUR. It has openjdk as a dependency, which is a little annoying but you&rsquo;ll probably need it eventually and somehow the entire JDK is smaller than <code>texlive-latexextra</code>.</li>
+<li><code>miktex-console</code> will not be available in your PATH, but it is located in <code>/opt/miktex/bin/miktex-console</code>. Run it. It will walk you through completing your installation and warn you to add your binary directory (it uses $HOME/bin, which is a bit annoying) to your PATH in your <code>.bash_profile</code> (in my case, <code>.zprofile</code>). Also tab over to the &lsquo;Updates&rsquo; section and click &lsquo;Check for updates&rsquo;. You can also select whether to allow, prompt, or disallow on-the-fly installations of missing packages in the &lsquo;Settings&rsquo; page (I started out with prompt and quickly changed to allow). You are now ready to use miktex, assuming you don&rsquo;t have any other installations of TeX that come before it in your PATH.</li>
+<li>If you try to install something like Texmaker, you&rsquo;ll run into an annoying issue where it doesn&rsquo;t know you have LaTeX already and tries to install <code>texlive-basic</code> as a dependency. Don&rsquo;t be fooled! To prevent this, we can install a dummy pkgbuild that claims to provide LaTeX. Here it is:</li>
+</ol>
+<pre><code>pkgname=texlive-dummy
+pkgver=1.0
+pkgrel=1
+pkgdesc=&quot;Placeholder to stop TeX installs&quot;
+arch=(i686 x86_64)
+license=('custom')
+provides=('tetex' 'texlive-bin' 'texlive-core' 'texinfo' 'texlive-basic')
+conflicts=('tetex' 'texlive-bin' 'texlive-core' 'texlive-basic')
+build() {
+/bin/true
+}
+package() {
+/bin/true
+}
+</code></pre>
+<p>A quick <code>makepkg -si</code> and your LaTeX dependencies are forever satisfied.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

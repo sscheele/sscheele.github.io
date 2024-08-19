@@ -4,10 +4,17 @@
     <title>Home on Sam&#39;s Engineering Stuff</title>
     <link>/</link>
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
-    <generator>Hugo -- gohugo.io</generator>
+    <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 27 Jan 2024 21:31:28 -0500</lastBuildDate>
+    <lastBuildDate>Sun, 18 Aug 2024 22:33:50 -0400</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>MikTeX on Arch Linux</title>
+      <link>/post/miktex/</link>
+      <pubDate>Sun, 18 Aug 2024 22:33:50 -0400</pubDate>
+      <guid>/post/miktex/</guid>
+      <description>I recently got a new laptop and had to reinstall latex. The default way to do this is to install TeXLive with pacman, which is packaged into a set of groups which contain anything from the most basic installation (texlive-basic) to a virtually exhaustive installation (some combination of texlive-latexextra, texlive-fontsextra and a few others). I initially opted to install texlive-latexrecommended, until I tried to compile a document and realized I was missing fullpage.</description>
+    </item>
     <item>
       <title>Brunton Textbook Review - Data Driven Control</title>
       <link>/post/data-driven-control/</link>
