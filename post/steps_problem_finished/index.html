@@ -66,7 +66,7 @@ def steps_dp(n):
         curr_n += 1
     return last_buf[-1]
 </code></pre>
-<p>Here, we notice that we don&rsquo;t need to store <em>all</em> values of the steps function, only the last three. Here, the intuition is that you can &ldquo;advance&rdquo; the buffer one item (from leading item $n$ to $n+1$) using only the last three items (and actually only two of those, but you need to store all three because the middle item is needed to properly advance the buffer).</p>
+<p>Here, we notice that we don&rsquo;t need to store <em>all</em> values of the steps function, only the last three. The intuition is that you can define a buffer that you can advance by one item (from leading item $n$ to $n+1$) using only the last three items (and actually only two of those, but you need to store all three because the middle item is needed to properly advance the buffer).</p>
 <p>Mathematically, we notice that the advancement operator we defined in this function is linear; it is represented by the matrix:</p>
 <p>$$
 A = \begin{bmatrix}
