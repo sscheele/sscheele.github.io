@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Steps Problem | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Steps Problem</span></h1>
+
+<h2 class="date">2024/08/27</h2>
+</div>
+
+<main>
+<p>At the technical interview for my first college internship, I was asked to solve a few simple programming problems. The last one was this question:</p>
+<blockquote>
+<p>You can move forward in increments of one step or three steps. In how many different ways can you reach $n$ steps?</p>
+</blockquote>
+<p>I got completely <a href="https://xkcd.com/356/">nerd sniped</a> by this question. Answering it is easy; there is a simple DP solution (below, using Python&rsquo;s <code>functools.cache</code> to do DP for me):</p>
+<pre><code class="language-python">from functools import cache
+
+@cache
+def steps_dp(n):
+    if n in [0, 1]:
+        return 1
+    elif n &lt; 0:
+        return 0
+    else:
+        return steps_dp(n-1) + steps_dp(n-3)
+</code></pre>
+<p>The intuition is that you can travel $n$ steps by either traveling $n-1$ steps and then one more, or $n-3$ steps and then three more.</p>
+<p>But the thing that nerd sniped me was trying to find a constant-time, analytical solution to this problem. In fact, I was thinking so hard about that that I completely forgot to give the DP solution and almost missed out on the internship. Over the last six years or so, I periodically remember the steps problem and spend ten minutes or so thinking about it. I spent an hour or so with ChatGPT seeing if it could solve it using generating functions (it couldn&rsquo;t, at the time). But a couple of days ago, I figured it out - and it&rsquo;s actually very simple!</p>
+<p>As an intermediate step which makes the solution more clear, note that, as with many DP algorithms, you can create a slightly more memory-efficient version of the above solution by getting the answer constructively instead of recursively:</p>
+<pre><code class="language-python">def steps_constructive(n):
+    if n in [0, 1]:
+        return 1
+    elif n &lt; 0:
+        return 0
+    curr_n = 2
+    last_buf = [1,1,1]
+    while curr_n &lt; n:
+        next_n = last_buf[0] + last_buf[2]
+        last_buf = last_buf[1:] + [next_n]
+        curr_n += 1
+    return last_buf[-1]
+</code></pre>
+<p>Here, we notice that we don&rsquo;t need to store <em>all</em> values of the steps function, only the last three. Here, the intuition is that you can &ldquo;advance&rdquo; the buffer one item (from leading item $n$ to $n+1$) using only the last three items (and actually only two of those, but you need to store all three because the middle item is needed to properly advance the buffer).</p>
+<p>Mathematically, we notice that the advancement operator we defined in this function is linear; it is represented by the matrix:</p>
+<p>$$
+A = \begin{bmatrix}
+1 &amp; 0 &amp; 1 \\
+1 &amp; 0 &amp; 0 \\
+0 &amp; 1 &amp; 0
+\end{bmatrix}
+$$</p>
+<p>The initial state is $\begin{bmatrix}1 1 1\end{bmatrix}^T$ (encoding that there is one way to reach $n=0,1,2$, and by happy coincidence giving a correct value of 2 for n=3), so to advance by $k$ steps we would simply find
+$A^k \begin{bmatrix}1 &amp; 1 &amp; 1\end{bmatrix}^T$. But of course, that isn&rsquo;t so simple, because exponentiating a matrix is not always a fast operation.</p>
+<p>In this case, though, we can verify by inspection that $A$ is a nonsingular matrix, meaning that it can be diagonalized by its eigenvector decomposition. So we will find $P$, the eigenvector matrix of $A$, and $D$, the diagonal matrix of $A$&rsquo;s corresponding eigenvalues. This is not always fast (in general, the eigenvector decomposition is $O(n^3)$), but it only needs to be done once, and in our case the matrix has a constant size that does not vary with the input, so we can consider this a constant-time operation. Another way to think of this is that we could manually perform the decomposition ourselves and write the algorithm as a formula using only arithmetic and no linear algebra. Of course, that would be inelegant. The full solution looks like this:</p>
+<pre><code class="language-python">def steps_analytical(n):
+    if n in [0, 1]:
+        return 1
+    elif n &lt; 0:
+        return 0
+        
+    A = np.array([[1,0,1],[1,0,0],[0,1,0]])
+    evals, P = np.linalg.eig(A)
+    D = np.diag(evals)
+    P_inv = np.linalg.inv(P)
+    start_vec = np.array([1,1,1]).reshape((3,1))
+    adv_matr = P @ np.power(D, n-2) @ P_inv
+    end_vec = adv_matr @ start_vec
+    return np.round(end_vec[0], decimals=3)
+</code></pre>
+<p>Note that this actually does a very good job of not running into floating-point errors; the <code>np.round</code> is there to showcase this. While the DP-based solutions are $O(n)$, this analytical solution is for all purposes $O(1)$ time and memory (technically, even raising integers to the $n$ power has a time complexity of $\log n$, but it&rsquo;s a tremendously fast operation).</p>
+<p>And with that, I&rsquo;m free of my years-long sporadic obsession! I hope this was a fun little application of linear algebra for you. As an exercise, you can do the Fibonacci sequence in the same way!</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

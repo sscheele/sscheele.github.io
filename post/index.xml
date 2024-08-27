@@ -6,8 +6,15 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 18 Aug 2024 22:33:50 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 27 Aug 2024 17:04:34 -0400</lastBuildDate>
     <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Steps Problem</title>
+      <link>/post/steps_problem_finished/</link>
+      <pubDate>Tue, 27 Aug 2024 17:04:34 -0400</pubDate>
+      <guid>/post/steps_problem_finished/</guid>
+      <description>At the technical interview for my first college internship, I was asked to solve a few simple programming problems. The last one was this question:&#xA;You can move forward in increments of one step or three steps. In how many different ways can you reach $n$ steps?&#xA;I got completely nerd sniped by this question. Answering it is easy; there is a simple DP solution (below, using Python&amp;rsquo;s functools.cache to do DP for me):</description>
+    </item>
     <item>
       <title>MikTeX on Arch Linux</title>
       <link>/post/miktex/</link>
