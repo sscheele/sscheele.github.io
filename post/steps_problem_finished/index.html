@@ -75,7 +75,7 @@ A = \begin{bmatrix}
 0 &amp; 1 &amp; 0
 \end{bmatrix}
 $$</p>
-<p>The initial state is $\begin{bmatrix}1 1 1\end{bmatrix}^T$ (encoding that there is one way to reach $n=0,1,2$, and by happy coincidence giving a correct value of 2 for n=3), so to advance by $k$ steps we would simply find
+<p>The initial state is $\begin{bmatrix}1 &amp; 1 &amp; 1\end{bmatrix}^T$ (encoding that there is one way to reach $n=0,1,2$, and by happy coincidence giving a correct value of 2 for n=3), so to advance by $k$ steps we would simply find
 $A^k \begin{bmatrix}1 &amp; 1 &amp; 1\end{bmatrix}^T$. But of course, that isn&rsquo;t so simple, because exponentiating a matrix is not always a fast operation.</p>
 <p>In this case, though, we can verify by inspection that $A$ is a nonsingular matrix, meaning that it can be diagonalized by its eigenvector decomposition. So we will find $P$, the eigenvector matrix of $A$, and $D$, the diagonal matrix of $A$&rsquo;s corresponding eigenvalues. This is not always fast (in general, the eigenvector decomposition is $O(n^3)$), but it only needs to be done once, and in our case the matrix has a constant size that does not vary with the input, so we can consider this a constant-time operation. Another way to think of this is that we could manually perform the decomposition ourselves and write the algorithm as a formula using only arithmetic and no linear algebra. Of course, that would be inelegant. The full solution looks like this:</p>
 <pre><code class="language-python">def steps_analytical(n):

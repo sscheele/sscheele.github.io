@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Kelly Criterion | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/categories/">Categories</a></li>
+      
+      <li><a href="/tags/">Tags</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Kelly Criterion</span></h1>
+
+<h2 class="date">2024/10/26</h2>
+</div>
+
+<main>
+<p>The Kelly criterion is a formula used in portfolio management and gambling which tells you how much of your portfolio to bet on a game with a certain payoff and probability of winning. Let&rsquo;s derive it!</p>
+<p>We&rsquo;ll set up the problem as:</p>
+<ul>
+<li>You have a bankroll of $W$</li>
+<li>Probability of winning $p$ (this is your privately estimated probability of victory)</li>
+<li>You&rsquo;re offered odds of $(b-1):1$, so you will be paid back $b$ times your bet if you win (if you&rsquo;re offered even odds, you will be paid back twice your bet by winning). We assume here that you lose your entire bet if you lose.</li>
+<li>You will bet $fW$ dollars, so $f$ is a fraction of your bankroll</li>
+</ul>
+<p>The expected value of your bankroll after the bet resolves is:</p>
+<p>$$\mathbb{E}[W_{new}] = p(W(1+bf)) + (1-p)(1-f)W$$
+To make things easier for ourselves, we will ignore the constant factor $W$ and maximize the expected value of the log of the bankroll (we can do this because the log function is monotonic). Note that the expected value of the log is different from the log of the expected value!! To maximize the EV of the log, we can just do the usual tactic of multiplying probabilities by (log) values:</p>
+<p>$$\begin{align}
+\mathbb{E}[\log W_{new}] &amp;= p \log(W(1+bf)) + (1-p) \log(W(1-f) ) \\
+&amp;= p \log W + p \log (1+bf) + (1-p) \log W + (1-p) \log (1-f) \\
+&amp;= \log W + p \log (1+bf) + (1-p) \log (1-f)
+\end{align}$$</p>
+<p>We want to maximize this expression with respect to $f$, so we&rsquo;ll take the derivative:</p>
+<p>$$\begin{align}
+0 &amp;= \dfrac{d}{df} \log W + p \log (1+bf) + (1-p) \log (1-f) \\
+&amp;= 0 + p \dfrac{b}{1+bf} + (1-p) \dfrac{-1}{1-f} \\
+\end{align}
+$$
+Solving for $f$:</p>
+<p>$$\begin{align}
+0 &amp;= \dfrac{pb}{1+bf} - \dfrac{(1-p)}{1-f} \\
+\dfrac{pb}{1+bf} &amp;= \dfrac{(1-p)}{1-f} \\
+pb(1-f) &amp;= (1+bf)(1-p) \\
+pb - pbf &amp;= 1 - p + bf - pbf \\
+-pbf + pbf -bf &amp;= 1-p - pb \\
+f &amp;= \dfrac{1-p - pb}{-b} \\
+&amp;= p - \dfrac{1-p}{b}
+\end{align}
+$$</p>
+<p>In this example, $f$ is the fraction of your bankroll you want to bet, so let&rsquo;s do a quick example. I remember reading this story, which <em>sounds</em> like it comes from Money Stuff, but I can&rsquo;t remember where it comes from:</p>
+<blockquote>
+<p>A guy goes to interview as a quant at Jane Street and they offer to put up \$51 against his \$50 on a coin flip. He accepts and they tell him he shouldn&rsquo;t have done that. &ldquo;Why?&rdquo; he asks, &ldquo;it&rsquo;s a positive-EV bet!&rdquo;
+&ldquo;Easy,&rdquo; they tell him. &ldquo;We have a guy on the trading floor who can flip heads 55% of the time.&rdquo;</p>
+</blockquote>
+<p>The point of the story is probably something about how you should always ask yourself why your counterparty is offering you an apparently good deal, but whatever, let&rsquo;s say you can run this scam offering the same odds: $b = 101/51 = 1.98, p = 0.55$. Your Kelly-optimal bet is to put $0.55 - .45/1.98 = 32.3\%$ of your bankroll on this at each iteration.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

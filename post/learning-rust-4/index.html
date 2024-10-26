@@ -99,57 +99,57 @@
 </code></pre>
 <p>This is taken pretty much exactly from the docs, and it will tell us how long each method (naive, Cow, and MyCow) took and how many borrows had to happen. All results are reported using debug compile targets, though I found that the release targets were consistently around 10x faster. And the result is&hellip;</p>
 <table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Time</th>
-<th>Clones</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Naive</td>
-<td>902.07 ms</td>
-<td>10</td>
-</tr>
-<tr>
-<td>MyCow</td>
-<td>1011.62 ms</td>
-<td>0</td>
-</tr>
-<tr>
-<td>Cow</td>
-<td>998.73 ms</td>
-<td>0</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: left">Name</th>
+          <th style="text-align: left">Time</th>
+          <th style="text-align: left">Clones</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Naive</td>
+          <td style="text-align: left">902.07 ms</td>
+          <td style="text-align: left">10</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">MyCow</td>
+          <td style="text-align: left">1011.62 ms</td>
+          <td style="text-align: left">0</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Cow</td>
+          <td style="text-align: left">998.73 ms</td>
+          <td style="text-align: left">0</td>
+      </tr>
+  </tbody>
 </table>
 <p>&hellip; huh. The good news is that <code>MyCow</code> performs similarly to <code>Cow</code>. The bad news is that we&rsquo;re actually doing like 11% worse by using <code>Cow</code>. What&rsquo;s going on here? My theory was that every time we access data inside a <code>Cow</code>, we incur a <code>match</code> statement that checks the variant. Not having branch prediction really hurts here, because <code>Cow</code> is pretty much the ultimate candidate for that. It looks like one <code>Cow</code> access is around 11% slower than copying 32 bits of memory as part of a large copy (we&rsquo;d expect small copies to be slower per unit data because the latency will start to dominate). Indeed, if we make the testing arrays much smaller (100 elements):</p>
 <table>
-<thead>
-<tr>
-<th>Name</th>
-<th>Time</th>
-<th>Clones</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Naive</td>
-<td>250.69 $\mu$s</td>
-<td>10</td>
-</tr>
-<tr>
-<td>MyCow</td>
-<td>101.88 $\mu$s</td>
-<td>0</td>
-</tr>
-<tr>
-<td>Cow</td>
-<td>116.80 $\mu$s</td>
-<td>1</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th style="text-align: left">Name</th>
+          <th style="text-align: left">Time</th>
+          <th style="text-align: left">Clones</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td style="text-align: left">Naive</td>
+          <td style="text-align: left">250.69 $\mu$s</td>
+          <td style="text-align: left">10</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">MyCow</td>
+          <td style="text-align: left">101.88 $\mu$s</td>
+          <td style="text-align: left">0</td>
+      </tr>
+      <tr>
+          <td style="text-align: left">Cow</td>
+          <td style="text-align: left">116.80 $\mu$s</td>
+          <td style="text-align: left">1</td>
+      </tr>
+  </tbody>
 </table>
 <p>Ah, this is more expected. Since the testing code is randomized, <code>Cow</code> ended up mutably borrowing once and <code>MyCow</code> not at all. The question then becomes: for small copies, how many accesses does it take to lose the benefits of <code>Cow</code>? The right answer, of course, is that it depends on the context and compiler and hardware, but the irresponsible speculation is that I found that it took around 1000 accumulated accesses on a <code>Cow</code> to equal the overhead of one copy (remembering that this is for small data). I wouldn&rsquo;t be surprised by 50% deviations in this number, though!</p>
 <p>This is the end of my Learning Rust log. I expect to keep using Rust, maybe a lot, in the future, and maybe posting about it here, but the idea of the regular updates was to track progress and investigate different ways to learn a programming language, and I think this final project makes sense as a milestone to indicate that the learning curve is leveling off enough that regular updates no longer make sense.</p>
