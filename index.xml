@@ -6,8 +6,15 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 26 Oct 2024 16:38:54 -0400</lastBuildDate>
+    <lastBuildDate>Sat, 04 Jan 2025 01:24:41 -0500</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Winkler Puzzle 1</title>
+      <link>/post/winkler-puzzle-1/</link>
+      <pubDate>Sat, 04 Jan 2025 01:24:41 -0500</pubDate>
+      <guid>/post/winkler-puzzle-1/</guid>
+      <description>&lt;p&gt;Happy new year! I&amp;rsquo;m reading Peter Winklers &amp;ldquo;Mathematical Puzzles: a Connoisseur&amp;rsquo;s Collection&amp;rdquo; and found this nice problem:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;Prove that all natural numbers have a nonzero multiple whose base-10 representation consists only of zeros and ones&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;Here&amp;rsquo;s the very elegant proof:&lt;/p&gt;&#xA;&lt;details&gt;&#xA;&lt;summary&gt;Show solution&lt;/summary&gt;&#xA;Given a natural number $n$, consider $\{111, 1111, 11111, \dots\}$, a set of &#39;all-ones&#39; numbers which begins with the first all-ones number greater than $n$ and contains $n+1$ elements, with each successive element adding a 1. Since there are only $n$ integers (modulo $n$) and the set has $n+1$ elements, it follows that at least two elements of the set must be congruent modulo $n$. If you subtract one from the other, you&#39;ll get a number congruent to zero modulo $n$ (a multiple of $n$) which begins with a string of ones and ends with a string of zeros.&#xA;&lt;/details&gt;&#xA;&lt;p&gt;I really enjoyed this one - it&amp;rsquo;s not terribly often that you see the pigeonhole principle come up in number theory. The problem is hard to solve any other way, but the trick in the solution makes it trivial. I&amp;rsquo;d highly recommend the book to anyone looking to do a little bit of math for fun!&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Kelly Criterion</title>
       <link>/post/kelly-criterion/</link>
