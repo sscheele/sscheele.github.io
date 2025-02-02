@@ -6,8 +6,15 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 04 Jan 2025 01:24:41 -0500</lastBuildDate>
+    <lastBuildDate>Sun, 02 Feb 2025 02:24:16 -0400</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>About</title>
+      <link>/about/</link>
+      <pubDate>Sun, 02 Feb 2025 02:24:16 -0400</pubDate>
+      <guid>/about/</guid>
+      <description>&lt;p&gt;My name is Sam Scheele, and I work at MIT Lincoln Laboratory in the Humanitarian Assistance and Disaster Relief Systems group. My master&amp;rsquo;s degree is in robotics and computational perception, but most of my work at MIT LL focuses on the application of AI and ML systems to disaster relief. Outside of the Lab, I like to cook, read, write, and occasionally play guitar.&lt;/p&gt;&#xA;&lt;p&gt;This is a place for me to write about technical stuff in a more informal way. My current plan is for said stuff to be pretty much entirely math, computer science, and engineering concepts, but I also like to get my hands dirty doing woodworking and electronics projects. Depending on my motivation to write those up and how well I think they&amp;rsquo;ll translate to a blog format (I think videos are better for physical things), the blog might end up evolving to cover projects of all sorts.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Winkler Puzzle 1</title>
       <link>/post/winkler-puzzle-1/</link>
@@ -196,13 +203,6 @@
       <pubDate>Sun, 19 Mar 2023 16:49:35 -0400</pubDate>
       <guid>/post/problem-14-1/</guid>
       <description>&lt;p&gt;I recently saw a post on &lt;a href=&#34;https://gwern.net/problem-14&#34;&gt;Gwern&amp;rsquo;s blog&lt;/a&gt; on an interesting problem in probability and expected value:&lt;/p&gt;&#xA;&lt;p&gt;&lt;strong&gt;A shuffled deck of cards has an equal number of red and black cards. When you draw a red card from the deck, you get \$1, and when you draw a black card you lose \$1. You can stop whenever you want. If the deck has $N$ cards, what is the expected value of playing this game? When should you stop?&lt;/strong&gt;&lt;/p&gt;</description>
-    </item>
-    <item>
-      <title>About</title>
-      <link>/about/</link>
-      <pubDate>Tue, 14 Mar 2023 22:24:16 -0400</pubDate>
-      <guid>/about/</guid>
-      <description>&lt;h1 id=&#34;who-are-you&#34;&gt;Who are you?&lt;/h1&gt;&#xA;&lt;p&gt;My name is Sam Scheele! I&amp;rsquo;m a master&amp;rsquo;s student in computer science, specializing in robotics and computational perception.&lt;/p&gt;&#xA;&lt;h1 id=&#34;what-is-this-place&#34;&gt;What is this place?&lt;/h1&gt;&#xA;&lt;p&gt;This is a place for me to write about technical stuff. My current plan is for said stuff to be pretty much entirely math, computer science, and engineering concepts, but I also like to get my hands dirty doing woodworking and electronics projects. Depending on my motivation to write those up and how well I think they&amp;rsquo;ll translate to a blog format (currently, it seems to me that videos are better for physical things), the blog might end up evolving to cover projects of all sorts.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Latex Packages</title>
