@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Bypassing Paste Restrictions | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3YNE0SB9ZS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3YNE0SB9ZS');
+</script>
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Bypassing Paste Restrictions</span></h1>
+
+<h2 class="date">2025/02/21</h2>
+</div>
+
+<main>
+<p>I recently had to pay a tax bill online, but it turned out that my town&rsquo;s bill payment website has one of those incredibly annoying JavaScript forms that blocks pasting into the bank account number field. This is so, so stupid. I genuinely don&rsquo;t understand what benefit they think this could possibly offer. They force me to type it in manually, and then, because typing things in manually is an error-prone process, the next field forces me to type in the whole number manually again! You know what&rsquo;s not an error-prone process? <em>Copying and pasting the account number.</em></p>
+<p>The first thing I tried to get around this was installing an extension called &ldquo;Don&rsquo;t Fuck with Paste.&rdquo; Charmingly, the name of the extension is starred out (&ldquo;Don&rsquo;t F*** with Paste&rdquo;) in the Chrome web store, but not in the Firefox web store. I prefer Firefox in any event, and in this case the name of the Firefox extension better reflected my level of frustration with the website. Anyway, I got the extension, which promptly&hellip; broke paste everywhere in the browser. Uninstall.</p>
+<p>Fortunately, Linux lets you do things yourself! I usually run Wayland, so I installed <code>wl-clipboard</code>, which lets you manipulate the Wayland clipboard, and <code>wtype</code>, which lets you emulate keystrokes. Then I added a line to my Sway config:</p>
+<pre><code>bindsym $mod+Shift+v exec wl-paste --no-newline | wtype -
+</code></pre>
+<p>(The <code>--no-newline</code> suppresses <code>wl-paste</code>&rsquo;s puzzling default behavior of adding a newline to strings that didn&rsquo;t have them).</p>
+<p>And that was it! Now I can bypass paste restrictions anywhere, more or less regardless of how they&rsquo;re implemented.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

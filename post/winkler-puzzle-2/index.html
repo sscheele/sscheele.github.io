@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Winkler Puzzle 2: Summing Sets | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3YNE0SB9ZS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3YNE0SB9ZS');
+</script>
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Winkler Puzzle 2: Summing Sets</span></h1>
+
+<h2 class="date">2025/02/06</h2>
+</div>
+
+<main>
+<p>Here&rsquo;s another puzzle from <em>Mathematical Puzzles: a Connoiseur&rsquo;s Collection</em>:</p>
+<blockquote>
+<p>Prove that in a set of 25 numbers, it is possible to select two numbers such that no other number in the set is equal to the sum or difference of the two you selected</p></blockquote>
+<p>Warning: spoilers ahead! There&rsquo;s too much here to wrap it all in a spoiler block.</p>
+<p>Winkler&rsquo;s solution is:</p>
+<p>Let the numbers be $x_1 &lt; x_2 &lt; \cdots &lt; x_n$. If $x_n$ is unavailable to be taken as one of the desired numbers, it must be that for each lower number $x_i$, there is another $x_j$ with $x_i + x_j = x_n$. Thus, the first 24 numbers are paired in such a way that $x_i + x_{n-i} = x_n$. Now consider $x_{n-1}$ together with any of $x_2, \ldots, x_{n-2}$; these pairs sum to more than $x_n = x_{n-1} + x_1$ and so $x_2, \ldots, x_{n-2}$ must also be paired, this time satisfying $x_{2+i} + x_{n-2-i} = x_{n-1}$. But that leaves $x_{(n-1)/2}$ paired with itself, so the numbers $x_n-1, x_{(n-1)/2}$ solve the problem.</p>
+<p>I think this doesn&rsquo;t quite work! The problem is that in the second step, $x_2, \ldots, x_{n-2}$ don&rsquo;t actually have to be paired <em>with each other</em>, they have to be paired with any number in $x_1, \ldots, x_{n-2}$. So another solution is needed.</p>
+<p>I like this one:</p>
+<p>First, it&rsquo;s simple to show that you can&rsquo;t constructively build</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

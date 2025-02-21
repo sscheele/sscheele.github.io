@@ -6,14 +6,21 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 04 Jan 2025 01:24:41 -0500</lastBuildDate>
+    <lastBuildDate>Fri, 21 Feb 2025 18:22:54 -0500</lastBuildDate>
     <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bypassing Paste Restrictions</title>
+      <link>/post/bypass-paste/</link>
+      <pubDate>Fri, 21 Feb 2025 18:22:54 -0500</pubDate>
+      <guid>/post/bypass-paste/</guid>
+      <description>&lt;p&gt;I recently had to pay a tax bill online, but it turned out that my town&amp;rsquo;s bill payment website has one of those incredibly annoying JavaScript forms that blocks pasting into the bank account number field. This is so, so stupid. I genuinely don&amp;rsquo;t understand what benefit they think this could possibly offer. They force me to type it in manually, and then, because typing things in manually is an error-prone process, the next field forces me to type in the whole number manually again! You know what&amp;rsquo;s not an error-prone process? &lt;em&gt;Copying and pasting the account number.&lt;/em&gt;&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Winkler Puzzle 1</title>
       <link>/post/winkler-puzzle-1/</link>
       <pubDate>Sat, 04 Jan 2025 01:24:41 -0500</pubDate>
       <guid>/post/winkler-puzzle-1/</guid>
-      <description>&lt;p&gt;Happy new year! I&amp;rsquo;m reading Peter Winklers &amp;ldquo;Mathematical Puzzles: a Connoisseur&amp;rsquo;s Collection&amp;rdquo; and found this nice problem:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;Prove that all natural numbers have a nonzero multiple whose base-10 representation consists only of zeros and ones&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;Here&amp;rsquo;s the very elegant proof:&lt;/p&gt;&#xA;&lt;details&gt;&#xA;&lt;summary&gt;Show solution&lt;/summary&gt;&#xA;Given a natural number $n$, consider $\{111, 1111, 11111, \dots\}$, a set of &#39;all-ones&#39; numbers which begins with the first all-ones number greater than $n$ and contains $n+1$ elements, with each successive element adding a 1. Since there are only $n$ integers (modulo $n$) and the set has $n+1$ elements, it follows that at least two elements of the set must be congruent modulo $n$. If you subtract one from the other, you&#39;ll get a number congruent to zero modulo $n$ (a multiple of $n$) which begins with a string of ones and ends with a string of zeros.&#xA;&lt;/details&gt;&#xA;&lt;p&gt;I really enjoyed this one - it&amp;rsquo;s not terribly often that you see the pigeonhole principle come up in number theory. The problem is hard to solve any other way, but the trick in the solution makes it trivial. I&amp;rsquo;d highly recommend the book to anyone looking to do a little bit of math for fun!&lt;/p&gt;</description>
+      <description>&lt;p&gt;Happy new year! I&amp;rsquo;m reading Peter Winklers &amp;ldquo;Mathematical Puzzles: a Connoisseur&amp;rsquo;s Collection&amp;rdquo; and found this nice problem:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;Prove that all natural numbers have a nonzero multiple whose base-10 representation consists only of zeros and ones&lt;/p&gt;&lt;/blockquote&gt;&#xA;&lt;p&gt;Here&amp;rsquo;s the very elegant proof:&lt;/p&gt;&#xA;&lt;details&gt;&#xA;&lt;summary&gt;Show solution&lt;/summary&gt;&#xA;Given a natural number $n$, consider $\{111, 1111, 11111, \dots\}$, a set of &#39;all-ones&#39; numbers which begins with the first all-ones number greater than $n$ and contains $n+1$ elements, with each successive element adding a 1. Since there are only $n$ integers (modulo $n$) and the set has $n+1$ elements, it follows that at least two elements of the set must be congruent modulo $n$. If you subtract one from the other, you&#39;ll get a number congruent to zero modulo $n$ (a multiple of $n$) which begins with a string of ones and ends with a string of zeros.&#xA;&lt;/details&gt;&#xA;&lt;p&gt;I really enjoyed this one - it&amp;rsquo;s not terribly often that you see the pigeonhole principle come up in number theory. The problem is hard to solve any other way, but the trick in the solution makes it trivial. I&amp;rsquo;d highly recommend the book to anyone looking to do a little bit of math for fun!&lt;/p&gt;</description>
     </item>
     <item>
       <title>Kelly Criterion</title>
@@ -27,7 +34,7 @@
       <link>/post/steps_problem_finished/</link>
       <pubDate>Tue, 27 Aug 2024 17:04:34 -0400</pubDate>
       <guid>/post/steps_problem_finished/</guid>
-      <description>&lt;p&gt;At the technical interview for my first college internship, I was asked to solve a few simple programming problems. The last one was this question:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;You can move forward in increments of one step or three steps. In how many different ways can you reach $n$ steps?&lt;/p&gt;&#xA;&lt;/blockquote&gt;&#xA;&lt;p&gt;I got completely &lt;a href=&#34;https://xkcd.com/356/&#34;&gt;nerd sniped&lt;/a&gt; by this question. Answering it is easy; there is a simple DP solution (below, using Python&amp;rsquo;s &lt;code&gt;functools.cache&lt;/code&gt; to do DP for me):&lt;/p&gt;</description>
+      <description>&lt;p&gt;At the technical interview for my first college internship, I was asked to solve a few simple programming problems. The last one was this question:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;You can move forward in increments of one step or three steps. In how many different ways can you reach $n$ steps?&lt;/p&gt;&lt;/blockquote&gt;&#xA;&lt;p&gt;I got completely &lt;a href=&#34;https://xkcd.com/356/&#34;&gt;nerd sniped&lt;/a&gt; by this question. Answering it is easy; there is a simple DP solution (below, using Python&amp;rsquo;s &lt;code&gt;functools.cache&lt;/code&gt; to do DP for me):&lt;/p&gt;</description>
     </item>
     <item>
       <title>MikTeX on Arch Linux</title>

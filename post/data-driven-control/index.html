@@ -72,8 +72,7 @@ Where $J$ is some cost function on the trajectory of states $x_{t:T}$ and the tr
 \end{align}$$</p>
 <p>This looks <em>almost</em> like our familiar $\dot{x} = Ax + Bu$ form, except that the effect of control is now dependent on the current state. According to Brunton:</p>
 <blockquote>
-<p>Note that, even with actuation, the dynamics of Koopman eigenfunctions remain linear, and the effect of actuation is still additive. However, now the actuation mode $\nabla \phi(x)$ may be state-dependent. In fact, the actuation <em>will</em> be state-dependent unless the directional derivative of the eigenfunction is constant in the B direction. Fortunately, there are many powerful generalizations of standard Riccati-based linear control theory (e.g., LQR, Kalman filters, etc.) for systems with a <em>state-dependent</em> Riccati equation.</p>
-</blockquote>
+<p>Note that, even with actuation, the dynamics of Koopman eigenfunctions remain linear, and the effect of actuation is still additive. However, now the actuation mode $\nabla \phi(x)$ may be state-dependent. In fact, the actuation <em>will</em> be state-dependent unless the directional derivative of the eigenfunction is constant in the B direction. Fortunately, there are many powerful generalizations of standard Riccati-based linear control theory (e.g., LQR, Kalman filters, etc.) for systems with a <em>state-dependent</em> Riccati equation.</p></blockquote>
 <p>So that&rsquo;s good news, my own personal biases about Riccati equations aside.</p>
 <p>One also imagines that you could use NNs to learn Koopman operators for models with control, similarly to how you can learn them for models without control, but Brunton doesn&rsquo;t mention any work here. Maybe a nice undergrad research project?</p>
 <h2 id="sindy-with-control">SINDy with Control</h2>
