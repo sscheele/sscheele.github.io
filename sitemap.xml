@@ -2,13 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>/post/bypass-paste/</loc>
-    <lastmod>2025-02-21T18:22:54-05:00</lastmod>
-  </url><url>
     <loc>/</loc>
-    <lastmod>2025-02-21T18:22:54-05:00</lastmod>
+    <lastmod>2025-03-07T22:30:15-05:00</lastmod>
   </url><url>
     <loc>/post/</loc>
+    <lastmod>2025-03-07T22:30:15-05:00</lastmod>
+  </url><url>
+    <loc>/post/sprt/</loc>
+    <lastmod>2025-03-07T22:30:15-05:00</lastmod>
+  </url><url>
+    <loc>/post/bypass-paste/</loc>
     <lastmod>2025-02-21T18:22:54-05:00</lastmod>
   </url><url>
     <loc>/about/</loc>
@@ -109,5 +112,7 @@
   </url><url>
     <loc>/post/test/</loc>
     <lastmod>2023-03-07T12:30:35-05:00</lastmod>
+  </url><url>
+    <loc>/post/untitled/</loc>
   </url>
 </urlset>

@@ -6,8 +6,15 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 21 Feb 2025 18:22:54 -0500</lastBuildDate>
+    <lastBuildDate>Fri, 07 Mar 2025 22:30:15 -0500</lastBuildDate>
     <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Sequential Probability Ratio Test</title>
+      <link>/post/sprt/</link>
+      <pubDate>Fri, 07 Mar 2025 22:30:15 -0500</pubDate>
+      <guid>/post/sprt/</guid>
+      <description>&lt;p&gt;Here&amp;rsquo;s a sort of interesting problem: suppose you want to test a drug to see if it&amp;rsquo;s effective. You decide to test the drug on 100 people, and when you get the results you see that it&amp;rsquo;s effective at $p=0.052$. Annoying! Under the conventional cutoff of $p &amp;lt; 0.05$ you can&amp;rsquo;t say that your result is significant. But you &lt;em&gt;also&lt;/em&gt; can&amp;rsquo;t test a few more people. The reason for this is that this would introduce a bias in your data: you&amp;rsquo;ve decided to add some more random noise to your data because you didn&amp;rsquo;t get the result you wanted, but you wouldn&amp;rsquo;t have done that if you had gotten $p=0.049$.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Bypassing Paste Restrictions</title>
       <link>/post/bypass-paste/</link>
@@ -174,7 +181,7 @@
       <link>/post/learning-rust-2/</link>
       <pubDate>Sun, 30 Apr 2023 19:45:48 -0400</pubDate>
       <guid>/post/learning-rust-2/</guid>
-      <description>&lt;p&gt;This week of Rust was focused almost entirely on last week&amp;rsquo;s technique #4, open source contribution! I spent the week working on three issues.&lt;/p&gt;&#xA;&lt;h2 id=&#34;issue-1-documentationhttpsgithubcomhelix-editorhelixissues6691&#34;&gt;Issue #1: &lt;a href=&#34;https://github.com/helix-editor/helix/issues/6691&#34;&gt;Documentation&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;This issue dealt with documenting two specific commands which had been added to Helix as part of a recent update that introduced soft line wrapping. I proposed extending the documentation generator to automatically document all commands, but then it turned out that someone was already doing the same thing (but probably better than I would have), so I just manually updated the docs. A nice first issue, I didn&amp;rsquo;t have to write any code but ended up reading some in order to locate the docstrings, which can only be found in the source right now.&lt;/p&gt;</description>
+      <description>&lt;p&gt;This week of Rust was focused almost entirely on last week&amp;rsquo;s technique #4, open source contribution! I spent the week working on three issues.&lt;/p&gt;&#xA;&lt;h2 id=&#34;issue-1-documentation&#34;&gt;Issue #1: &lt;a href=&#34;https://github.com/helix-editor/helix/issues/6691&#34;&gt;Documentation&lt;/a&gt;&lt;/h2&gt;&#xA;&lt;p&gt;This issue dealt with documenting two specific commands which had been added to Helix as part of a recent update that introduced soft line wrapping. I proposed extending the documentation generator to automatically document all commands, but then it turned out that someone was already doing the same thing (but probably better than I would have), so I just manually updated the docs. A nice first issue, I didn&amp;rsquo;t have to write any code but ended up reading some in order to locate the docstrings, which can only be found in the source right now.&lt;/p&gt;</description>
     </item>
     <item>
       <title>Learning Rust: Week 1</title>
@@ -238,6 +245,13 @@
       <pubDate>Tue, 07 Mar 2023 12:30:35 -0500</pubDate>
       <guid>/post/test/</guid>
       <description>&lt;p&gt;Hello, world!&lt;/p&gt;&#xA;&lt;p&gt;I made this site based on a very minimal hugo theme. Despite the fact that this theme is only 150 lines of code, I still don&amp;rsquo;t understand it! There are two reasons for this:&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;I&amp;rsquo;m not familiar with Hugo (the static site generator I&amp;rsquo;m using) or really web development&lt;/li&gt;&#xA;&lt;li&gt;There seem to be a lot of magic constants in hugo that I don&amp;rsquo;t like. I think this was part of an effort to make Hugo &amp;ldquo;creator-friendly&amp;rdquo; by hiding complexity from users of the tool. But hidden complexity is still there! For example, the homepage of this site renders by including some custom headers and footers (which are easily visible in the source), a list of posts (again, visible in the source), and custom content from &amp;ldquo;content/_index.md&amp;rdquo;, a filename that is completely invisible to the user. Apparently this is just hardcoded into Hugo. If you make the mistake of editing &amp;ldquo;content/index.md&amp;rdquo; instead, the page won&amp;rsquo;t render correctly and there&amp;rsquo;s nothing visible in the source or configuration files that you can use to trace the problem through the build process. Eventually, I may choose to migrate this site to another tool to avoid this problem.&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;In the meantime, my priority was to get MathJax working so I can do math on here:&lt;/p&gt;</description>
+    </item>
+    <item>
+      <title></title>
+      <link>/post/untitled/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      <guid>/post/untitled/</guid>
+      <description></description>
     </item>
   </channel>
 </rss>

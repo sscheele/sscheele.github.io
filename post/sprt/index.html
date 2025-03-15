@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sequential Probability Ratio Test | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3YNE0SB9ZS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3YNE0SB9ZS');
+</script>
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Sequential Probability Ratio Test</span></h1>
+
+<h2 class="date">2025/03/07</h2>
+</div>
+
+<main>
+<p>Here&rsquo;s a sort of interesting problem: suppose you want to test a drug to see if it&rsquo;s effective. You decide to test the drug on 100 people, and when you get the results you see that it&rsquo;s effective at $p=0.052$. Annoying! Under the conventional cutoff of $p &lt; 0.05$ you can&rsquo;t say that your result is significant. But you <em>also</em> can&rsquo;t test a few more people. The reason for this is that this would introduce a bias in your data: you&rsquo;ve decided to add some more random noise to your data because you didn&rsquo;t get the result you wanted, but you wouldn&rsquo;t have done that if you had gotten $p=0.049$.</p>
+<p>Incidentally, this is a reason that pre-registration is important! If a study just reports that they got significant results with a certain sample size, you don&rsquo;t know how many times they peeked at the significance statistics mid-experiment before they got a number they liked. If they pre-registered that they would test exactly $n$ subjects and that&rsquo;s what they did, it doesn&rsquo;t matter if they peeked or not.</p>
+<p>On the other hand, pre-committing to test a certain number of subjects is very annoying. If your experiment seems to be obviously showing a very strong effect, it feels like a waste of time to keep going, but you generally want to plan your study so it has enough power to pick up small or mid-size effects.</p>
+<p>But let&rsquo;s say you&rsquo;re not attached to traditional significance testing. It turns out there&rsquo;s a way to avoid the peeking problem: instead of fixing a sample size and a significance threshold, you can fix high and low significance thresholds and keep sampling until you either confirm your hypothesis (by exceeding the high threshold) or reject it (by falling below the low threshold). Before, the problem was that you kept adding samples until you got the result you wanted, but now you only add samples until you have enough information to accept or reject and then you stop.</p>
+<p>The most common instantiation of this idea is called Sequential Probability Ratio Testing. It gets that name from the fact that it instantiates two hypotheses, $H_0$ and $H_1$, and tests the ratio $\Lambda  = \frac{P(\texttt{data} | H_1)}{P(\texttt{data} | H_0)}$. Conventionally, we call the lower threshold $A$ and the upper threshold $B$, such that if $\Lambda &lt; A$ we accept $H_0$ and if $\Lambda &gt; B$ we accept $H_1$.</p>
+<p>The natural question is, how do we choose $A$ and $B$? Ideally, we&rsquo;d like to find them in terms of the acceptable Type I Error rate (false positive rate) $\alpha$ and Type II Error rate (false negative rate) $\beta$. The higher the acceptable error rate, the closer we would expect the corresponding threshold to be to 1.</p>
+<p>To derive the thresholds, we&rsquo;ll make a little change to our setup and consider $\Lambda  = \log \left( \frac{P(\texttt{data} | H_1)}{P(\texttt{data} | H_0)} \right)$. We do this because independently sampled points will aggregate by multiplying their probability ratios (if the ratio for point $x_1$ is 0.2 and the ratio for point $x_2$ is 0.1, the combined probability ratio of sampling points $x_1$ and $x_2$ is 0.02). This is annoying to model! However, <em>log</em> probabilities accumulate by addition, which means that we can model our new lambda as a random walk. As an initial value, we&rsquo;ll assume a uniform prior of $\Lambda = 0$ (for log probabilities, this is the same as assigning equal probability to $H_1$ and $H_0$). A and B will of course also change to be log thresholds, such that A &lt; 0 &lt; B.</p>
+<p>When we define an SPRT problem, we will decide $H_0$ and $H_1$ to be statements like &ldquo;the new drug reduces all-cause mortality by less than 5 deaths per thousand per year&rdquo; and &ldquo;the new drug .reduces all-cause mortality by at least 5 deaths per thousand per year&rdquo; We&rsquo;ll also pre-fix a maximum number of data points. All together, the SPRT will look something like this:</p>
+<pre><code class="language-python">p0 = 0.004 # p0: less than 0.005
+p1 = 0.005 # p1: at least 0.005
+max_points = 10000
+def step(x, lamb, A, B):
+	if x:
+		log_prob = np.log(p1/p0)
+	else:
+		log_prob = np.log((1-p1)/(1-p0))
+	lamb = lamb + log_prob
+	if lamb &gt; B:
+		return lamb, &quot;Hypothesis 1 confirmed&quot;
+	elif lamb &lt; A:
+		return lamb, &quot;Hypothesis 0 confirmed&quot;
+	return lamb, &quot;More data needed&quot;
+</code></pre>
+<p>If, in reality, the drug we&rsquo;re trying to evaluate has a normally distributed effect of average size $m$ and standard deviation $s$, our random walk is $\Lambda_x = \Lambda_{x-1} + \sim N(\mu, \sigma^2)$. Note that the normal distribution here is <em>not</em> parameterized by $m$ and $s$: there are actually only two updates that $\Lambda$ can receive, in this case $\log(0.005/0.004) = 0.22$ and $\log(0.995/0.996) = -0.001$. So if the drug actually does work, the parameters would be $\mu_{1} = 0.005*\log(0.005/0.004) + 0.995*\log(0.995/0.996) = 0.000116$ and $\sigma^2_{1} = \mathbb{E}[(x-\mu)^2] = 0.00025$. If the drug does not work (say it has a 4 deaths-per-thousand improvement), the parameters would be $\mu_{0} = 0.004*\log(0.005/0.004) + 0.996*\log(0.995/0.996) = -0.0001079$ and $\sigma^2_{0} = \mathbb{E}[(x-\mu)^2] = 0.0002001$.</p>
+<h1 id="biased-random-walks">Biased Random Walks</h1>
+<p>We&rsquo;ll be working with the function $P(x)$, the probability that our random walk with bias $\mu$ will fall below A before it exceeds B <em>given</em> that the current value is $x$. For reasons I&rsquo;m going to skip over (Google Gemini tells me that you have to apply Ito&rsquo;s lemma, simplify the result using some properties of a Wiener process, which is a formalization of Brownian motion, and then apply Dynkin&rsquo;s formula), we know that $P(x)$ satisfies this differential equation:</p>
+<p>$$\frac{1}{2} \sigma^2 P&rsquo;&rsquo;(x) + \mu P&rsquo;(x) = 0$$</p>
+<p>with boundary conditions $P(A) = 1$ and $P(B) = 0$. The general solution to this differential equation is: $$P(x) = C_1 + C_2 e^{-2 \mu x/\sigma ^ 2}$$ Applying boundary conditions and solving turns out to be quite simple and we end up with $$P(x) = \frac{e^{-2 \mu x/\sigma^2} - e^{-2 \mu B/\sigma^2}}{e^{-2 \mu A/\sigma^2} - e^{-2 \mu B/\sigma^2}}$$ Since $X_0 = 0$, we want to find $P(0)$: $$P(0) = \frac{1 - e^{-2 \mu B/\sigma^2}}{e^{-2 \mu A/\sigma^2} - e^{-2 \mu B/\sigma^2}}$$</p>
+<h1 id="probability-of-false-negative-beta">Probability of False Negative $\beta$</h1>
+<p>A false negative occurs if the true value of $\mu$ is $\mu = \mu_1$ but the random walk falls below A before exceeding B. For simplicity, we&rsquo;ll quickly calculate that $2 \mu_1/\sigma_1^2 = 2 * \frac{0.000116}{0.00025} = 0.967$. Then we have:</p>
+<p>$$\beta = \frac{1 - e^{-0.967 B}}{e^{-0.967A} - e^{0.967 B}}$$</p>
+<h1 id="probability-of-false-positive-alpha">Probability of False Positive $\alpha$</h1>
+<p>A false positive occurs if the true value of $\mu$ is $\mu = \mu_0$ but the random walk falls exceeds B before it falls below A. We again compute: $2 \mu_0/\sigma_0^2 = 2 * \frac{-0.0001079}{0.0002001} = -1.078$</p>
+<p>$$\alpha = 1 - \frac{1 - e^{1.078 B}}{e^{1.078A} - e^{1.078 B}}$$</p>
+<p>Of course, $\alpha$ is one minus the probability of falling below A before exceeding B.</p>
+<h1 id="example-case">Example Case</h1>
+<p>We now have:</p>
+<p>$$\alpha = 1 - \frac{1 - e^{1.078 B}}{e^{1.078A} - e^{1.078 B}}$$
+$$\beta = \frac{1 - e^{-0.967 B}}{e^{-0.967A} - e^{0.967 B}}$$</p>
+<p>We can choose values for each. Let&rsquo;s say both are equal to 0.05. It&rsquo;s actually fairly tough to solve these analytically, but scipy.optimize makes quick work of a numerical solution (absolute error &lt; $10^{-10}$) and we get: A=-3.14, B=2.75 (happy belated Pi day!).</p>
+<h1 id="approximations">Approximations</h1>
+<p>With very small numbers like the one presented here, you can just as easily use Wald&rsquo;s approximation to find A and B:</p>
+<pre><code>A = np.log(beta / (1-alpha))
+B = np.log((1-beta)/alpha)
+</code></pre>
+<p>This approximation is the equivalent of assuming an unbiased random walk.</p>
+<p>For $\alpha = \beta = 0.05$, Wald&rsquo;s approximation gives -2.94, 2.94, which is quite close to the more correct versions we found. This approximation gets worse as the step updates get larger (the step updates being $\log(p_{0}/p_{1}))$ and the opposite), signifying a more substantial difference between the null and non-null hypotheses. Fortunately, it&rsquo;s fairly unusual for these hypotheses not to be directly adjacent, and so in practice we can almost always use Wald&rsquo;s approximation and save ourselves a big math headache!</p>
+<h1 id="how-long-to-finish">How Long to Finish?</h1>
+<p>To be rigorous about an SPRT, you should pre-commit to a maximum number of trials. This prevents you from giving up partway if you see a result coming that you don&rsquo;t like. This raises the question: what is the expected number of trials required for an SPRT to terminate? This time we&rsquo;ll just accept Wald&rsquo;s approximation and model the process as an unbiased random walk, which means our solution is just the first passage time of Brownian motion:</p>
+<p>$$T(x_{0}) = \dfrac{(A - x_{0})(x_{0} - B)}{\sigma^2}$$</p>
+<p>So for our all-cause mortality experiment, accepting Wald&rsquo;s approximation and using $x_0 = 0$ as our prior, we would get an expected time of roughly $2.94^2/0.0002 = 43218$ steps. The variance of this time is:</p>
+<p>$$\text{Var}[T(x_0)] = \frac{(A - x_0)(x_0 - B) \left( (A - x_0)^2 + (x_0 - B)^2 \right)}{3\sigma^4}$$</p>
+<p>Plugging in A = -2.94, B = 2.94, we get $\text{Var}[T] \approx 1.25\ \text{billion}$, so one standard deviation is about 35k. This suggests that to play it safe, you&rsquo;ll want to pre-commit to something like 115k subjects (+2 SD) to get a very high probability of getting a result, remembering that you can stop before this if needed.</p>
+<p>How does this compare to the standard frequentist approach to science? A standard power analysis would tell us that we need:</p>
+<p>$$n = \frac{\left( Z_{\alpha/2} \sqrt{2p(1 - p)} + Z_{\beta} \sqrt{p_1(1 - p_1) + p_2(1 - p_2)} \right)^2}{(p_2 - p_1)^2}$$</p>
+<p>Subjects in each group, for a total of about 140k. This means that the SPRT is anywhere from somewhat more sample efficient to WAY more sample efficient than frequentist approaches.</p>
+<hr>
+<h2 id="code">Code</h2>
+<p>Here&rsquo;s some of the code I wrote to test my math during this post using Monte Carlo simulations. It&rsquo;s not exactly pretty but has a nice visualization and you can use it to verify that the error rates are as expected.</p>
+<pre><code class="language-python">import numpy as np
+import matplotlib.pyplot as plt
+from scipy.optimize import least_squares
+import sys
+
+# Define the null hypothesis (H0: no effect or small effect)
+p0 = 0.004  # Baseline conversion rate
+
+# Define the alternative hypothesis (H1: Lift &gt; 5%)
+p1 = 0.005 # Least favorable case for &quot;p &gt; 0.005&quot;
+
+pos_update = np.log(p1 / p0)
+neg_update = np.log((1 - p1) / (1 - p0))
+u_0 = p0*pos_update + (1-p0)*neg_update
+u_1 = p1*pos_update + (1-p1)*neg_update
+s_0 = p0*(pos_update - u_0)**2 + (1-p0)*(neg_update - u_0)**2
+s_1 = p1*(pos_update - u_1)**2 + (1-p1)*(neg_update - u_1)**2
+
+print(f&quot;{u_0=} {s_0=}&quot;)
+print(f&quot;{u_1=} {s_1=}&quot;)
+
+eqn_const_0 = 2*u_0/s_0
+eqn_const_1 = 2*u_1/s_1
+
+print(f&quot;{eqn_const_0=} {eqn_const_1=}&quot;)
+
+alpha = 0.05
+beta = 0.05
+
+def solve_thresholds(vars):
+    A, B = vars
+    error_alpha = alpha - (1 - (1 - np.exp(-eqn_const_0*B))/(np.exp(-eqn_const_0*A) - np.exp(-eqn_const_0*B)))
+    error_beta = beta - (1 - np.exp(-eqn_const_1*B))/(np.exp(-eqn_const_1*A) - np.exp(-eqn_const_1*B))
+    return [error_alpha, error_beta]
+
+initial_guess = [-1, 1] # just need A &lt; 0 &lt; B
+result = least_squares(solve_thresholds, initial_guess)
+
+A, B = result.x[0], result.x[1]
+
+# beta = 0.05
+# alpha = 0.05
+# A = np.log(beta / (1-alpha))
+# B = np.log((1-beta)/alpha)
+
+print(f&quot;{A=}, {B=}&quot;)
+
+
+def update_log_likelihood_ratio(log_LR, x, p0, p1, verbose=False):
+    &quot;&quot;&quot;
+    Updates the log-likelihood ratio given a new observation x.
+    
+    log_LR: Current log-likelihood ratio
+    x: Observed data point (1 for success, 0 for failure)
+    p0: Probability under null hypothesis
+    p1: Probability under alternative hypothesis (least favorable case)
+    &quot;&quot;&quot;
+    if x == 1 or x == True:
+        log_LR += pos_update # Log-likelihood ratio update for a success
+    else:
+        log_LR += neg_update  # Update for a failure
+    return log_LR
+
+# Simulating an experiment where the true conversion rate is 11% (close to H0)
+np.random.seed(42)
+n_trials = 50000  # Maximum number of trials
+log_LR = 0  # Start log-likelihood ratio at 0
+trajectory = [log_LR]
+
+# True conversion rate for this simulation (small lift of 1%)
+true_p = 0.005
+
+# Simulate sequential observations and update log-likelihood ratio
+for _ in range(n_trials):
+    x = np.random.rand() &lt; true_p  # Generate a new observation
+    log_LR = update_log_likelihood_ratio(log_LR, x, p0, p1)
+    trajectory.append(log_LR)
+    
+    # Check stopping conditions
+    if log_LR &gt;= B:
+        decision = &quot;Accept H1 (Lift &gt; 5%)&quot;
+        break
+    elif log_LR &lt;= A:
+        decision = &quot;Accept H0 (No significant lift)&quot;
+        break
+else:
+    decision = &quot;Max trials reached (Inconclusive)&quot;
+
+# Plot the log-likelihood ratio trajectory
+plt.figure(figsize=(10, 5))
+plt.plot(trajectory, label=&quot;Log-Likelihood Ratio&quot;, color=&quot;blue&quot;)
+plt.axhline(y=A, color=&quot;red&quot;, linestyle=&quot;--&quot;, label=&quot;Lower Threshold (H0)&quot;)
+plt.axhline(y=B, color=&quot;green&quot;, linestyle=&quot;--&quot;, label=&quot;Upper Threshold (H1)&quot;)
+plt.xlabel(&quot;Number of Observations&quot;)
+plt.ylabel(&quot;Log-Likelihood Ratio&quot;)
+plt.title(&quot;Sequential Probability Ratio Test (SPRT) for H1: Lift &gt; 5% (True Lift = 1%)&quot;)
+plt.legend()
+plt.show()
+
+
+
+# Run multiple trials with new A and B
+positive_count = 0
+negative_count = 0
+n_simulations = 5000
+
+for _ in range(n_simulations):
+    log_LR = 0  # Reset log-likelihood ratio
+    for _ in range(n_trials):
+        x = np.random.rand() &lt; true_p  # Generate a new observation
+        log_LR = update_log_likelihood_ratio(log_LR, x, p0, p1)
+        
+        # Check stopping conditions with exact A and B
+        if log_LR &gt;= B:
+            positive_count += 1  # Incorrectly accept H1
+            break
+        elif log_LR &lt;= A:
+            negative_count += 1
+            break  # Correctly accept H0
+
+# Compute and output new false positive rate
+positive_rate = positive_count / n_simulations
+negative_rate = negative_count / n_simulations
+inconclusive_rate = 1 - positive_rate - negative_rate
+print(f&quot;{positive_rate=}, {negative_rate=}, {inconclusive_rate=}&quot;)
+
+scaled_pos_rate = positive_rate/(1-inconclusive_rate)
+scaled_neg_rate = negative_rate/(1-inconclusive_rate)
+print(f&quot;{scaled_pos_rate=}, {scaled_neg_rate=}&quot;)
+print(f&quot;{A=}, {B=}&quot;)
+</code></pre>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
