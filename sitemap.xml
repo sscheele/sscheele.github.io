@@ -3,10 +3,13 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>/</loc>
-    <lastmod>2025-03-07T22:30:15-05:00</lastmod>
+    <lastmod>2025-05-09T19:10:35-04:00</lastmod>
   </url><url>
     <loc>/post/</loc>
-    <lastmod>2025-03-07T22:30:15-05:00</lastmod>
+    <lastmod>2025-05-09T19:10:35-04:00</lastmod>
+  </url><url>
+    <loc>/post/robotaxi-economics/</loc>
+    <lastmod>2025-05-09T19:10:35-04:00</lastmod>
   </url><url>
     <loc>/post/sprt/</loc>
     <lastmod>2025-03-07T22:30:15-05:00</lastmod>
@@ -112,7 +115,5 @@
   </url><url>
     <loc>/post/test/</loc>
     <lastmod>2023-03-07T12:30:35-05:00</lastmod>
-  </url><url>
-    <loc>/post/untitled/</loc>
   </url>
 </urlset>
