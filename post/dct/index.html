@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Physical Intelligence&#39;s FAST and the Discrete Cosine Transform | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3YNE0SB9ZS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3YNE0SB9ZS');
+</script>
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Physical Intelligence&rsquo;s FAST and the Discrete Cosine Transform</span></h1>
+
+<h2 class="date">2025/05/21</h2>
+</div>
+
+<main>
+<p>I was recently reading about Physical Intelligence&rsquo;s new-ish <a href="https://www.physicalintelligence.company/research/fast">FAST</a> tokenizer. Formally, tokenizing an action looks like taking in a multidimensional fixed-length trajectory $\tau^{(i)} \in \mathbb{R}^D$, where $i$ is a timestep indexer and $D$ is the dimensionality of your space, and outputting a sequence of tokens whose length will almost always scale linearly with the length of the input. As an aside: you might choose to tokenize actions in joint space, which is more natural to control in, but it&rsquo;s extremely common in generalist models like the ones Physical Intelligence is working on to work in a &ldquo;task space&rdquo; (read: Cartesian space) and handle robot morphology with traditional controls.</p>
+<p>The trick of FAST is to take the multidimensional Discrete Cosine Transform (DCT) of the trajectory, round it, and do byte-pair encoding on the resulting sequence. When I first read the post and paper, my first thought was &ldquo;why not fit a cubic curve to each trajectory and use the coefficients of that instead of your DCT coefficients?&rdquo; For all I know, this might work! But in this post, I&rsquo;ll talk a bit about why the DCT idea is actually more elegant. First, we&rsquo;ll derive a DCT!</p>
+<h1 id="derivations">Derivations</h1>
+<p>I&rsquo;m going to explain how to derive the DCT under the assumption that you have some idea of what a DFT (Discrete Fourier Transform) is, without actually relying on the DFT. If you have no idea what a DFT is, there are lots of great resources out there. I also talk about it a little bit in one of my reviews of Steve Brunton&rsquo;s textbook, on <a href="https://sscheele.github.io/post/fourier-wavelet/">Fourier and Wavelet Transforms</a>, but only very briefly.</p>
+<p>The DCT is in a class of transforms called &ldquo;frequency domain transforms.&rdquo; They sound scary but are, in fact, harmless. There are two ways to think about the DCT, the normal way and my way. The normal way is a lot more elegant; my way works for me.</p>
+<h2 id="aside-variations-of-the-dct-and-dct-vs-dft">Aside: Variations of the DCT, and DCT vs DFT</h2>
+<p>The DCT is extremely similar to the DFT. In fact, the DCT is <em>identical</em> to the DFT of a signal, if you repeat mirrored versions of that signal enough times before taking the DFT (neither one typically scales out the number of samples, so this is actually only true up to a scale factor). The key difference between the DCT and the DFT is in the boundary conditions. The DFT is derived from the normal Fourier transform, which assumes an infinitely long signal. The DFT assumes a periodic signal as a way of getting around this, so if it sees the signal</p>
+<p>$$x = [1,2,3,4,5]$$
+It treats that sequence like the next number is going to be 1 (the signal repeats). This is physically unrealistic for signals like the motion of a robotic arm! It is extremely unlikely that after driving from 1 to 5, the robot will dramatically accelerate in the opposite direction. If it <em>has</em> to reverse direction, the best guess is that it will first stop, then retrace its steps. The DCT assumes exactly this: mathematically, that the signal will have an <em>even symmetry</em>, or that it will mirror itself. There are two ways this might happen:</p>
+<p>$$1,2,3,4,5\dots4,3,2,1\ \texttt{or}\ 1,2,3,4,5\dots5,4,3,2,1$$
+In other words, the last number might repeat itself, or not. Except actually, the <em>first</em> number might also repeat itself, or not, independently of the last number ($3,2,1\dots2,3$, etc). So there are a total of four different types of DCT, which are all helpfully numbered in extremely forgettable ways. The most common variant is <em>not</em>, as you would expect, the DCT-1, but the DCT-2. The DCT-2 assumes that the numbers will repeat themselves on both sides. This is equivalent, for a robot trajectory, to the assumption that the robot will stop and then go back the way it came.</p>
+<p>$$1,2,3 \dots 3,2,1 \dots 1,2,3\dots$$</p>
+<p>I will do my best to write the rest of this post in such a way that you can forget the fact that there are multiple versions of the DCT. <em>Note from future Sam: this did not work out.</em></p>
+<h2 id="the-normal-way">The Normal Way</h2>
+<p>In the normal way, we conceptualize the DCT as doing what the DFT does: pulling out the most prominent frequencies in a signal. It does this through a clever mathematical trick, which is that for any pair of integers $j$ and $k$:</p>
+<p>$$
+\begin{align}
+&amp;\int_0^{2\pi} \cos(kx) \cos(jx) dx \\
+= &amp;\int_0^{2\pi} \cos((k-j)x) + \cos((k+j)x) dx \\
+= &amp;\left[ \dfrac{1}{k-j} \sin((k-j)x) + \dfrac{1}{j+k}\sin((k+j)x) \right]_0^{2\pi}
+\end{align}
+$$</p>
+<p>When $k=j$ here, the last line cannot be solved because of division by 0, but we can rewrite the second-to-last line as $\int_0^{2\pi} 1 + \cos((k+j)x) dx$ and solve that to get a final solution of $2\pi$. For all $k \neq j$, the last line evaluates to 0 (integrating a sine wave over an integer number of periods). You might remember an almost identical integral from when I wrote about the <a href="https://sscheele.github.io/post/fourier-wavelet/">Fourier transform</a> (actually, the Fourier integral is even simpler, and works for non-integer $j$ and $k$, but it produces a complex output that we don&rsquo;t want here).</p>
+<p>More generally, if we have a function $g(x) = \cos(k_1 x) + \cos(k_2 x) + \dots$, and we integrate $g(x)\cos(jx)$ over 0 to $2\pi$, we will get 0, unless one or more of $k_i = j$.</p>
+<p>So if we have a discrete signal $g[n]$ of length $N$, we can use this orthogonality to cleverly extract the frequencies from it, because:</p>
+<p>$$\sum_{n=0}^{N-1} g[n] \cos(k \frac{2 \pi n}{N})$$
+Is an approximation of the integral we were looking at before. So we can check various multiples of the fundamental frequency of the signal (a fancy way of saying we can check frequencies which will complete integer numbers of periods in the number of samples in g). And in fact, the integral didn&rsquo;t just come out to a nonzero number for $j=k$, it came out to a <em>constant</em> number, meaning that the <em>amplitude</em> of $2 \pi k$ in $g$ is equal to that summation, up to a constant factor!</p>
+<p>The last thing we have to do is a little fix to respect the boundary conditions for the Type II DCT, which we mentioned earlier.</p>
+<p>The summation above samples like this (pictured are $k=1$ and $k=2$, for 1 and 2 periods per sample), where each &lsquo;x&rsquo; marks a place where $g[n]$ is multiplied against the cosine wave:</p>
+<p><img src="./img/cosine_samples.png" alt="">
+These samples don&rsquo;t match our boundary conditions! The next sample will be at $g[10]$, which will have a different value from $g[9]$ (it will have the same value as $g[0]$, meaning that $g$ will repeat itself like the DFT). But we said we wanted the transform to behave like $x$ was even and symmetric, where we get something like $g[8], g[9], g[9], g[8],g[7], \dots$</p>
+<p>To do this, we will use two tricks. The first trick is to apply a phase shift of half a sample to the cosine wave. For instance, for $g[0]$ we would actually sample the cosine wave at $n = 0.5$. This half-sample shift means that the last sample of our data would be taken at $n = N - 0.5$ instead of at $n = N - 1$, and the next sample, incrementing $n$ by 1, would be taken at $n = N + 0.5$. This centers a multiple of $\pi$ between the last sample of our actual signal and the first sample of our virtual, mirrored signal. Since $\cos(a \pi + \phi) = \cos(a \pi - \phi)$ for all integer values of $a$ and the argument of the cosine function is an integer multiple of $\pi$ when $n=N$, all cosine functions in the sum will have the same value for both $N + 0.5$ and $N - 0.5$ and $g[9]$ will be reproduced twice as required by the boundary conditions.</p>
+<p>Now the transform will work as expected across the reflection point, and we could (to a constant factor, because the DCT is not typically normalized) add in the reflected array and compute:</p>
+<p>$$\sum_{n=0}^{2N-1} h[n] \cos \left( \dfrac{2 \pi (n+0.5) k}{2N} \right)$$</p>
+<p>Where $h[n]$ is $g[n]$ with a reflection, having length $2N$. However, we can also save ourselves some work! Since both $h[n]$ and the cosine function are even and symmetric about $n=N$, we can use our second trick: only sample <em>half</em> a period of the cosine instead of the whole thing, and throw out. We will get exactly half the result of the full sum involving $h[n]$, but the phrase &lsquo;up to a constant factor&rsquo; appears quite a lot when you&rsquo;re talking about the DCT. So the final and actual form of the DCT is:</p>
+<p>$$\sum_{n=0}^{N-1} g[n] \cos \left( \dfrac{\pi (n+0.5) k}{N} \right)$$
+And visually, the sampling looks like this:</p>
+<p><img src="./img/samples_after_fix.png" alt=""></p>
+<h1 id="my-way">My Way</h1>
+<p>For the purpose of understanding how the DCT is built, you don&rsquo;t really have to think about ideas like &ldquo;pulling the frequencies out of a signal.&rdquo; Very often, we don&rsquo;t even care about the frequencies, we just want to project a curve into a coordinate space where we can easily sparsify it. It&rsquo;s easiest to project into orthogonal coordinate spaces because you can project into each dimension independently. From a perspective of function spaces, if we have a space and a vector</p>
+<p>$$F = \begin{bmatrix}
+a(x[1]) &amp; b(x[1]) &amp; c(x[1]) &amp; \dots \\
+a(x[2]) &amp; b(x[2]) &amp; c(x[2]) &amp; \dots \\
+a(x[3]) &amp; b(x[3]) &amp; c(x[3]) &amp; \dots \\
+\end{bmatrix}, G = \begin{bmatrix}
+g(x[1]) &amp; g(x[2]]) &amp; g(x[3])
+\end{bmatrix}
+$$</p>
+<p>If the functions $a$, $b$, and $c$ are orthogonal, then $F$ is an orthogonal basis, and $(F^T F)_{(i, j)} = &lt;f_i, f_j&gt;$ (switching here from $a, b, c$ to $f_1, f_2, f_3$ for readability), so the full matrix is just the diagonal:</p>
+<p>$$F^T F = \begin{bmatrix}
+&lt;f_1, f_{1}&gt; &amp; 0 &amp; 0 \\
+0 &amp;&lt;f_2, f_{2}&gt; &amp; 0 \\
+0 &amp; 0 &amp; &lt;f_3, f_{3}&gt; \\
+\end{bmatrix}
+$$
+If you <em>also</em> have the property that those inner products all evaluate to the same constant, then the $G F F^T  = kG$ for a constant $k$. The choice of $cos(kx)$ for our basis library is just a convenient orthonormal basis; the shift by half a sample and halving of the period are interesting tricks that make this particular basis more compelling.</p>
+<h2 id="a-humble-proposal">A Humble Proposal</h2>
+<p>One thing I like about my way of thinking about the DCT is that it makes it more clear to me how many <em>options</em> there are for bases. For example, if your actions were trajectories in a velocity space instead of physical space, you could use (checks ChatGPT) Laguerre polynomials, which also constitute an orthonormal basis but might admit an even sparser representation because they encode the assumption that the robot will stop at the end of its action (if actions are defined in short time horizons, this actually might not be true! I did not try to tokenize actions using Laguerre polynomials and don&rsquo;t actually know if it&rsquo;s better!). Here&rsquo;s a pretty chart showing the first four Laguerre polynomials:</p>
+<p><img src="./img/laguerre_polys.png" alt="">
+In fact, you don&rsquo;t even <em>need</em> an orthogonal basis! There&rsquo;s no law stopping you from projecting into any (full-rank) function space you want; you just need to invert a matrix to project back into the original space. It&rsquo;s not a terribly expensive thing to do for a 10x10 matrix, or even a 50x50 matrix - especially since you only have to do it once and can reuse the inverted matrix for future actions!</p>
+<h1 id="admiring-fast">Admiring FAST</h1>
+<p>I started this post by asking why FAST bothered doing <em>any</em> re-projection when they could just fit a polynomial to a trajectory. The answer is that by doing a re-projection into a space that&rsquo;s usually sparse (higher-frequency DCT coefficients will be at or near zero for most spatio-temporally coherent structures), the tokenizer can produce tokens that are extremely easy to learn as &ldquo;nothing to see here&rdquo;, which is super useful in directing attention. However, those coefficients <em>are</em> still there, so if a more complex action comes through the tokenization pipeline, we don&rsquo;t lose the ability to represent it. This enabled Physical Intelligence to train a transformer model to do what we&rsquo;ve typically only seen from diffusion policies, which is very neat.</p>
+<p>A polynomial fit could be a quite good approximation of most actions or a sparse representation, but it might not be both. Unless&hellip; you don&rsquo;t have to fit a least-squares polynomial. You could fit a physical model with a sparsification term, like in <a href="https://sscheele.github.io/post/data-driven-dynamics/">SINDy</a>. Or any number of other models. The DCT is super cool, but over short time horizons (3 sec?), the movement of robots just seems to me like it could be very well approximated by low-degree polynomials of some sort.</p>
+<p>Still, the FAST paper was really interesting to read. Kudos to the team at PI, it&rsquo;s also awesome that they&rsquo;re releasing stuff open-source.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

@@ -6,8 +6,15 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 09 May 2025 19:10:35 -0400</lastBuildDate>
+    <lastBuildDate>Wed, 21 May 2025 13:07:02 -0400</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Physical Intelligence&#39;s FAST and the Discrete Cosine Transform</title>
+      <link>/post/dct/</link>
+      <pubDate>Wed, 21 May 2025 13:07:02 -0400</pubDate>
+      <guid>/post/dct/</guid>
+      <description>&lt;p&gt;I was recently reading about Physical Intelligence&amp;rsquo;s new-ish &lt;a href=&#34;https://www.physicalintelligence.company/research/fast&#34;&gt;FAST&lt;/a&gt; tokenizer. Formally, tokenizing an action looks like taking in a multidimensional fixed-length trajectory $\tau^{(i)} \in \mathbb{R}^D$, where $i$ is a timestep indexer and $D$ is the dimensionality of your space, and outputting a sequence of tokens whose length will almost always scale linearly with the length of the input. As an aside: you might choose to tokenize actions in joint space, which is more natural to control in, but it&amp;rsquo;s extremely common in generalist models like the ones Physical Intelligence is working on to work in a &amp;ldquo;task space&amp;rdquo; (read: Cartesian space) and handle robot morphology with traditional controls.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Robotaxi Economics</title>
       <link>/post/robotaxi-economics/</link>
