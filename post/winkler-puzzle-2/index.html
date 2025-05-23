@@ -51,8 +51,7 @@ Use the pigeonhole principle
 <details>
 <summary>Show solution</summary>
 The largest sum any 10 integers less than or equal 100 could have is 950 (=5*190). Therefore, there are at most 950 distinct sums in the subset. 
-<p>How many ways are there to divide 10 integers into two disjoint non-empty subsets? Well, it&rsquo;s the number of ternary strings of length 10, minus the number which don&rsquo;t have at least one 1 and one 2 - in other words, it&rsquo;s the number of ternary strings of length 10 minus the number of binary strings of length 10, divided by two: $(3^{10} - 2^{10})/2$, which is much greater than 950 (why divided by two? because we consider that just swapping the contents of each set doesn&rsquo;t matter for our counting). Since there are more ways to generate sums than there are possible sums to generate, at least one sum is repeated.</p>
-<p>But if you don&rsquo;t believe me (I didn&rsquo;t bother to calculate it), there&rsquo;s a way to get the answer using just mental math: consider the number of ways to generate pairs of <em>exhaustive</em> non-empty disjoint subsets; this is just the number binary strings of length 10, minus two (for the all-zeros and all-ones strings that produce an empty subset). $2^{10}-2 = 1022$, which is also greater than 950. So even a relaxation of this problem still leaves us with a comfortable margin.</p>
+<p>There are 1023 distinct subsets of a 10-element set, so two of these subsets must have the same sum. If these subsets happen to overlap, you can discard the common elements; since you have discarded the same elements from both subsets, they will still have the same sum.</p>
 </details>
 </main>
 
