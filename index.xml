@@ -6,8 +6,15 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Wed, 21 May 2025 13:07:02 -0400</lastBuildDate>
+    <lastBuildDate>Thu, 22 May 2025 07:15:52 -0500</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Winkler Puzzle 2: Subsets of 1-100</title>
+      <link>/post/winkler-puzzle-2/</link>
+      <pubDate>Thu, 22 May 2025 07:15:52 -0500</pubDate>
+      <guid>/post/winkler-puzzle-2/</guid>
+      <description>&lt;p&gt;Here&amp;rsquo;s another Peter Winkler puzzle:&lt;/p&gt;&#xA;&lt;blockquote&gt;&#xA;&lt;p&gt;Prove that any set of 10 integers between 1 and 100 has two disjoint non-empty subsets with the same sum&lt;/p&gt;&lt;/blockquote&gt;&#xA;&lt;p&gt;Here&amp;rsquo;s a hint:&lt;/p&gt;&#xA;&lt;details&gt;&#xA;&lt;summary&gt;Show hint&lt;/summary&gt;&#xA;Use the pigeonhole principle&#xA;&lt;/details&gt;&#xA;&lt;p&gt;And the solution:&lt;/p&gt;&#xA;&lt;details&gt;&#xA;&lt;summary&gt;Show solution&lt;/summary&gt;&#xA;The largest sum any 10 integers less than or equal 100 could have is 950 (=5*190). Therefore, there are at most 950 distinct sums in the subset. &#xA;&lt;p&gt;How many ways are there to divide 10 integers into two disjoint non-empty subsets? Well, it&amp;rsquo;s the number of ternary strings of length 10, minus the number which don&amp;rsquo;t have at least one 1 and one 2 - in other words, it&amp;rsquo;s the number of ternary strings of length 10 minus the number of binary strings of length 10, divided by two: $(3^{10} - 2^{10})/2$, which is much greater than 950 (why divided by two? because we consider that just swapping the contents of each set doesn&amp;rsquo;t matter for our counting). Since there are more ways to generate sums than there are possible sums to generate, at least one sum is repeated.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Physical Intelligence&#39;s FAST and the Discrete Cosine Transform</title>
       <link>/post/dct/</link>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en-us">
-  <head><script src="/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=livereload" data-no-instant defer></script>
+  <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Winkler Puzzle 2: Summing Sets | Sam&#39;s Engineering Stuff</title>
+    <title>Winkler Puzzle 2: Subsets of 1-100 | Sam&#39;s Engineering Stuff</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/fonts.css" />
     
@@ -33,22 +33,27 @@
     </nav>
 
 <div class="article-meta">
-<h1><span class="title">Winkler Puzzle 2: Summing Sets</span></h1>
+<h1><span class="title">Winkler Puzzle 2: Subsets of 1-100</span></h1>
 
-<h2 class="date">2025/02/06</h2>
+<h2 class="date">2025/05/22</h2>
 </div>
 
 <main>
-<p>Here&rsquo;s another puzzle from <em>Mathematical Puzzles: a Connoiseur&rsquo;s Collection</em>:</p>
+<p>Here&rsquo;s another Peter Winkler puzzle:</p>
 <blockquote>
-<p>Prove that in a set of 25 numbers, it is possible to select two numbers such that no other number in the set is equal to the sum or difference of the two you selected</p></blockquote>
-<p>Warning: spoilers ahead! There&rsquo;s too much here to wrap it all in a spoiler block.</p>
-<p>Winkler&rsquo;s solution is:</p>
-<p>Let the numbers be $x_1 &lt; x_2 &lt; \cdots &lt; x_n$. If $x_n$ is unavailable to be taken as one of the desired numbers, it must be that for each lower number $x_i$, there is another $x_j$ with $x_i + x_j = x_n$. Thus, the first 24 numbers are paired in such a way that $x_i + x_{n-i} = x_n$. Now consider $x_{n-1}$ together with any of $x_2, \ldots, x_{n-2}$; these pairs sum to more than $x_n = x_{n-1} + x_1$ and so $x_2, \ldots, x_{n-2}$ must also be paired, this time satisfying $x_{2+i} + x_{n-2-i} = x_{n-1}$. But that leaves $x_{(n-1)/2}$ paired with itself, so the numbers $x_n-1, x_{(n-1)/2}$ solve the problem.</p>
-<p>I think this doesn&rsquo;t quite work! The problem is that in the second step, $x_2, \ldots, x_{n-2}$ don&rsquo;t actually have to be paired <em>with each other</em>, they have to be paired with any number in $x_1, \ldots, x_{n-2}$. So another solution is needed.</p>
-<p>I like this one:</p>
-<p>First, it&rsquo;s simple to show that you can&rsquo;t constructively build</p>
-
+<p>Prove that any set of 10 integers between 1 and 100 has two disjoint non-empty subsets with the same sum</p></blockquote>
+<p>Here&rsquo;s a hint:</p>
+<details>
+<summary>Show hint</summary>
+Use the pigeonhole principle
+</details>
+<p>And the solution:</p>
+<details>
+<summary>Show solution</summary>
+The largest sum any 10 integers less than or equal 100 could have is 950 (=5*190). Therefore, there are at most 950 distinct sums in the subset. 
+<p>How many ways are there to divide 10 integers into two disjoint non-empty subsets? Well, it&rsquo;s the number of ternary strings of length 10, minus the number which don&rsquo;t have at least one 1 and one 2 - in other words, it&rsquo;s the number of ternary strings of length 10 minus the number of binary strings of length 10, divided by two: $(3^{10} - 2^{10})/2$, which is much greater than 950 (why divided by two? because we consider that just swapping the contents of each set doesn&rsquo;t matter for our counting). Since there are more ways to generate sums than there are possible sums to generate, at least one sum is repeated.</p>
+<p>But if you don&rsquo;t believe me (I didn&rsquo;t bother to calculate it), there&rsquo;s a way to get the answer using just mental math: consider the number of ways to generate pairs of <em>exhaustive</em> non-empty disjoint subsets; this is just the number binary strings of length 10, minus two (for the all-zeros and all-ones strings that produce an empty subset). $2^{10}-2 = 1022$, which is also greater than 950. So even a relaxation of this problem still leaves us with a comfortable margin.</p>
+</details>
 </main>
 
   <footer>
