@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Dexterous Generalist Policies with Force Feedback | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3YNE0SB9ZS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3YNE0SB9ZS');
+</script>
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Dexterous Generalist Policies with Force Feedback</span></h1>
+
+<h2 class="date">2025/05/26</h2>
+</div>
+
+<main>
+<p>I&rsquo;ve been reading a lot about generalist robotic policies recently. A few days ago, <a href="https://sscheele.github.io/post/dct/">I wrote</a> about Physical Intelligence&rsquo;s FAST, which is the tokenizer for their transformer-based policy model $\pi0$, but I&rsquo;ve also been looking at a lot of the other open source work, especially work that relates to turning language into controls (for instance, <a href="https://arxiv.org/abs/2212.06817">RT-1</a>, <a href="https://arxiv.org/pdf/2307.15818">RT-2</a>, <a href="https://arxiv.org/abs/2310.08864">RT-X</a>, and <a href="https://arxiv.org/pdf/2405.12213">Octo</a> - all of these are coauthored by Chelsea Finn, a co-founder of Physical Intelligence, who as far as I can tell has worked on approximately every open source generalist model).</p>
+<p>But one thing that has really surprised me when I read about these policies: they consistently ignore tactile feedback. Why is it so common to ignore touch?</p>
+<p>Of the papers I just listed, only the Octo paper even mentions tactile feedback; they fine-tune their model to include tactile feedback to complete a peg insertion task. This seems very strange: if you look at experiments like <a href="https://www.youtube.com/watch?v=0LfJ3M3Kn80">this one</a> it seems very clear that humans rely heavily on tactile feedback to perform dexterous tasks. It&rsquo;s probably extremely easy for you to pull a single dollar bill out of your wallet or open a tupperware container without looking, once you have the objects you need in your hands already. Videos like the one I linked suggest that you could not do the same thing without feeling.</p>
+<p>Also, there are already papers that suggest that touch is extremely useful in learning robotic manipulation. <a href="https://visuoskin.github.io/">Here&rsquo;s one</a> showing that robots with touch can perform dexterous tasks like swiping credit cards and plugging in flash drives at a much higher rate than robots without it (I think these are task-specific policies, not a generalist model). <a href="https://clairelc.github.io/dexforce.github.io/">Here&rsquo;s another one</a> showing the same thing with tasks like opening an AirPods case or screwing on a nut, with even lower success rates for pure vision.</p>
+<p>These papers show that having a generalist vision policy is really important! A good vision policy allows you to get close enough to touch the right object, for one thing. Vision frequently lets you know when you&rsquo;ve failed at something, and how, which lets you try it again. I think this is the main reason that the current generalist models work as well as they do; they can easily see when they miss a grasp or something and they just try that part of the action again. So just to be clear: I think vision is important too, it just seems like touch is underrated.</p>
+<p>If touch is underrated, we still don&rsquo;t know why. It would be ridiculous to think that the people at the generalist robotics labs don&rsquo;t know it&rsquo;s important; it&rsquo;s even <em>in</em> the Octo paper, on the exact task where touch is most important (I spent a summer working on low tolerance peg insertion; as far as I know, it is universally acknowledged that you need tactile sensing to solve it reliably).</p>
+<p>I also don&rsquo;t think it&rsquo;s a data problem. It&rsquo;s true that most large robotics datasets don&rsquo;t have force or tactile data, but Isaac Lab and MuJoCo both have contact dynamics that you could use to gather simulated data*, and you could try a two-step training process where you first use larger non-force data and then fine-tune with a mixture of synthetic data and real-world force-rich data. And that&rsquo;s just the simplest approach; you could try much fancier things like trying to learn the force data (or learn simulation parameters) from a video and then putting the force data (simulated or inferred) into your large datasets.</p>
+<p>It doesn&rsquo;t make sense as a flexibility problem: you might want your generalist model to only require an absolute minimum number of sensors, but you can always train different output heads for forceful/forceless settings. Anecdotally, I very seldom do <em>reasoning</em> on my tactile feedback and so I don&rsquo;t need it as an input to the part of my neural net that contains the bulk of the parameters.</p>
+<p>So there are only a couple more things I can think of:</p>
+<ul>
+<li><strong>Dense tactile sensing hardware/software:</strong> the labs are convinced that dense tactile sensing is the most important thing, and dense tactile sensing is still somewhat in its infancy, in terms of hardware and software. It seems to me like the best dense tactile sensors are the (very clever) GelSight sensors, which use a camera covered in gel to see visually which parts of the gel are being compressed and by how much. Classic robotics simulation software like Isaac Lab and MuJoCo doesn&rsquo;t support dense tactile sensors, but there are papers/projects like <a href="https://difftactile.github.io/">DiffTactile</a> that do. So maybe the labs are waiting for that ecosystem to become more mature? This doesn&rsquo;t quite make sense to me because it doesn&rsquo;t seem like it would be <em>that</em> hard to push things forward yourself (and if you kept it closed-source, you could actually gain a competitive advantage by doing this). So maybe the answer is that the labs are currently partway through work on their closed-source contact dynamics software and we&rsquo;ll see cool results from it soon?</li>
+<li><strong>It&rsquo;s actually trivial:</strong> the labs are convinced that all the hard problems to solve are covered by vision, language, and action. Tactile sensing will be trivially easy to finetune into the models at any time (as it seems to have been for Octo) and will have a predictable impact on performance. Given this, it&rsquo;s just a waste of parameters to train it into research models that are targeting the actually important issues. This doesn&rsquo;t make sense to me because very few startups are in the business of ignoring low-hanging fruit and it&rsquo;s really silly to imagine that you can <em>perfectly predict the impact of tactile sensing on performance</em>.</li>
+<li><strong>The labs are actually doing this but they&rsquo;re keeping it secret.</strong> But why would you maintain two research pipelines and show people the results from the worse one?</li>
+<li><strong>Tactile sensing is actually not helpful.</strong> I would be shocked if this were true - at the very least it should help substantially with things like missed grasps - but I guess it&rsquo;s possible.</li>
+<li><strong>The EMH is false.</strong> Labs all suspect tactile sensing would be helpful, all believe that it would give them an edge to start gathering tactile data, etc, but none of them have gotten around to it yet because there are lots of things to work on.</li>
+</ul>
+<p>So, in conclusion, I have no idea why things are the way they are. Maturity of the software/hardware ecosystem is probably my best guess? If you&rsquo;re someone from one of the generalist robotics labs, I would love to hear from you.</p>
+<hr>
+<p>* As I mention later, I think you could get simple contact dynamics like normal and frictional forces from MuJoCo and Isaac, but they don&rsquo;t support dense tactile sensing.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

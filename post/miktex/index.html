@@ -39,6 +39,8 @@
 </div>
 
 <main>
+<p><em>UPDATE May 2025 - in the last months, it seems that Arch got tlmgr compatibility. At the same time, Miktex has been slow to release versions that link against the latest versions of boost, meaning that you have to build it yourself or keep making symlinks to duct tape it together. I would not recommend the use of miktex on Arch. I now use tlmgr myself, and recommend that you install the <code>collection-fontsrecommended</code> tlmgr package to save yourself a bit of headache.</em></p>
+<hr>
 <p>I recently got a new laptop and had to reinstall latex. The default way to do this is to install TeXLive with pacman, which is packaged into a set of groups which contain anything from the most basic installation (<code>texlive-basic</code>) to a virtually exhaustive installation (some combination of <code>texlive-latexextra</code>, <code>texlive-fontsextra</code> and a few others). I initially opted to install <code>texlive-latexrecommended</code>, until I tried to compile a document and realized I was missing <code>fullpage.sty</code>. This was only available in <code>texlive-latexextra</code>, and I also needed a font that was only present in <code>texlive-fontsextra</code>. So to get about 200 kB of .sty files, I was supposed to install &gt;2 GB of packages.</p>
 <p>Fortunately, I learned about MikTeX and made the switch. MikTeX, as I understand it, wraps traditional LaTeX tools like <code>pdflatex</code> in a script that detects missing .sty files and installs them (automatically, if so configured). Their motto is &ldquo;Just enough TeX.&rdquo; The installation requires a few steps, so I&rsquo;m documenting here:</p>
 <ol>
@@ -62,7 +64,7 @@ package() {
 }
 </code></pre>
 <p>A quick <code>makepkg -si</code> and your LaTeX dependencies are forever satisfied.</p>
-<p>Note: it is possible to install something like &ldquo;Just enough TeX&rdquo; using <code>tlmgr</code> manually, which I would normally be perfectly happy to do. I&rsquo;m using MikTeX because the version of <code>tlmgr</code> that ships with MikTeX is broken; the <a href="https://wiki.archlinux.org/title/TeX_Live#tlmgr">Arch wiki</a> describes a manual process for fixing it which must be re-run every time you update <code>texlive-basic</code>. This seems a little absurd to me, even if it does eliminate the OpenJDK dependency.</p>
+<p>Note: it is possible to install something like &ldquo;Just enough TeX&rdquo; using <code>tlmgr</code> manually, which I would normally be perfectly happy to do. I&rsquo;m using MikTeX because the version of <code>tlmgr</code> that ships with LaTeX is broken; the <a href="https://wiki.archlinux.org/title/TeX_Live#tlmgr">Arch wiki</a> describes a manual process for fixing it which must be re-run every time you update <code>texlive-basic</code>. This seems a little absurd to me, even if it does eliminate the OpenJDK dependency.</p>
 
 </main>
 

@@ -6,8 +6,15 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Thu, 22 May 2025 07:15:52 -0500</lastBuildDate>
+    <lastBuildDate>Mon, 26 May 2025 15:32:34 -0400</lastBuildDate>
     <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Dexterous Generalist Policies with Force Feedback</title>
+      <link>/post/dexterous-feedback/</link>
+      <pubDate>Mon, 26 May 2025 15:32:34 -0400</pubDate>
+      <guid>/post/dexterous-feedback/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve been reading a lot about generalist robotic policies recently. A few days ago, &lt;a href=&#34;https://sscheele.github.io/post/dct/&#34;&gt;I wrote&lt;/a&gt; about Physical Intelligence&amp;rsquo;s FAST, which is the tokenizer for their transformer-based policy model $\pi0$, but I&amp;rsquo;ve also been looking at a lot of the other open source work, especially work that relates to turning language into controls (for instance, &lt;a href=&#34;https://arxiv.org/abs/2212.06817&#34;&gt;RT-1&lt;/a&gt;, &lt;a href=&#34;https://arxiv.org/pdf/2307.15818&#34;&gt;RT-2&lt;/a&gt;, &lt;a href=&#34;https://arxiv.org/abs/2310.08864&#34;&gt;RT-X&lt;/a&gt;, and &lt;a href=&#34;https://arxiv.org/pdf/2405.12213&#34;&gt;Octo&lt;/a&gt; - all of these are coauthored by Chelsea Finn, a co-founder of Physical Intelligence, who as far as I can tell has worked on approximately every open source generalist model).&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Winkler Puzzle 2: Subsets of 1-100</title>
       <link>/post/winkler-puzzle-2/</link>
@@ -69,7 +76,7 @@
       <link>/post/miktex/</link>
       <pubDate>Sun, 18 Aug 2024 22:33:50 -0400</pubDate>
       <guid>/post/miktex/</guid>
-      <description>&lt;p&gt;I recently got a new laptop and had to reinstall latex. The default way to do this is to install TeXLive with pacman, which is packaged into a set of groups which contain anything from the most basic installation (&lt;code&gt;texlive-basic&lt;/code&gt;) to a virtually exhaustive installation (some combination of &lt;code&gt;texlive-latexextra&lt;/code&gt;, &lt;code&gt;texlive-fontsextra&lt;/code&gt; and a few others). I initially opted to install &lt;code&gt;texlive-latexrecommended&lt;/code&gt;, until I tried to compile a document and realized I was missing &lt;code&gt;fullpage.sty&lt;/code&gt;. This was only available in &lt;code&gt;texlive-latexextra&lt;/code&gt;, and I also needed a font that was only present in &lt;code&gt;texlive-fontsextra&lt;/code&gt;. So to get about 200 kB of .sty files, I was supposed to install &amp;gt;2 GB of packages.&lt;/p&gt;</description>
+      <description>&lt;p&gt;&lt;em&gt;UPDATE May 2025 - in the last months, it seems that Arch got tlmgr compatibility. At the same time, Miktex has been slow to release versions that link against the latest versions of boost, meaning that you have to build it yourself or keep making symlinks to duct tape it together. I would not recommend the use of miktex on Arch. I now use tlmgr myself, and recommend that you install the &lt;code&gt;collection-fontsrecommended&lt;/code&gt; tlmgr package to save yourself a bit of headache.&lt;/em&gt;&lt;/p&gt;</description>
     </item>
     <item>
       <title>Brunton Textbook Review - Data Driven Control</title>
