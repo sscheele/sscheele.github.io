@@ -6,8 +6,15 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Mon, 26 May 2025 15:32:34 -0400</lastBuildDate>
+    <lastBuildDate>Tue, 10 Jun 2025 11:53:58 -0400</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Interruptible Splines</title>
+      <link>/post/interruptible-splines/</link>
+      <pubDate>Tue, 10 Jun 2025 11:53:58 -0400</pubDate>
+      <guid>/post/interruptible-splines/</guid>
+      <description>&lt;p&gt;I&amp;rsquo;ve seen a few papers recently about the concept of what I think of as &amp;ldquo;trajectory interruption.&amp;rdquo; Robotics policies which generate action chunks have the issue that chunks sometimes overlap. If the current running action chunk is scheduled to end in 5 seconds, and a new chunk arrives right now, what do you do? You could design your policy so that new chunks begin where old chunks end; the issue with this is that your robot will be unable to react to perceptual inputs for &lt;em&gt;at least&lt;/em&gt; the length of a full chunk, and maybe longer if computing those chunks isn&amp;rsquo;t guaranteed to take negligible time. So a better approach is to solve a bunch of chunks under realistic conditions, compute a 99th percentile time or something, and schedule new chunks to start at that time (you need to schedule the chunk start time in advance because you typically need to know where the robot will start to solve the chunk). Obviously, the length of a chunk needs to be at least the solution time or you can&amp;rsquo;t run in real time.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Dexterous Generalist Policies with Force Feedback</title>
       <link>/post/dexterous-feedback/</link>
