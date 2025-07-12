@@ -6,8 +6,15 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 10 Jun 2025 11:53:58 -0400</lastBuildDate>
+    <lastBuildDate>Fri, 11 Jul 2025 19:54:04 -0400</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Geodetic Buffer</title>
+      <link>/post/geodetic-buffer/</link>
+      <pubDate>Fri, 11 Jul 2025 19:54:04 -0400</pubDate>
+      <guid>/post/geodetic-buffer/</guid>
+      <description>&lt;p&gt;In the Beaver Works Summer Institute course in Remote Sensing Disaster Response, which I&amp;rsquo;ve taught for the last two years, we do a lot of GIS work. One exercise I thought might be fun for the students was writing some code to cheat at &lt;a href=&#34;https://globle-game.com/game&#34;&gt;Globle&lt;/a&gt;. Globle is a game where you try to guess a secret country. Every time you make a guess, Globle tells you how far the secret country is from your guessed country. Distances are computed as the nearest border-to-border distance (the distance between Canada and the US is 0).&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Interruptible Splines</title>
       <link>/post/interruptible-splines/</link>

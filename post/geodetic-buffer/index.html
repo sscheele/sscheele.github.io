@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Geodetic Buffer | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3YNE0SB9ZS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3YNE0SB9ZS');
+</script>
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Geodetic Buffer</span></h1>
+
+<h2 class="date">2025/07/11</h2>
+</div>
+
+<main>
+<p>In the Beaver Works Summer Institute course in Remote Sensing Disaster Response, which I&rsquo;ve taught for the last two years, we do a lot of GIS work. One exercise I thought might be fun for the students was writing some code to cheat at <a href="https://globle-game.com/game">Globle</a>. Globle is a game where you try to guess a secret country. Every time you make a guess, Globle tells you how far the secret country is from your guessed country. Distances are computed as the nearest border-to-border distance (the distance between Canada and the US is 0).</p>
+<p>Intuitively, this should be easy! We mostly use geopandas, and geopandas&rsquo; geometries are all shapely objects. Shapely objects have a <code>.buffer</code> method that adds a buffer of a specified size, so you <em>should</em> be able to just:</p>
+<ol>
+<li>Make a guess</li>
+<li>Take the guessed country border polygons</li>
+<li>Buffer them</li>
+<li>Look at where they intersect with other countries&rsquo; borders (or with other buffered borders)</li>
+</ol>
+<p>Sadly, nothing is ever easy. Shapely is a planar geometry package. If you buffer a shapely polygon in geopandas, geopandas will do its best to respect the fact that the Earth is not flat by wrapping any sections that pass though the antimeridian around the edges of the map. Unfortunately, this has the side effect of usually ruining shapely&rsquo;s expectation that a polygon is defined by the coordinates of its perimeter <em>in counterclockwise order</em>. Visually, this can look like an inversion between the inside and outside of the polygon:</p>
+<p><img src="./img/incorrect.png" alt=""></p>
+<p>Note: this is purely an example of buffering country borders, not a real Globle problem.</p>
+<p>So I wrote this geodesic buffer code to correctly detect when points in a polygon got wrapped around the antimeridian and handle it by splitting the wrapped polygon into a MultiPolygon:</p>
+<pre><code class="language-python">import geopandas as gpd
+from shapely.geometry import Point, LinearRing
+from shapely.geometry import LinearRing, Polygon, MultiPolygon
+
+def split_polygon_on_antimeridian(coords):
+    # ensure closure
+    pts = list(coords)
+    if pts[0] != pts[-1]:
+        pts.append(pts[0])
+
+    # split into raw rings at each discontinuity
+    rings = []
+    current = [pts[0]]
+    for prev, curr in zip(pts[:-1], pts[1:]):
+        if abs(curr[0] - prev[0]) &gt; 180:
+            rings.append(current)
+            current = [curr]
+        else:
+            current.append(curr)
+    rings.append(current)
+
+    # if exactly three fragments, merge 1st+3rd into one ring
+    if len(rings) == 3:
+        first, middle, last = rings
+        rings = [ first[:-1] + last, middle ]
+
+    # build polygons, ensuring each ring is closed and ccw
+    parts = []
+    for ring in rings:
+        if ring[0] != ring[-1]:
+            ring.append(ring[0])
+        lr = LinearRing(ring)
+        poly = Polygon(lr) if lr.is_ccw else Polygon(lr.coords[::-1])
+        parts.append(poly)
+
+    if not parts:
+        return Polygon(pts)
+    return MultiPolygon(parts) if len(parts) &gt; 1 else parts[0]
+
+def geodesic_buffer(geometry, radius_km):
+    centroid = geometry.centroid
+    lon, lat = centroid.x, centroid.y
+
+    # Define an azimuthal projection centered on this country
+    aeqd_proj = CRS.from_proj4(f&quot;+proj=aeqd +lat_0={lat} +lon_0={lon} +datum=WGS84 +units=m +no_defs&quot;)
+
+    # country_proj = gpd.GeoSeries(geometries, crs=&quot;EPSG:4326&quot;)
+    country_proj = gpd.GeoDataFrame(dict(geometry=[geometry]), crs=&quot;EPSG:4326&quot;).to_crs(aeqd_proj)
+    buffered = country_proj.buffer(radius_km * 1000)  # meters
+
+    # Reproject back to WGS84
+    buffered_wgs84 = gpd.GeoSeries(buffered, crs=aeqd_proj).to_crs(&quot;EPSG:4326&quot;)
+
+    all_buffered = []
+    for buf_g in buffered_wgs84:
+        coords = list(buf_g.exterior.coords)
+        split_buffered = split_polygon_on_antimeridian(coords)
+        all_buffered.append(split_buffered)
+
+    return gpd.GeoSeries(all_buffered, crs=&quot;EPSG:4326&quot;)
+</code></pre>
+<p>Now the buffered polygons display properly!!</p>
+<p><img src="./img/correct.png" alt=""></p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
