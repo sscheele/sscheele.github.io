@@ -72,10 +72,12 @@ def split_polygon_on_antimeridian(coords):
             current.append(curr)
     rings.append(current)
 
-    # if exactly three fragments, merge 1st+3rd into one ring
-    if len(rings) == 3:
-        first, middle, last = rings
-        rings = [ first[:-1] + last, middle ]
+    # every other ring is part of the main polygon, merge them
+    if len(rings) &gt;= 3:
+        start = []
+        for i in range(0, len(rings), 2):
+            start.extend(rings[i])
+        rings = rings[1::2] + [start]
 
     # build polygons, ensuring each ring is closed and ccw
     parts = []
@@ -90,7 +92,7 @@ def split_polygon_on_antimeridian(coords):
         return Polygon(pts)
     return MultiPolygon(parts) if len(parts) &gt; 1 else parts[0]
 
-def geodesic_buffer(geometry, radius_km):
+def make_geodesic_buffer(geometry, radius_km):
     centroid = geometry.centroid
     lon, lat = centroid.x, centroid.y
 
@@ -103,14 +105,14 @@ def geodesic_buffer(geometry, radius_km):
 
     # Reproject back to WGS84
     buffered_wgs84 = gpd.GeoSeries(buffered, crs=aeqd_proj).to_crs(&quot;EPSG:4326&quot;)
-
+    
     all_buffered = []
-    for buf_g in buffered_wgs84:
+    for buf_g in buffered_wgs84:            
         coords = list(buf_g.exterior.coords)
         split_buffered = split_polygon_on_antimeridian(coords)
         all_buffered.append(split_buffered)
 
-    return gpd.GeoSeries(all_buffered, crs=&quot;EPSG:4326&quot;)
+    return gpd.GeoSeries(all_buffered, crs=&quot;EPSG:4326&quot;) #buffered_wgs84
 </code></pre>
 <p>Now the buffered polygons display properly!!</p>
 <p><img src="./img/correct.png" alt=""></p>
