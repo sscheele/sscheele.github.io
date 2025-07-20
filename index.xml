@@ -6,8 +6,15 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Fri, 11 Jul 2025 19:54:04 -0400</lastBuildDate>
+    <lastBuildDate>Sat, 19 Jul 2025 20:49:52 -0400</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>GET Zero-J</title>
+      <link>/post/get-zero-j/</link>
+      <pubDate>Sat, 19 Jul 2025 20:49:52 -0400</pubDate>
+      <guid>/post/get-zero-j/</guid>
+      <description>&lt;p&gt;One really wonderful property for a generalist robotics model to have would be for it to generalize across embodiments. There are two main reasons for this:&lt;/p&gt;&#xA;&lt;ol&gt;&#xA;&lt;li&gt;If, as a roboticist, you want to deploy to new hardware, it is obviously preferable to just copy the same model over and be done, rather than laboriously training a new foundation model from scratch&lt;/li&gt;&#xA;&lt;li&gt;It will typically be possible to train a model that&amp;rsquo;s supposed to generalize across embodiments on data collected from multiple embodiments. This opens the door to doing something like downloading lots of YouTube videos of humans and using human pose detection (maybe with a little bit of motion retargeting) to present those videos as training samples of a humanoid robot morphology.&lt;/li&gt;&#xA;&lt;/ol&gt;&#xA;&lt;p&gt;A truly general cross-embodiment model (one that is capable of zero-shot generalization to novel embodiments) requires some way to represent the embodiment it&amp;rsquo;s currently using. This is a tricky problem! I&amp;rsquo;ll briefly digress to mention that the words &amp;ldquo;embodiment&amp;rdquo; and &amp;ldquo;morphology&amp;rdquo; mean very similar but distinct things in robotics. Generally, &amp;rsquo;embodiment&amp;rsquo; can be used to refer to virtually any aspect of the mechanical design of a robot, whereas &amp;lsquo;morphology&amp;rsquo; refers only to the kinematic aspects like link geometries and joint types. So for instance, rubber being applied to a gripper to make it more frictive is part of the embodiment, but not part of the morphology. When most robotics papers talk about &amp;lsquo;generalizing across embodiments&amp;rsquo;, as of 2025, they are being aspirational. Currently, we would very much like to generalize well across morphologies. To do this, a nice starting point would be able to take in a kinematic graph and output joint-space commands to perform some task using the morphology that graph represents.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Geodetic Buffer</title>
       <link>/post/geodetic-buffer/</link>
