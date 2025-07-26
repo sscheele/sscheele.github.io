@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Fix Epub Script | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3YNE0SB9ZS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3YNE0SB9ZS');
+</script>
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Fix Epub Script</span></h1>
+
+<h2 class="date">2025/07/26</h2>
+</div>
+
+<main>
+<p>I almost hesitate to post this here, because it&rsquo;s not particularly technically interesting, but this blog is partially notes for my future self. I frequently read ebooks on my phone in the epub format. Epub has gone through a few major versions and some epubs now don&rsquo;t work with major epub readers. On my old laptop, I had a script called <code>fix_ebook.sh</code> that would attempt a number of common fixes, like upgrading the format version and converting the epub to mobi and back. Unfortunately, I lost that script, but fortunately, ChatGPT one-shotted a new version for me! The new version is much more professionally formatted than the old version and has optional round-trip mobi conversion (default off). Default usage is:</p>
+<p><code>./fix_ebook.sh my_book.epub</code></p>
+<p>And round-trip conversion with:</p>
+<p><code>./fix_ebook.sh -r my_ebook.epub</code></p>
+<p>Both will produce a my_ebook.fixed.epub. This script has Calibre as a dependency (Calibre provides CLI conversion tools).</p>
+<p>You can get the script <a href="./res/fix_ebook.sh">here</a></p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+

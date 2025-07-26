@@ -6,8 +6,15 @@
     <description>Recent content in Home on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 19 Jul 2025 20:49:52 -0400</lastBuildDate>
+    <lastBuildDate>Sat, 26 Jul 2025 11:42:56 -0400</lastBuildDate>
     <atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Fix Epub Script</title>
+      <link>/post/fix-ebook/</link>
+      <pubDate>Sat, 26 Jul 2025 11:42:56 -0400</pubDate>
+      <guid>/post/fix-ebook/</guid>
+      <description>&lt;p&gt;I almost hesitate to post this here, because it&amp;rsquo;s not particularly technically interesting, but this blog is partially notes for my future self. I frequently read ebooks on my phone in the epub format. Epub has gone through a few major versions and some epubs now don&amp;rsquo;t work with major epub readers. On my old laptop, I had a script called &lt;code&gt;fix_ebook.sh&lt;/code&gt; that would attempt a number of common fixes, like upgrading the format version and converting the epub to mobi and back. Unfortunately, I lost that script, but fortunately, ChatGPT one-shotted a new version for me! The new version is much more professionally formatted than the old version and has optional round-trip mobi conversion (default off). Default usage is:&lt;/p&gt;</description>
+    </item>
     <item>
       <title>GET Zero-J</title>
       <link>/post/get-zero-j/</link>
