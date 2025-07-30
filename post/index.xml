@@ -6,8 +6,15 @@
     <description>Recent content in Posts on Sam&#39;s Engineering Stuff</description>
     <generator>Hugo</generator>
     <language>en-us</language>
-    <lastBuildDate>Sat, 26 Jul 2025 11:42:56 -0400</lastBuildDate>
+    <lastBuildDate>Wed, 30 Jul 2025 10:10:26 -0400</lastBuildDate>
     <atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Review: Open Source Robots</title>
+      <link>/post/open-source-robots/</link>
+      <pubDate>Wed, 30 Jul 2025 10:10:26 -0400</pubDate>
+      <guid>/post/open-source-robots/</guid>
+      <description>&lt;p&gt;When the US shut down for COVID in the summer of 2020, my internship was cancelled and I had to stay home like everyone else. Fortunately, I managed to find a robotics research project that I could work on remotely in Dr. Sonia Chernova&amp;rsquo;s RAIL lab at Georgia Tech. Even cooler: since no one could go into the lab, they let me take home a robot arm (a Jaco gen 2) so I could work on it. I love robots and I was super excited to have one in my house, so I drove from Washington DC all the way to Atlanta to pick up the arm. When I arrived at the lab, they handed over the robot and a form for me to sign explaining that if I broke the robot, I would have to pay the replacement cost of&amp;hellip; $40,000. As I signed the form, I realized that if I got in a car crash on the way back, I could replace the car for much less than the cost of the robot.&lt;/p&gt;</description>
+    </item>
     <item>
       <title>Fix Epub Script</title>
       <link>/post/fix-ebook/</link>

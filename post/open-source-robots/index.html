@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Review: Open Source Robots | Sam&#39;s Engineering Stuff</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-3YNE0SB9ZS"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-3YNE0SB9ZS');
+</script>
+
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/about/">About</a></li>
+      
+      <li><a href="/index.xml">Subscribe</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Review: Open Source Robots</span></h1>
+
+<h2 class="date">2025/07/30</h2>
+</div>
+
+<main>
+<p>When the US shut down for COVID in the summer of 2020, my internship was cancelled and I had to stay home like everyone else. Fortunately, I managed to find a robotics research project that I could work on remotely in Dr. Sonia Chernova&rsquo;s RAIL lab at Georgia Tech. Even cooler: since no one could go into the lab, they let me take home a robot arm (a Jaco gen 2) so I could work on it. I love robots and I was super excited to have one in my house, so I drove from Washington DC all the way to Atlanta to pick up the arm. When I arrived at the lab, they handed over the robot and a form for me to sign explaining that if I broke the robot, I would have to pay the replacement cost of&hellip; $40,000. As I signed the form, I realized that if I got in a car crash on the way back, I could replace the car for much less than the cost of the robot.</p>
+<p>But it&rsquo;s a thrill to be a roboticist today, not least because the costs just keep coming down. On the commercial side, we&rsquo;ve seen the R1 from Unitree, a 26-dof humanoid that costs just \$6k. I would have been much happier to pay \$7k for a robot with hands, but it&rsquo;s still very impressive! And in the open-source research/wealthy hobbyist domain, we have a couple of low-cost open source hardware entries: K-Scale Labs&rsquo; K-Bot (an approx \$9k humanoid, which does have two-finger grippers by default), and Enactic&rsquo;s OpenArm (a bimanual system with a \$6.5k BOM, though you have to fabricate a lot of it yourself). Since the latter two systems use open-source hardware, I wanted to take a look at how they&rsquo;re built!</p>
+<p>My main sources for this post are <a href="https://www.youtube.com/watch?v=qhZi9rtdEKg">this video</a> for the K-Bot and <a href="https://docs.openarm.dev/hardware/">the main hardware docs</a> for OpenArm. It&rsquo;s worth noting that both K-Bot and OpenArm are, as of this writing, very recent releases, to the extent that the documentation for each project is very much a work in progress and has substantial missing content. So for example, the K-Bot hardware design will eventually be on <a href="https://github.com/kscalelabs/kbot/tree/master/mechanical">their github</a>, but currently the folder that&rsquo;s supposed to contain the design files is empty.</p>
+<h1 id="k-bot">K-Bot</h1>
+<p>The K-Bot gets 4 hours of normal operation per charge of its 12 Ah battery. Its actuators are integrated QDD (quasi-direct drive) motors from a vendor called RobStride. <a href="https://www.robstride.com/">RobStride&rsquo;s website</a> seems to be down, so I haven&rsquo;t been able to get specs or pricing on their actuators, but they have an <a href="https://www.aliexpress.com/store/1103506059">AliExpress storefront</a> where you can get their motor modules for anywhere from \$250 (for the RobStride 02, up to 17Nm torque, used in K-Bot for the elbow joint) to \$450 (for the RobStride 04, up to 120Nm, used for the hip and knee joints).</p>
+<p>A quick note on QDD modules: Quasi-Direct Drive is <em>technically</em> just techspeak for &ldquo;low gear ratio.&rdquo; A low gear ratio means that you can backdrive a motor, so the joints have a bit of compliance to them. However, for reasons I&rsquo;ll be getting into, QDD modules almost always include:</p>
+<ul>
+<li>A motor (generally brushless DC)</li>
+<li>A gearbox</li>
+<li>Dual encoders (one directly on the motor, one after the gearbox)</li>
+<li>A FOC (Field-Oriented Control) module, which includes an amp-meter and ESC, and may also include the motor encoder</li>
+</ul>
+<p>Field-Oriented Control is a fancy way of controlling DC motors by doing partial, rather than binary, activation of the stators, in a way that keeps the magnetic force exerted on the rotor perpendicular to the rotor. This means that FOC provides both constant torque and better power efficiency (and better thermal performance) than commutated control, which is the default way to control a motor. To learn more about FOC, I recommend <a href="https://www.youtube.com/watch?v=YPD1_rcXBIE">this video</a>, which has a nice level of information density even though they don&rsquo;t work very hard to jazz it up.</p>
+<p>One thing you can do with FOC is torque control, which would otherwise be difficult or impossible for a DC motor but which is quite important for a robot (for safety, but also for dexterous manipulation or agile motions, which often require compliance or torque control). However, FOC needs to know the current rotor position and amount of electrical current to provide the right voltages to each stator coil - hence the encoder directly on the motor. And of course, due to compliance and imperfect tolerances in the gearbox (and also because of symmetries that we can&rsquo;t resolve without prior information), we can&rsquo;t just infer the joint angle from the motor encoder, so we need a joint encoder after the gearbox as well. All of this is a more-or-less inevitable aspect of robot design, and QDD modules package all it into a single unit.</p>
+<p>You could build the equivalent of a QDD module yourself, and maybe even get certain benefits (for instance, you can package things differently or handle cooling in some special way), but it looks to me like the RobStride QDDs are being sold at just about the cost of their components unless you&rsquo;re working at a huge scale.</p>
+<p><strong>Other notes on the K-Bot</strong>: it was interesting how much attention they paid to wire routing and making it easy to model. They also mentioned making a number of design decisions to improve maintainability for researchers/hobbyists, which is cool. I think my biggest question was: what makes this more expensive than the Unitree R1? Both bots are made almost entirely from Chinese-sourced components. The answer I got was: partially because the K-Bot does have higher-quality hardware (a bigger battery and beefier actuators), and partially because the R1 is being amortized over a larger production run at a large robotics company, so they have a lot of economies of scale. Also, the K-Bot does advertise as being &ldquo;Made in America&rdquo;, meaning assembled in America, meaning they have a more expensive supply chain and pay more for labor. Making the robot in China seems like the only obvious Pareto improvement on K-Bot; other attempts to reduce price seem likely to sacrifice capabilities. Note, however, that I say this without access to a bill of materials for the bot. In any case, massive props to the K-Bot team!</p>
+<h1 id="openarm">OpenArm</h1>
+<p>OpenArm is a stationary bimanual robot design, each arm is 7dof. Enactic does not currently sell OpenArm and they are based in Japan, so they might not pay the same prices that I do in the US, but the BOM they give shows a total cost of $6,500 for the full bimanual system. The arms have a 4.1kg (8 pound) peak nominal load with the arm fully extended perpendicular to the load (holding for one minute). The shoulder joint is a 20Nm DAMIAO DM8009P QDD module. Interestingly, they use a mix of QDD and more stiff actuators (the DM8009P has a 9:1 gear ratio, but the second shoulder joint is actuated by a DM4340, with a 40:1 gear ratio). Maybe this helps resolve under-defined behavior when backdriving the arm?</p>
+<p>OpenArm is substantially better documented than K-Bot at the moment, and from their published BOM we can see that the QDD modules are 41% of the total cost of the system (though they don&rsquo;t have a battery), with another 50% of the cost coming from the mechanical components. Most of the mechanical components are made of metal, a fair bit of sheet metal but also some custom CNC parts. This also seems like a good place to mention that OpenArm mostly seems to be aimed at people with access to a fairly high-quality fabrication facility with CNC machines and metalworking tools (or who are comfortable wrangling fabrication vendors - OpenArm does provide CAD files you can send to other services). I think they eventually have plans to sell a kit, but so far <a href="https://docs.openarm.dev/getting-started/purchase/">that page on their website</a> just says it will happen at some point, and notes that they are &ldquo;actively seeking manufacturing partners.&rdquo;</p>
+<h1 id="bonus-robot-robotstudio-so-101">Bonus Robot: RobotStudio SO-101</h1>
+<p>I&rsquo;ll also give an honorable mention of sorts to the LeRobot/RobotStudio/HuggingFace <a href="https://github.com/TheRobotStudio/SO-ARM100">SO-101 arm system</a>. It has the excellent distinction of being the only system on here that&rsquo;s priced accessibly to high school students ($400 <a href="https://partabot.com/products/so-arm101?variant=43026077122675">here</a>, less than a Nintendo Switch 2!), but sadly it doesn&rsquo;t produce very beautiful motion. I think this is a combination of using cheap servos and high gear ratios for their actuators and not using any bearings in the arm (the interfaces are 3D printed - I imagine this also hurts durability a lot but I don&rsquo;t know that for a fact). Using servos for your joints also means that you only get position control. Still, it&rsquo;s really cool to see a sort of minimum viable robot, and in combination with Octo or other open-source general policies it means that you can get a generally intelligent robot in your house, today, for under $500.</p>
+<h1 id="i-think-i-can">I think I CAN</h1>
+<p>Last section: I was a little surprised to see that the default bus for K-Bot and OpenArm is CAN! CAN (Controller Area Network) is a bus that&rsquo;s most common in cars, and I had sort of written it off without giving it a chance when I was an undergrad because I saw it had <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC7219335/">a lot of security issues</a> and also because Tesla made an effort to <a href="https://www.autoevolution.com/news/tesla-patents-modular-wiring-system-that-will-make-a-wiring-harness-and-can-bus-obsolete-225672.html">stop using it</a> back when Tesla was making a lot of excellent engineering decisions. However, CAN is actually a sensible bus to use in a lot of robotic applications. Probably its strongest selling point is that it&rsquo;s very simple to implement, and it&rsquo;s already supported for lots of hardware (actually, many integrated QDD modules accept CAN input directly). It turns out that Tesla didn&rsquo;t completely switch from CAN to Ethernet, they just added an Ethernet bus that they used for higher-bandwidth sensors. Good to know!</p>
+<p>So to close out - I&rsquo;m super excited about all the open-source robot designs coming out. Delivering a polished experience is important for companies that are creating early-stage general-purpose technologies (eg, Apple in the &rsquo;80s), but ultimately a lot of the value that gets created by general-purpose technologies originates from people besides the ones building the platform, so there&rsquo;s an interesting balance to strike from a business perspective. In the meanwhile, there&rsquo;s never been a more exciting time to be alive if you love robots. The K-Scale Labs people made a great point in their video: the actuators that represent a large fraction of the BOM for these robots have been getting dramatically better and cheaper in the last few years. Lithium ion battery costs are looking like they might plateau, but new battery chemistries look interesting and might get us even cheaper in the long term. And in the meanwhile, the fact that I can get a full bimanual system in 2025 for one sixth of what I would have paid in 2020 is insane and thrilling.</p>
+
+</main>
+
+  <footer>
+  <script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<link rel="stylesheet"
+      href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
+  
+  <hr/>
+  © Sam Scheele | <a href="https://github.com/sscheele">Github</a>
+  
+  </footer>
+  </body>
+</html>
+
